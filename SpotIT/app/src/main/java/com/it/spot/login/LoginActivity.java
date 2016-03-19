@@ -1,9 +1,13 @@
 package com.it.spot.login;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -18,6 +22,9 @@ import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.maps.MapsActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginActivity extends IdentityActivity {
 
@@ -94,6 +101,13 @@ public class LoginActivity extends IdentityActivity {
 
 		Log.d(Constants.APP + Constants.SIGN_IN, "buttonSignIn()");
 
+		if(checkAndRequestPermissionGET_ACCOUNTS()) {
+			startSignIn();
+		}
+	}
+
+	public void startSignIn() {
+
 		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
 		startActivityForResult(signInIntent, Constants.RC_SIGN_IN);
 	}
@@ -162,5 +176,55 @@ public class LoginActivity extends IdentityActivity {
 		Intent intent = new Intent(this, MapsActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		startActivity(intent);
+	}
+
+// -------------------------------------------------------------------------------------------------
+// PERMISSIONS
+// -------------------------------------------------------------------------------------------------
+
+	private  boolean checkAndRequestPermissionGET_ACCOUNTS() {
+
+		List<String> listPermissionsNeeded = new ArrayList<>();
+
+		int permissionGetAccounts = ContextCompat.checkSelfPermission(this,
+				Manifest.permission.GET_ACCOUNTS);
+
+		if (permissionGetAccounts != PackageManager.PERMISSION_GRANTED) {
+			listPermissionsNeeded.add(Manifest.permission.GET_ACCOUNTS);
+		}
+
+		if (!listPermissionsNeeded.isEmpty()) {
+			ActivityCompat.requestPermissions(this,
+					listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),
+					Constants.REQUEST_ID_GET_ACCOUNTS);
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+
+		switch (requestCode) {
+			case Constants.REQUEST_ID_GET_ACCOUNTS: {
+
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0
+						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+					// permission was granted, yay! Do the
+					// contacts-related task you need to do.
+
+					startSignIn();
+
+				} else {
+
+					// permission denied, boo! Disable the
+					// functionality that depends on this permission.
+
+				}
+				return;
+			}
+		}
 	}
 }
