@@ -45,9 +45,9 @@
     <color name="button_material_light">#ffd6d7d7</color>
     <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/src/main/res/values/colors.xml -->
     <eat-comment/>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#ff4e5c</color>
+    <color name="colorPrimary">#3b3b58</color>
+    <color name="colorPrimaryDark">#f9f9f9</color>
     <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.3.0/res/values/base_colors.xml -->
     <eat-comment/>
     <color name="common_action_bar_splitter">#d2d2d2</color>

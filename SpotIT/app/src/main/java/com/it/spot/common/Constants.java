@@ -8,4 +8,6 @@ public class Constants {
 	public final static String APP = "APP-";
 	public final static String LIFECYCLE = "LIFEC-";
 	public final static String SIGN_IN = "SIGN_IN-";
+
+	public final static int RC_SIGN_IN = 9001;
 }
