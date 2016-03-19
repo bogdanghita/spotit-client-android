@@ -1,6 +1,6 @@
 package com.it.spot.common;
 
-import com.it.spot.login.IdentityManager;
+import com.it.spot.identity.IdentityManager;
 
 /**
  * Created by Bogdan on 19/03/2016.

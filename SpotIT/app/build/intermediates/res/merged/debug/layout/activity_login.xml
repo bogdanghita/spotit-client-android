@@ -7,7 +7,7 @@
 	android:background="@color/colorPrimary"
 	android:fitsSystemWindows="true"
 	android:orientation="vertical"
-	tools:context="com.it.spot.login.LoginActivity">
+	tools:context="com.it.spot.identity.LoginActivity">
 
 	<RelativeLayout
 		android:layout_width="match_parent"
