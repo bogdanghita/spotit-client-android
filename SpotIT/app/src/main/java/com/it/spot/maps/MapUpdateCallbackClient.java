@@ -1,5 +1,7 @@
 package com.it.spot.maps;
 
+import com.it.spot.services.PolygonUI;
+
 import java.util.List;
 
 /**
