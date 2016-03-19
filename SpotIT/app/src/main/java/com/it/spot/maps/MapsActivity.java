@@ -33,14 +33,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
-import com.it.spot.login.IdentityActivity;
-import com.it.spot.login.LoginActivity;
-import com.it.spot.login.TokenRequestAsyncTask;
-import com.it.spot.login.TokenRequestEventListener;
+import com.it.spot.identity.IdentityActivity;
+import com.it.spot.identity.LoginActivity;
+import com.it.spot.identity.TokenRequestAsyncTask;
+import com.it.spot.identity.TokenRequestEventListener;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ import java.util.List;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-		LocationListener, TokenRequestEventListener {
+		LocationListener, TokenRequestEventListener, MapUpdateCallbackClient {
 
 	private ActionBarDrawerToggle mDrawerToggle;
 
@@ -65,6 +65,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	// Bool to track whether the app is already resolving an error
 	private boolean mResolvingError = false;
+
+	private MapUpdateService mapUpdateService;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +90,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		buildGoogleApiClient();
 
 		createLocationRequest();
+
+		mapUpdateService = new MapUpdateService(this);
 	}
 
 	@Override
@@ -113,12 +117,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void onResume() {
 		super.onResume();
 
+		mapUpdateService.startMapStatusUpdateLoop();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 
+		mapUpdateService.stopMapStatusUpdateLoop();
 	}
 
 	@Override
@@ -155,10 +161,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 				Log.d(Constants.APP + Constants.CAMERA_CHANGE, cameraBounds.getCenter() + " - " + cameraBounds.southwest + ", " + cameraBounds.northeast);
 
-				// TODO
-//				// Setting camera position and requesting a map status update
-//				serviceEngine.setCameraPosition(cameraBounds);
-//				serviceEngine.requestMapStatusUpdate();
+				// Setting camera position and requesting a map status update
+				mapUpdateService.setCameraPosition(cameraBounds);
+				mapUpdateService.requestMapStatusUpdate();
 			}
 		});
 
@@ -177,7 +182,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		Log.d(Constants.APP + Constants.CONNECTION, "onConnected");
 
 		mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
-		if(mLastLocation != null) {
+		if (mLastLocation != null) {
 			onLocationChanged(mLastLocation);
 		}
 
@@ -445,5 +450,51 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				return;
 			}
 		}
+	}
+
+// -------------------------------------------------------------------------------------------------
+// SPOTS MAP
+// -------------------------------------------------------------------------------------------------
+
+	@Override
+	public void updateMapStatus(final List<PolygonUI> polygons) {
+
+		Log.d(Constants.APP + Constants.MAP_UPDATE, "Received update map status. Polygons: " + polygons.size());
+
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+
+				// Clearing polygons
+				mMap.clear();
+
+				// Drawing all polygons
+				for (PolygonUI polygon : polygons) {
+
+					drawPolygon(polygon.getPoints(), polygon.getColor());
+				}
+			}
+		});
+	}
+
+	@Override
+	public void notifyRequestFailure() {
+
+		updateToken();
+	}
+
+	private void drawPolygon(Iterable<LatLng> points, int color) {
+
+		String text = "";
+		for (LatLng point : points) {
+			text += point.toString() + ", ";
+		}
+		Log.d(Constants.APP + Constants.DRAW, text);
+
+		mMap.addPolygon(new PolygonOptions()
+				.addAll(points)
+				.strokeColor(color)
+				.strokeWidth(0)
+				.fillColor(color));
 	}
 }

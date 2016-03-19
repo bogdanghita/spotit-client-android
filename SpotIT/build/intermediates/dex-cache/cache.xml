@@ -86,6 +86,13 @@
         <dex dex="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\pre-dexed\debug\classes-62f5f8d179d8280828f8672f10ff35de720a2dde.jar" />
     </item>
     <item
+        jar="C:\Users\Bogdan\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit\retrofit\1.9.0\a681c044244d9fc375198588297a39ba78028423\retrofit-1.9.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="a681c044244d9fc375198588297a39ba78028423">
+        <dex dex="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\pre-dexed\debug\retrofit-1.9.0-d4906abe330d861d4d892c07101887b9b2c135e6.jar" />
+    </item>
+    <item
         jar="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\8.3.0\jars\classes.jar"
         jumboMode="false"
         revision="23.0.1"
@@ -112,6 +119,13 @@
         revision="23.0.1"
         sha1="6cbc7773921fcfedbe55657578f0cbfe614778dc">
         <dex dex="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\pre-dexed\debug\classes-fcc12ec5ce5bb91d394729b8970cbaea5dd0d317.jar" />
+    </item>
+    <item
+        jar="C:\Users\Bogdan\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.3.1\ecb6e1f8e4b0e84c4b886c2f14a1500caf309757\gson-2.3.1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ecb6e1f8e4b0e84c4b886c2f14a1500caf309757">
+        <dex dex="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\pre-dexed\debug\gson-2.3.1-9734f324c4b43c91bf2d49a8be7e9cf41e46c130.jar" />
     </item>
     <item
         jar="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-gcm\8.3.0\jars\classes.jar"
@@ -168,13 +182,6 @@
         revision="23.0.1"
         sha1="9aedc597d74c6d77258ce5236e9abff0c3cc65e3">
         <dex dex="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\pre-dexed\debug\classes-d4ad143f8517e2c802c80c8c31587bf575df6e78.jar" />
-    </item>
-    <item
-        jar="C:\Users\Bogdan\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.3\5fc52c41ef0239d1093a1eb7c3697036183677ce\gson-2.3.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="5fc52c41ef0239d1093a1eb7c3697036183677ce">
-        <dex dex="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\pre-dexed\debug\gson-2.3-0a4ac983e7f094494c291383701cd929fe32c8f3.jar" />
     </item>
     <item
         jar="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-drive\8.3.0\jars\classes.jar"

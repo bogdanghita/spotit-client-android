@@ -180,14 +180,14 @@ ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\mai
 		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:42:4-47
 	android:name
 		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:41:4-37
-activity#com.it.spot.login.LoginActivity
+activity#com.it.spot.identity.LoginActivity
 ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:45:3-54:14
 	android:screenOrientation
 		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:48:4-40
 	android:label
 		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:47:4-36
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:46:4-39
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:46:4-42
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
 ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:49:4-53:20
 action#android.intent.action.MAIN
@@ -198,10 +198,10 @@ category#android.intent.category.LAUNCHER
 ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:52:5-64
 	android:name
 		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:52:15-62
-activity#com.it.spot.login.IdentityActivity
+activity#com.it.spot.identity.IdentityActivity
 ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:56:3-57:14
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:56:13-51
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:56:13-54
 activity#com.it.spot.common.BaseActivity
 ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:59:3-60:14
 	android:name
