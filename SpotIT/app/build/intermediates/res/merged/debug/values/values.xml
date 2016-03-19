@@ -134,6 +134,7 @@
     <declare-styleable name="AlertDialog"><attr name="android:layout"/><attr format="reference" name="buttonPanelSideLayout"/><attr format="reference" name="listLayout"/><attr format="reference" name="multiChoiceItemLayout"/><attr format="reference" name="singleChoiceItemLayout"/><attr format="reference" name="listItemLayout"/></declare-styleable>
     <declare-styleable name="AppCompatTextView"><attr format="reference|boolean" name="textAllCaps"/><attr name="android:textAppearance"/></declare-styleable>
     <declare-styleable name="ButtonBarLayout"><attr format="boolean" name="allowStacking"/></declare-styleable>
+    <declare-styleable name="CircleImageView"><attr format="dimension" name="border_width"/><attr format="color" name="border_color"/></declare-styleable>
     <declare-styleable name="CompoundButton"><attr name="android:button"/><attr format="color" name="buttonTint"/><attr name="buttonTintMode"><enum name="src_over" value="3"/><enum name="src_in" value="5"/><enum name="src_atop" value="9"/><enum name="multiply" value="14"/><enum name="screen" value="15"/></attr></declare-styleable>
     <declare-styleable name="CustomWalletTheme"><attr format="enum" name="windowTransitionStyle"><enum name="slide" value="1"/><enum name="none" value="2"/></attr></declare-styleable>
     <declare-styleable name="DrawerArrowToggle"><attr format="color" name="color"/><attr format="boolean" name="spinBars"/><attr format="dimension" name="drawableSize"/><attr format="dimension" name="gapBetweenBars"/><attr format="dimension" name="arrowHeadLength"/><attr format="dimension" name="arrowShaftLength"/><attr format="dimension" name="barLength"/><attr format="dimension" name="thickness"/></declare-styleable>
@@ -365,6 +366,10 @@
     <string name="mr_media_route_controller_stop">Stop casting</string>
     <string name="mr_system_route_name">System</string>
     <string name="mr_user_route_category_name">Devices</string>
+    <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
     <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>
@@ -386,12 +391,14 @@
     <style name="Animation.AppCompat.DropDownUp" parent="Base.Animation.AppCompat.DropDownUp"/>
     <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/src/main/res/values/styles.xml -->
     <eat-comment/>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
 		<!-- Customize your theme here. -->
 		<item name="colorPrimary">@color/colorPrimary</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
 	</style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
     <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <style name="Base.AlertDialog.AppCompat" parent="android:Widget">
@@ -1601,6 +1608,11 @@
     <style name="ThemeOverlay.AppCompat.Dark" parent="Base.ThemeOverlay.AppCompat.Dark"/>
     <style name="ThemeOverlay.AppCompat.Dark.ActionBar" parent="Base.ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="ThemeOverlay.AppCompat.Light" parent="Base.ThemeOverlay.AppCompat.Light"/>
+    <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/src/main/res/values/styles.xml -->
+    <eat-comment/>
+    <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+		<item name="android:textSize">20sp</item>
+	</style>
     <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/8.3.0/res/values/wallet_styles.xml -->
     <eat-comment/>
     <style name="WalletFragmentDefaultButtonTextAppearance">
