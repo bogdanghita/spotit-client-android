@@ -1,24 +1,24 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:2:1-52:12
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:2:1-55:12
 	package
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:3:5-26
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:2:11-32
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
 	android:versionName
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:2:11-69
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:3:11-69
 	android:versionCode
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
 uses-permission#android.permission.ACCESS_FINE_LOCATION
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:10:5-79
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:10:2-75
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:10:22-76
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:10:19-73
 application
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:12:5-50:19
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:12:2-53:16
 MERGED from [com.android.support:appcompat-v7:23.1.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.1\AndroidManifest.xml:22:5-20
 MERGED from [com.android.support:support-v4:23.1.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.gms:play-services:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services\8.3.0\AndroidManifest.xml:19:5-20
@@ -116,49 +116,53 @@ MERGED from [com.google.android.gms:play-services-wearable:8.3.0] D:\IPCC\HackIT
 MERGED from [com.google.android.gms:play-services-basement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-basement\8.3.0\AndroidManifest.xml:20:5-24:19
 MERGED from [com.android.support:support-v4:23.1.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\AndroidManifest.xml:22:5-20
 	android:label
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:15:9-41
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:15:3-35
 	android:supportsRtl
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:16:9-35
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:16:3-29
 	android:allowBackup
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:13:9-35
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:13:3-29
 	android:icon
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:14:9-43
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:14:3-37
 	android:theme
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:17:9-40
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:17:3-34
 meta-data#com.google.android.geo.API_KEY
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:27:9-29:55
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:27:3-29:45
 	android:value
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:29:13-52
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:29:4-43
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:28:13-58
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:28:4-49
 activity#com.it.spot.maps.MapsActivity
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:31:9-34:20
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:31:3-34:14
 	android:label
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:33:13-56
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:33:4-47
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:32:13-46
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:32:4-37
 activity#com.it.spot.login.LoginActivity
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:36:9-42:20
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:36:3-45:14
+	android:screenOrientation
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:39:4-40
+	android:label
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:38:4-36
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:36:19-54
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:37:4-39
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:37:13-41:29
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:40:4-44:20
 action#android.intent.action.MAIN
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:38:17-69
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:41:5-56
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:38:25-66
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:41:13-54
 category#android.intent.category.LAUNCHER
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:40:17-77
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:43:5-64
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:40:27-74
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:43:15-62
 activity#com.it.spot.login.IdentityActivity
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:44:9-45:20
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:47:3-48:14
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:44:19-57
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:47:13-51
 activity#com.it.spot.common.BaseActivity
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:47:9-48:20
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:50:3-51:14
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:47:19-54
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:50:13-48
 uses-sdk
 INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 MERGED from [com.android.support:appcompat-v7:23.1.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.1\AndroidManifest.xml:20:5-43
