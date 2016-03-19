@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.it.spot.common.Constants;
+import com.it.spot.common.Utils;
 import com.it.spot.threading.TaskScheduler;
 
 /**

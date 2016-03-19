@@ -41,6 +41,7 @@ import com.it.spot.identity.IdentityActivity;
 import com.it.spot.identity.LoginActivity;
 import com.it.spot.identity.TokenRequestAsyncTask;
 import com.it.spot.identity.TokenRequestEventListener;
+import com.it.spot.services.PolygonUI;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
