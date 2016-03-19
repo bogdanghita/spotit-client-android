@@ -29,14 +29,24 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".maps.MapsActivity"
             android:label="@string/title_activity_maps" >
+        </activity>
+
+        <activity android:name=".login.LoginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".login.IdentityActivity" >
+        </activity>
+
+        <activity android:name=".common.BaseActivity" >
+        </activity>
+
     </application>
 
 </manifest>
