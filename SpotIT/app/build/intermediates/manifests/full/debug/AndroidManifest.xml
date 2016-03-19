@@ -49,14 +49,21 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.it.spot.MapsActivity"
+            android:name="com.it.spot.maps.MapsActivity"
             android:label="@string/title_activity_maps" >
+        </activity>
+        <activity android:name="com.it.spot.login.LoginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.it.spot.login.IdentityActivity" >
+        </activity>
+        <activity android:name="com.it.spot.common.BaseActivity" >
+        </activity>
+
         <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
