@@ -1,7 +1,6 @@
 package com.it.spot.maps;
 
 import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -9,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -21,13 +21,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.it.spot.R;
-import com.it.spot.common.BaseActivity;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.login.IdentityActivity;
 import com.it.spot.login.LoginActivity;
+import com.it.spot.login.TokenRequestAsyncTask;
+import com.it.spot.login.TokenRequestEventListener;
 
-public class MapsActivity extends IdentityActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
+		GoogleApiClient.OnConnectionFailedListener, TokenRequestEventListener {
 
 	private GoogleMap mMap;
 
@@ -50,10 +52,40 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.map);
 		mapFragment.getMapAsync(this);
+	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		if (!mServiceManager.getIdentityManager().hasToken()) {
+			updateToken();
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+	}
 
 	/**
 	 * Manipulates the map once available.
@@ -137,5 +169,31 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		Intent intent = new Intent(this, LoginActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		startActivity(intent);
+	}
+
+	private void updateToken() {
+
+		if(!mServiceManager.getIdentityManager().hasUserInfo()) {
+			Log.d(Constants.APP, "No user info available.");
+			return;
+		}
+
+		String email = mServiceManager.getIdentityManager().getUserInfo().getEmail();
+
+		new TokenRequestAsyncTask(this, this, email, Constants.TOKEN_REQUEST_SCOPE).execute();
+	}
+
+	@Override
+	public void requestFailed() {
+
+		Log.d(Constants.APP + Constants.TOKEN, "Token request failed.");
+	}
+
+	@Override
+	public void requestSucceeded(String token) {
+
+		mServiceManager.getIdentityManager().setToken(token);
+
+		Log.d(Constants.APP + Constants.TOKEN, "Token obtained successfully: " + token);
 	}
 }

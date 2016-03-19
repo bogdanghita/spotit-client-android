@@ -6,13 +6,13 @@ import com.it.spot.debug.DebugActivity;
 
 public class BaseActivity extends DebugActivity {
 
-	protected ServiceManager serviceManager;
+	protected ServiceManager mServiceManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		serviceManager = ServiceManager.getInstance();
+		mServiceManager = ServiceManager.getInstance();
 	}
 
 	@Override
@@ -21,6 +21,6 @@ public class BaseActivity extends DebugActivity {
 
 		// Clearing this so that it is not kept in memory as a static object until the OS
 		// decides to stop the process and clear the RAM
-		serviceManager.clear();
+		mServiceManager.clear();
 	}
 }
