@@ -43,7 +43,7 @@ public class LoginActivity extends IdentityActivity {
 		super.onStart();
 
 		// Silent sign in
-		OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+		OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(mIdentityGoogleApiClient);
 
 		if (pendingResult.isDone()) {
 			// There's immediate result available.
@@ -101,14 +101,14 @@ public class LoginActivity extends IdentityActivity {
 
 		Log.d(Constants.APP + Constants.SIGN_IN, "buttonSignIn()");
 
-		if(checkAndRequestPermissionGET_ACCOUNTS()) {
+		if (checkAndRequestPermissionGET_ACCOUNTS()) {
 			startSignIn();
 		}
 	}
 
 	public void startSignIn() {
 
-		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mIdentityGoogleApiClient);
 		startActivityForResult(signInIntent, Constants.RC_SIGN_IN);
 	}
 
@@ -182,7 +182,7 @@ public class LoginActivity extends IdentityActivity {
 // PERMISSIONS
 // -------------------------------------------------------------------------------------------------
 
-	private  boolean checkAndRequestPermissionGET_ACCOUNTS() {
+	private boolean checkAndRequestPermissionGET_ACCOUNTS() {
 
 		List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -209,19 +209,14 @@ public class LoginActivity extends IdentityActivity {
 			case Constants.REQUEST_ID_GET_ACCOUNTS: {
 
 				// If request is cancelled, the result arrays are empty.
-				if (grantResults.length > 0
-						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					// permission was granted, yay! Do the
 					// contacts-related task you need to do.
-
 					startSignIn();
-
-				} else {
-
+				}
+				else {
 					// permission denied, boo! Disable the
 					// functionality that depends on this permission.
-
 				}
 				return;
 			}
