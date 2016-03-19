@@ -1587,7 +1587,7 @@
 		<item name="colorPrimary">@color/colorPrimary</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
-	</style><style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/><style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/><style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+	</style><style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
 		<item name="android:textSize">20sp</item>
 	</style></file><file path="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\res\values-w820dp\dimens.xml" qualifiers="w820dp"><dimen name="activity_horizontal_margin">64dp</dimen></file></source><source path="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\generated\res\rs\debug"/><source path="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\generated\res\resValues\debug"/></dataSet><dataSet config="debug"><source path="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\debug\res"><file path="D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\debug\res\values\google_maps_api.xml" qualifiers=""><string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
 		AIzaSyANyY0KiOrnU2BPrGcOQcUMFGua-Hq4pJA

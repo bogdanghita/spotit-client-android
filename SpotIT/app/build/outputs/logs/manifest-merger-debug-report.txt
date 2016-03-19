@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:2:1-55:12
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:2:1-60:12
 	package
 		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:2:11-32
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
@@ -17,8 +17,46 @@ uses-permission#android.permission.ACCESS_FINE_LOCATION
 ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:10:2-75
 	android:name
 		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:10:19-73
+uses-permission#android.permission.INTERNET
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:11:2-63
+MERGED from [com.google.android.gms:play-services-ads:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\8.3.0\AndroidManifest.xml:20:5-66
+MERGED from [com.google.android.gms:play-services-analytics:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-analytics\8.3.0\AndroidManifest.xml:21:5-67
+MERGED from [com.google.android.gms:play-services-appinvite:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appinvite\8.3.0\AndroidManifest.xml:19:5-67
+MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:21:5-66
+MERGED from [com.google.android.gms:play-services-gcm:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-gcm\8.3.0\AndroidManifest.xml:22:5-67
+MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:21:5-67
+MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:21:5-66
+MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:21:5-66
+MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:21:5-67
+MERGED from [com.google.android.gms:play-services-wallet:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\8.3.0\AndroidManifest.xml:20:5-66
+MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:21:5-66
+	android:name
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:11:19-61
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:12:2-75
+MERGED from [com.google.android.gms:play-services-ads:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\8.3.0\AndroidManifest.xml:21:5-78
+MERGED from [com.google.android.gms:play-services-analytics:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-analytics\8.3.0\AndroidManifest.xml:22:5-79
+MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:20:5-78
+MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:22:5-79
+MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:20:5-78
+MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:20:5-78
+MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:22:5-79
+MERGED from [com.google.android.gms:play-services-nearby:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-nearby\8.3.0\AndroidManifest.xml:19:5-79
+MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:20:5-78
+	android:name
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:12:19-73
+uses-permission#android.permission.GET_ACCOUNTS
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:14:2-68
+MERGED from [com.google.android.gms:play-services-wallet:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\8.3.0\AndroidManifest.xml:21:5-70
+	android:name
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:14:19-65
+uses-permission#android.permission.USE_CREDENTIALS
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:15:2-71
+MERGED from [com.google.android.gms:play-services-wallet:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\8.3.0\AndroidManifest.xml:22:5-73
+	android:name
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:15:19-68
 application
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:12:2-53:16
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:17:2-58:16
 MERGED from [com.android.support:appcompat-v7:23.1.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.1\AndroidManifest.xml:22:5-20
 MERGED from [com.android.support:support-v4:23.1.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.gms:play-services:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services\8.3.0\AndroidManifest.xml:19:5-20
@@ -117,53 +155,53 @@ MERGED from [com.google.android.gms:play-services-basement:8.3.0] D:\IPCC\HackIT
 MERGED from [com.android.support:support-v4:23.1.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\AndroidManifest.xml:22:5-20
 MERGED from [de.hdodenhof:circleimageview:1.2.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\1.2.1\AndroidManifest.xml:9:5-20
 	android:label
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:15:3-35
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:20:3-35
 	android:supportsRtl
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:16:3-29
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:21:3-29
 	android:allowBackup
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:13:3-29
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:18:3-29
 	android:icon
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:14:3-37
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:19:3-37
 	android:theme
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:17:3-34
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:22:3-34
 meta-data#com.google.android.geo.API_KEY
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:27:3-29:45
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:32:3-34:45
 	android:value
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:29:4-43
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:34:4-43
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:28:4-49
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:33:4-49
 activity#com.it.spot.maps.MapsActivity
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:31:3-34:14
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:36:3-39:14
 	android:label
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:33:4-47
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:38:4-47
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:32:4-37
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:37:4-37
 activity#com.it.spot.login.LoginActivity
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:36:3-45:14
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:41:3-50:14
 	android:screenOrientation
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:39:4-40
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:44:4-40
 	android:label
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:38:4-36
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:43:4-36
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:37:4-39
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:42:4-39
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:40:4-44:20
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:45:4-49:20
 action#android.intent.action.MAIN
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:41:5-56
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:46:5-56
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:41:13-54
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:46:13-54
 category#android.intent.category.LAUNCHER
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:43:5-64
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:48:5-64
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:43:15-62
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:48:15-62
 activity#com.it.spot.login.IdentityActivity
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:47:3-48:14
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:52:3-53:14
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:47:13-51
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:52:13-51
 activity#com.it.spot.common.BaseActivity
-ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:50:3-51:14
+ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:55:3-56:14
 	android:name
-		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:50:13-48
+		ADDED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml:55:13-48
 uses-sdk
 INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 MERGED from [com.android.support:appcompat-v7:23.1.1] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.1\AndroidManifest.xml:20:5-43
@@ -295,32 +333,6 @@ MERGED from [de.hdodenhof:circleimageview:1.2.1] D:\IPCC\HackITall2016\Bitbucket
 	android:minSdkVersion
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
 		INJECTED from D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\src\main\AndroidManifest.xml
-uses-permission#android.permission.INTERNET
-ADDED from [com.google.android.gms:play-services-ads:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\8.3.0\AndroidManifest.xml:20:5-66
-MERGED from [com.google.android.gms:play-services-analytics:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-analytics\8.3.0\AndroidManifest.xml:21:5-67
-MERGED from [com.google.android.gms:play-services-appinvite:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appinvite\8.3.0\AndroidManifest.xml:19:5-67
-MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:21:5-66
-MERGED from [com.google.android.gms:play-services-gcm:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-gcm\8.3.0\AndroidManifest.xml:22:5-67
-MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:21:5-67
-MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:21:5-66
-MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:21:5-66
-MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:21:5-67
-MERGED from [com.google.android.gms:play-services-wallet:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\8.3.0\AndroidManifest.xml:20:5-66
-MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:21:5-66
-	android:name
-		ADDED from [com.google.android.gms:play-services-ads:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\8.3.0\AndroidManifest.xml:20:22-64
-uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from [com.google.android.gms:play-services-ads:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\8.3.0\AndroidManifest.xml:21:5-78
-MERGED from [com.google.android.gms:play-services-analytics:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-analytics\8.3.0\AndroidManifest.xml:22:5-79
-MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:20:5-78
-MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:22:5-79
-MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:20:5-78
-MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:20:5-78
-MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:22:5-79
-MERGED from [com.google.android.gms:play-services-nearby:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-nearby\8.3.0\AndroidManifest.xml:19:5-79
-MERGED from [com.google.android.gms:play-services-maps:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-maps\8.3.0\AndroidManifest.xml:20:5-78
-	android:name
-		ADDED from [com.google.android.gms:play-services-ads:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\8.3.0\AndroidManifest.xml:21:22-76
 activity#com.google.android.gms.ads.AdActivity
 ADDED from [com.google.android.gms:play-services-ads:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-ads\8.3.0\AndroidManifest.xml:26:9-29:64
 	android:configChanges
@@ -430,11 +442,3 @@ MERGED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\Hac
 		ADDED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:44:11-35
 	android:name
 		ADDED from [com.google.android.gms:play-services-measurement:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-measurement\8.3.0\AndroidManifest.xml:42:11-82
-uses-permission#android.permission.GET_ACCOUNTS
-ADDED from [com.google.android.gms:play-services-wallet:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\8.3.0\AndroidManifest.xml:21:5-70
-	android:name
-		ADDED from [com.google.android.gms:play-services-wallet:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\8.3.0\AndroidManifest.xml:21:22-68
-uses-permission#android.permission.USE_CREDENTIALS
-ADDED from [com.google.android.gms:play-services-wallet:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\8.3.0\AndroidManifest.xml:22:5-73
-	android:name
-		ADDED from [com.google.android.gms:play-services-wallet:8.3.0] D:\IPCC\HackITall2016\BitbucketRepos\SpotITAndroid\SpotIT\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-wallet\8.3.0\AndroidManifest.xml:22:22-71
