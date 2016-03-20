@@ -12,8 +12,13 @@ import com.it.spot.services.RetrofitInterceptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -25,94 +30,145 @@ import retrofit.client.Response;
  */
 public class ServerAPI {
 
-	MapUpdateCallbackClient updateClient;
+    MapUpdateCallbackClient updateClient;
 
-	HttpService httpService;
+    HttpService httpService;
 
-	ServerAPI(MapUpdateCallbackClient updateClient) {
+    List<List<List<PolygonUI>>> rawHystoryData = new ArrayList<>();
 
-		this.updateClient = updateClient;
+    public static final int NUMBER_OF_DAYS = 7;
+    public static int CURRENT_DAYS = 1;
+    public static boolean ready = false;
 
-		RestAdapter retrofit = new RestAdapter.Builder()
-				.setEndpoint(Constants.API)
-				.setRequestInterceptor(new RetrofitInterceptor())
-				.build();
+    ServerAPI(MapUpdateCallbackClient updateClient) {
 
-		httpService = retrofit.create(HttpService.class);
-	}
+        this.updateClient = updateClient;
 
-	public void getMapStatus(LatLng latLng, double radius) {
+        RestAdapter retrofit = new RestAdapter.Builder()
+                .setEndpoint(Constants.API)
+                .setRequestInterceptor(new RetrofitInterceptor())
+                .build();
 
-		double latitude = latLng.latitude;
-		double longitude = latLng.longitude;
+        httpService = retrofit.create(HttpService.class);
+    }
 
-		Map<String, String> request = new HashMap<>();
-		request.put("latitude", String.valueOf(latitude));
-		request.put("longitude", String.valueOf(longitude));
-		request.put("radius", String.valueOf(radius));
+    public void getMapStatus(LatLng latLng, double radius) {
 
-		httpService.getMap(request, new Callback<List<PolygonDB>>() {
+        double latitude = latLng.latitude;
+        double longitude = latLng.longitude;
 
-			@Override
-			public void success(List<PolygonDB> polygons, Response response) {
+        Map<String, String> request = new HashMap<>();
+        request.put("latitude", String.valueOf(latitude));
+        request.put("longitude", String.valueOf(longitude));
+        request.put("radius", String.valueOf(radius));
 
-				List<PolygonUI> uiPolygons = new ArrayList<>();
+        httpService.getMap(request, new Callback<List<PolygonDB>>() {
 
-				for (PolygonDB polygon : polygons) {
+            @Override
+            public void success(List<PolygonDB> polygons, Response response) {
+
+                List<PolygonUI> uiPolygons = new ArrayList<>();
+
+                for (PolygonDB polygon : polygons) {
 
 //					Log.d(Constants.APP + Constants.SERVER_API, String.valueOf(polygon.getColor()));
-					uiPolygons.add(polygon.toPolygonUI());
-				}
+                    uiPolygons.add(polygon.toPolygonUI());
+                }
 
-				// Calling callback method to return result
-				updateClient.updateMapStatus(uiPolygons);
-			}
+                // Calling callback method to return result
+                updateClient.updateMapStatus(uiPolygons);
+            }
 
-			@Override
-			public void failure(RetrofitError error) {
+            @Override
+            public void failure(RetrofitError error) {
 
-				Log.d(Constants.APP + Constants.SERVER_API, error.toString());
+                Log.d(Constants.APP + Constants.SERVER_API, error.toString());
 
-				if(error.getResponse() == null) {
-					return;
-				}
+                if (error.getResponse() == null) {
+                    return;
+                }
 
-				if(error.getResponse().getStatus() == Constants.HTTP_UNAUTHORIZED) {
-					updateClient.notifyRequestFailure();
-				}
-			}
-		});
-	}
+                if (error.getResponse().getStatus() == Constants.HTTP_UNAUTHORIZED) {
+                    updateClient.notifyRequestFailure();
+                }
+            }
+        });
+    }
 
-	public void postStatus(LatLng latLng, int status) {
+    public void postStatus(LatLng latLng, int status) {
 
-		double latitude = latLng.latitude;
-		double longitude = latLng.longitude;
+        double latitude = latLng.latitude;
+        double longitude = latLng.longitude;
 
-		Message.StatusMessage statusMessage = new Message.StatusMessage(latitude, longitude, status);
+        Message.StatusMessage statusMessage = new Message.StatusMessage(latitude, longitude, status);
 
-		httpService.postStatus(statusMessage, new Callback<Message.StatusMessageID>() {
+        httpService.postStatus(statusMessage, new Callback<Message.StatusMessageID>() {
 
-			@Override
-			public void success(Message.StatusMessageID statusMessageID, Response response) {
+            @Override
+            public void success(Message.StatusMessageID statusMessageID, Response response) {
 
-				Log.d(Constants.APP + Constants.SERVER_API, String.valueOf(statusMessageID.latitude) +
-						" " + String.valueOf(statusMessageID.longitude) + " " + String.valueOf(statusMessageID.status));
-			}
+                Log.d(Constants.APP + Constants.SERVER_API, String.valueOf(statusMessageID.latitude) +
+                        " " + String.valueOf(statusMessageID.longitude) + " " + String.valueOf(statusMessageID.status));
+            }
 
-			@Override
-			public void failure(RetrofitError error) {
+            @Override
+            public void failure(RetrofitError error) {
 
-				Log.d(Constants.APP + Constants.SERVER_API, error.toString());
+                Log.d(Constants.APP + Constants.SERVER_API, error.toString());
 
-				if(error.getResponse() == null) {
-					return;
-				}
+                if (error.getResponse() == null) {
+                    return;
+                }
 
-				if(error.getResponse().getStatus() == Constants.HTTP_UNAUTHORIZED) {
-					updateClient.notifyRequestFailure();
-				}
-			}
-		});
-	}
+                if (error.getResponse().getStatus() == Constants.HTTP_UNAUTHORIZED) {
+                    updateClient.notifyRequestFailure();
+                }
+            }
+        });
+    }
+
+    public void getHistory(LatLng latLng, int daysDelay, int hour, int interval) {
+
+        double latitude = latLng.latitude;
+        double longitude = latLng.longitude;
+
+        Map<String, String> request = new HashMap<>();
+        request.put("latitude", String.valueOf(latitude));
+        request.put("longitude", String.valueOf(longitude));
+        request.put("day", String.valueOf(-daysDelay));
+        request.put("hour", String.valueOf(hour));
+        request.put("interval", String.valueOf(interval));
+
+        httpService.getMap(request, new Callback<List<PolygonDB>>() {
+
+            @Override
+            public void success(List<PolygonDB> polygons, Response response) {
+
+                List<PolygonUI> uiPolygons = new ArrayList<>();
+
+                for (PolygonDB polygon : polygons) {
+
+//					Log.d(Constants.APP + Constants.SERVER_API, String.valueOf(polygon.getColor()));
+                    uiPolygons.add(polygon.toPolygonUI());
+                }
+
+                // Calling callback method to return result
+                updateClient.updateMapStatus(uiPolygons);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+                Log.d(Constants.APP + Constants.SERVER_API, error.toString());
+
+                if (error.getResponse() == null) {
+                    return;
+                }
+
+                if (error.getResponse().getStatus() == Constants.HTTP_UNAUTHORIZED) {
+                    updateClient.notifyRequestFailure();
+                }
+            }
+        });
+    }
 }

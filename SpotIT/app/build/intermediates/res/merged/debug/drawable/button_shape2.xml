@@ -1,5 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/colorAccent"/>
-    <corners android:radius="7dip"/>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:state_pressed="true" >
+        <shape>
+            <solid
+                android:color="@color/colorButtonDark" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid
+                android:color="@color/colorAccent" />
+        </shape>
+    </item>
 </selector><!-- From: file:/D:/Anul_III_sem_2/TBC_HackITall/SpotIT/app/src/main/res/drawable/button_shape2.xml -->
