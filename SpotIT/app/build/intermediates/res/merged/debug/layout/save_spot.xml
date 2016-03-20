@@ -14,7 +14,7 @@
     android:paddingTop="10dp">
 
     <ImageButton
-        android:id="@+id/help_icon"
+        android:id="@+id/save_spot_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/help_icon"
+        android:layout_toRightOf="@id/save_spot_icon"
         android:clickable="false"
         android:paddingLeft="20dp"
         android:paddingRight="@dimen/activity_horizontal_margin"
