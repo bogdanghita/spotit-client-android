@@ -19,6 +19,7 @@ public class Constants {
 	public final static String MAP_UPDATE = "MAP_UPDATE-";
 	public final static String SERVER_API = "SERVER_API-";
 	public final static String DRAW = "DRAW-";
+	public final static String SAVED_SPOT = "SAVED-";
 
 	public final static int RC_SIGN_IN = 9001;
 	public final static int USER_RECOVERABLE_AUTH_EXCEPTION = 7001;
@@ -57,4 +58,6 @@ public class Constants {
 	public static final String API = "http://192.168.1.105:3000";
 	public static final int MAP_UPDATE_INTERVAL = 3 * 1000;
 	public static final int HTTP_UNAUTHORIZED = 401;
+
+	public static final String SAVED_SPOT_FILE = "saved_spot.json";
 }

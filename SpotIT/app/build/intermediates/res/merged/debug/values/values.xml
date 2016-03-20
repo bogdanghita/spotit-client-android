@@ -47,7 +47,7 @@
     <eat-comment/>
     <color name="colorAccent">#ff4e5c</color>
     <color name="colorPrimary">#3b3b58</color>
-    <color name="colorPrimaryDark">#f9f9f9</color>
+    <color name="colorPrimaryDark">#252545</color>
     <!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/8.3.0/res/values/base_colors.xml -->
     <eat-comment/>
     <color name="common_action_bar_splitter">#d2d2d2</color>

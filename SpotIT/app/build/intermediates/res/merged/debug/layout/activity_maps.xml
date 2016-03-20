@@ -11,21 +11,59 @@
 
 		<include layout="@layout/toolbar"/>
 
-		<FrameLayout
-			android:id="@+id/fragment_container"
+		<fragment
+			android:id="@+id/map"
+			android:name="com.google.android.gms.maps.SupportMapFragment"
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			xmlns:map="http://schemas.android.com/apk/res-auto"
+			xmlns:tools="http://schemas.android.com/tools"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent">
+			android:layout_height="match_parent"
+			tools:context=".MapsActivity">
 
-			<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-			          xmlns:tools="http://schemas.android.com/tools"
-			          xmlns:map="http://schemas.android.com/apk/res-auto"
-			          android:layout_width="match_parent"
-			          android:layout_height="match_parent"
-			          android:id="@+id/map"
-			          tools:context=".MapsActivity"
-			          android:name="com.google.android.gms.maps.SupportMapFragment"/>
+			<RelativeLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
 
-		</FrameLayout>
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:orientation="horizontal"
+					android:layout_alignParentBottom="true"
+					android:padding="6dp">
+
+					<Button
+						android:id="@+id/spotItButton"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:background="@color/colorPrimaryDark"
+						android:onClick="spotItButtonFree"
+						android:text="Free"/>
+
+					<Button
+						android:id="@+id/spotItButton2"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:background="@color/colorPrimaryDark"
+						android:onClick="spotItButtonMedium"
+						android:text="Medium"/>
+
+					<Button
+						android:id="@+id/spotItButton3"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:background="@color/colorPrimaryDark"
+						android:onClick="spotItButtonFull"
+						android:text="Full"/>
+
+				</LinearLayout>
+
+			</RelativeLayout>
+
+		</fragment>
 
 	</LinearLayout>
 
