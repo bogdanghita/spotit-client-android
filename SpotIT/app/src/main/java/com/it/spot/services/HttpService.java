@@ -19,7 +19,7 @@ public interface HttpService {
 	public void getMap(@QueryMap Map<String, String> getMapMessage, Callback<List<PolygonDB>> response);
 
 	@GET("/api/spot/day")
-	public List<List<PolygonDB>> getDay(@Query("number") String number);
+	public void getHistory(@QueryMap Map<String, String> getHistoryMessage, Callback<List<PolygonDB>> response);
 
 	@POST("/api/spot/status")
 	public void postStatus(@Body Message.StatusMessage statusMessage, Callback<Message.StatusMessageID> response);
