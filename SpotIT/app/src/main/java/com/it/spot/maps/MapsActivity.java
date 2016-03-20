@@ -60,16 +60,11 @@ import com.it.spot.identity.UserInfo;
 import com.it.spot.services.PolygonUI;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -95,6 +90,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private Marker mSavedMarker = null;
 	private PolylineOptions mDirectionsPolylineOptions = null;
 	private Polyline mDirectionsPolyline = null;
+
+	private LatLng destinationSpot = null;
+	private Marker destinationMarker = null;
 
 	private boolean firstTimeLocation = true;
 
@@ -205,6 +203,19 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				// Setting camera position and requesting a map status update
 				mapUpdateService.setCameraPosition(cameraBounds);
 				mapUpdateService.requestMapStatusUpdate();
+			}
+		});
+
+		mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+			@Override
+			public void onMapClick(final LatLng latLng) {
+
+				if (mSavedSpot != null) {
+					return;
+				}
+
+				destinationSpot = latLng;
+				drawDestinationSpot();
 			}
 		});
 
@@ -549,6 +560,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				mMap.clear();
 
 				drawSavedSpot();
+				drawDestinationSpot();
 				drawDirectionsPolyline();
 
 				// Drawing all polygons
@@ -588,10 +600,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	void toggleLeaveSaveSpot() {
 
-		RelativeLayout buttonSaveSpot = (RelativeLayout)findViewById(R.id.item_save_spot);
-		RelativeLayout buttonLeaveSpot = (RelativeLayout)findViewById(R.id.item_leave_spot);
+		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
+		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
 
-		if(mSavedSpot == null) {
+		if (mSavedSpot == null) {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -631,7 +643,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 			@Override
 			public boolean onMarkerClick(Marker marker) {
-				if(marker.getTitle().equals("Your car is here")) {
+				if (marker.getTitle().equals("Your car is here")) {
 					drawRouteToSavedSpotButton();
 				}
 				return false;
@@ -639,7 +651,50 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		});
 	}
 
+	void drawDestinationSpot() {
+
+		if (destinationMarker != null) {
+			destinationMarker.remove();
+		}
+
+		if (destinationSpot == null) {
+			return;
+		}
+
+		if(mDirectionsPolyline != null) {
+			mDirectionsPolyline.remove();
+			mDirectionsPolyline = null;
+			mDirectionsPolylineOptions = null;
+		}
+
+		destinationMarker = mMap.addMarker(new MarkerOptions().position(destinationSpot).
+				title("Your parking spot").
+				snippet("Click on marker for directions"));
+		destinationMarker.showInfoWindow();
+
+		mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+			@Override
+			public boolean onMarkerClick(Marker marker) {
+				if (marker.getTitle().equals("Your parking spot")) {
+					drawRouteToDestinationSpot(destinationSpot);
+				}
+				return false;
+			}
+		});
+	}
+
 	public void buttonSaveSpot(View view) {
+
+		if(destinationSpot != null) {
+			destinationMarker.remove();
+			destinationMarker = null;
+			destinationSpot = null;
+		}
+		if(mDirectionsPolylineOptions != null) {
+			mDirectionsPolyline.remove();
+			mDirectionsPolyline = null;
+			mDirectionsPolylineOptions = null;
+		}
 
 		SavedSpot spot = new SavedSpot(true, mLastLocation);
 
@@ -660,13 +715,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
 
 		mSavedSpot = null;
-		if(mSavedMarker != null) {
+		if (mSavedMarker != null) {
 			mSavedMarker.remove();
 			mSavedMarker = null;
 		}
 
 		mDirectionsPolylineOptions = null;
-		if(mDirectionsPolyline != null) {
+		if (mDirectionsPolyline != null) {
 			mDirectionsPolyline.remove();
 			mDirectionsPolyline = null;
 		}
@@ -749,7 +804,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void drawRouteToSavedSpotButton() {
 
-		if(mSavedSpot == null) {
+		if (mSavedSpot == null) {
 			return;
 		}
 
@@ -762,13 +817,23 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		directions.execute(new RouteOptions(source, destination, Constants.MODE_WALKING));
 	}
 
+	public void drawRouteToDestinationSpot(LatLng position) {
+
+		// Get directions from source to destination as PolylineOptions.
+		DirectionsAsyncTask directions = new DirectionsAsyncTask(this);
+
+		LatLng source = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+		directions.execute(new RouteOptions(source, position, Constants.MODE_WALKING));
+	}
+
 	void drawDirectionsPolyline() {
 
-		if(mDirectionsPolyline != null) {
+		if (mDirectionsPolyline != null) {
 			mDirectionsPolyline.remove();
 		}
 
-		if(mDirectionsPolylineOptions == null) {
+		if (mDirectionsPolylineOptions == null) {
 			return;
 		}
 
