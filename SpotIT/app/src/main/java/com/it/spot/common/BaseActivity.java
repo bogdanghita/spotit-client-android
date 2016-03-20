@@ -19,8 +19,9 @@ public class BaseActivity extends DebugActivity {
 	public void onDestroy() {
 		super.onDestroy();
 
+		// NOTE: This is called when login activity is closed. We do not want this...
 		// Clearing this so that it is not kept in memory as a static object until the OS
 		// decides to stop the process and clear the RAM
-		mServiceManager.clear();
+//		mServiceManager.clear();
 	}
 }
