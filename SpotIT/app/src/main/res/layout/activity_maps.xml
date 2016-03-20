@@ -27,7 +27,7 @@
 
 				<LinearLayout
 					android:layout_width="match_parent"
-					android:layout_height="match_parent"
+					android:layout_height="wrap_content"
 					android:orientation="horizontal"
 					android:layout_alignParentBottom="true"
 					android:padding="6dp">
@@ -37,26 +37,41 @@
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
-						android:background="@color/colorPrimaryDark"
+						android:background="@color/colorAccent"
 						android:onClick="spotItButtonFree"
+						android:paddingRight="1dp"
+						android:textColor="@color/colorLight"
 						android:text="Free"/>
+
+					<View
+						android:layout_width="6dp"
+						android:layout_height="1dp"/>
 
 					<Button
 						android:id="@+id/spotItButton2"
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
-						android:background="@color/colorPrimaryDark"
+						android:background="@color/colorAccent"
 						android:onClick="spotItButtonMedium"
-						android:text="Medium"/>
+						android:paddingLeft="1dp"
+						android:paddingRight="1dp"
+						android:textColor="@color/colorLight"
+						android:text="Moderate"/>
+
+					<View
+						android:layout_width="6dp"
+						android:layout_height="1dp"/>
 
 					<Button
 						android:id="@+id/spotItButton3"
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
-						android:background="@color/colorPrimaryDark"
+						android:background="@color/colorAccent"
 						android:onClick="spotItButtonFull"
+						android:paddingLeft="1dp"
+						android:textColor="@color/colorLight"
 						android:text="Full"/>
 
 				</LinearLayout>
