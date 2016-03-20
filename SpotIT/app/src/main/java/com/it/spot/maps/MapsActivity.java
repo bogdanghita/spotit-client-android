@@ -2,6 +2,7 @@ package com.it.spot.maps;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -15,7 +16,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -34,6 +37,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.gson.Gson;
@@ -53,6 +57,7 @@ import com.it.spot.services.PolygonUI;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -82,6 +87,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private LatLngBounds cameraBounds;
 
 	private Location mSavedSpot = null;
+	private Marker mSavedMarker = null;
 
 	private boolean firstTimeLocation = true;
 
@@ -116,6 +122,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		createUserProfile();
 
 		loadSavedSpot();
+
+		toggleLeaveSaveSpot();
 
 		mapUpdateService = new MapUpdateService(this);
 	}
@@ -332,6 +340,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mDrawerToggle.syncState();
 	}
 
+	private void toggleNavigationDrawer() {
+
+		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+		if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
+			mDrawerLayout.closeDrawer(Gravity.LEFT);
+		}
+		else {
+			mDrawerLayout.openDrawer(Gravity.LEFT);
+		}
+	}
+
 	private void createUserProfile() {
 
 		IdentityManager identityManager = ServiceManager.getInstance().getIdentityManager();
@@ -515,6 +535,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				// Clearing polygons
 				mMap.clear();
 
+				drawSavedSpot();
+
 				// Drawing all polygons
 				for (PolygonUI polygon : polygons) {
 
@@ -550,24 +572,43 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // SIDEBAR OPTIONS
 // -------------------------------------------------------------------------------------------------
 
+	void toggleLeaveSaveSpot() {
+
+		RelativeLayout buttonSaveSpot = (RelativeLayout)findViewById(R.id.item_save_spot);
+		RelativeLayout buttonLeaveSpot = (RelativeLayout)findViewById(R.id.item_leave_spot);
+
+		if(mSavedSpot == null) {
+			buttonLeaveSpot.setVisibility(View.GONE);
+			buttonSaveSpot.setVisibility(View.VISIBLE);
+		}
+		else {
+			buttonLeaveSpot.setVisibility(View.VISIBLE);
+			buttonSaveSpot.setVisibility(View.GONE);
+		}
+	}
+
 	void loadSavedSpot() {
 
 		SavedSpot savedSpot = readSavedSpotFile(Constants.SAVED_SPOT_FILE);
 
-		if(savedSpot != null && savedSpot.hasSavedSpot) {
+		if (savedSpot != null && savedSpot.hasSavedSpot) {
 			mSavedSpot = savedSpot.location;
 		}
 	}
 
 	void drawSavedSpot() {
 
-		if(mSavedSpot == null) {
+		if (mSavedMarker != null) {
+			mSavedMarker.remove();
+		}
+
+		if (mSavedSpot == null) {
 			return;
 		}
 
 		LatLng point = new LatLng(mSavedSpot.getLatitude(), mSavedSpot.getLongitude());
-		mMap.addMarker(new MarkerOptions().position(point).title("Marker in Sydney"));
-		mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
+		mSavedMarker = mMap.addMarker(new MarkerOptions().position(point).title("Your car"));
+//		mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
 	}
 
 	public void buttonSaveSpot(View view) {
@@ -576,30 +617,40 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
 
-//		mSavedSpot = spot.location;
-//
-//		drawSavedSpot();
+		mSavedSpot = spot.location;
+		drawSavedSpot();
 
-		loadSavedSpot();
+		toggleLeaveSaveSpot();
+
+		toggleNavigationDrawer();
+	}
+
+	public void buttonLeaveSpot(View view) {
+
+		SavedSpot spot = new SavedSpot(false, mLastLocation);
+
+		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
+
+		mSavedSpot = null;
+		mSavedMarker.remove();
+		mSavedMarker = null;
+
+		toggleLeaveSaveSpot();
+
+		toggleNavigationDrawer();
 	}
 
 	private void writeSavedSpotFile(SavedSpot spot, String filename) {
 
-		File file = getFileStreamPath(filename);
 		try {
-			OutputStream os = new FileOutputStream(file);
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
+			FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
 
 			Gson gson = new Gson();
-
 			String jsonString = gson.toJson(spot);
 
-			Log.d("BLA", jsonString);
+			fos.write(jsonString.getBytes());
 
-			writer.write(jsonString);
-
-			writer.close();
-			os.close();
+			fos.close();
 		}
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -615,15 +666,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		SavedSpot result = null;
 
 		try {
-			InputStream is = getAssets().open(filename);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			FileInputStream fis = openFileInput(filename);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 
 			Gson gson = new Gson();
+			result = gson.fromJson(reader, SavedSpot.class);
 
-			result = gson.fromJson(reader, SavedSpot.class);
-			result = gson.fromJson(reader, SavedSpot.class);
 			reader.close();
-			is.close();
+			fis.close();
 		}
 		catch (IOException e) {
 			e.printStackTrace();

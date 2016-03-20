@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:onClick="buttonSaveSpot"
+    android:onClick="buttonLeaveSpot"
     android:orientation="horizontal"
     android:paddingBottom="10dp"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -14,7 +14,7 @@
     android:paddingTop="10dp">
 
     <ImageButton
-        android:id="@+id/save_spot_icon"
+        android:id="@+id/leave_spot_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -27,11 +27,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/save_spot_icon"
+        android:layout_toRightOf="@id/leave_spot_icon"
         android:clickable="false"
         android:paddingLeft="20dp"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:text="Save spot"
+        android:text="Leave spot"
         android:textSize="17dip"/>
 
-</RelativeLayout><!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/src/main/res/layout/save_spot.xml -->
+</RelativeLayout>

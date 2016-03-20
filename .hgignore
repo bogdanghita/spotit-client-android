@@ -1,3 +1,31 @@
 syntax: glob
 
 SpotIT/app/google-services.json
+
+SpotIT/.gradle/**
+SpotIT/.idea/**
+SpotIT/app/build/**
+SpotIT/app/app.iml
+SpotIT/build**
+SpotIT/gradle**
+SpotIT/build.gradle
+SpotIT/SpotIT.iml
+SpotIT/gradlew
+SpotIT/gradlew.bat
+SpotIT/import-summary.txt
+SpotIT/local.properties
+SpotIT/settings.gradle
+
+GMTest/.gradle/**
+GMTest/.idea/**
+GMTest/app/build/**
+GMTest/app/app.iml
+GMTest/build**
+GMTest/gradle**
+GMTest/build.gradle
+GMTest/GMTest.iml
+GMTest/gradlew
+GMTest/gradlew.bat
+GMTest/import-summary.txt
+GMTest/local.properties
+GMTest/settings.gradle
