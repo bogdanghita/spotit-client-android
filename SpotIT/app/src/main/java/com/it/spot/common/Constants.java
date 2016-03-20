@@ -60,4 +60,7 @@ public class Constants {
 	public static final int HTTP_UNAUTHORIZED = 401;
 
 	public static final String SAVED_SPOT_FILE = "saved_spot.json";
+
+	public final static String MODE_DRIVING = "driving";
+	public final static String MODE_WALKING = "walking";
 }
