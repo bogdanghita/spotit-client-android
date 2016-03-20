@@ -7,4 +7,4 @@
     </gradient>    <corners android:radius="7dip" />    <stroke
     android:width="1px"
     android:color="@android:color/background_light" />
-</selector><!-- From: file:/D:/Anul_III_sem_2/TBC_HackITall/SpotIT/app/src/main/res/drawable/button_shape.xml -->
+</selector><!-- From: file:/D:/IPCC/HackITall2016/BitbucketRepos/SpotITAndroid/SpotIT/app/src/main/res/drawable/button_shape.xml -->
