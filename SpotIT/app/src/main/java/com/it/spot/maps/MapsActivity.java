@@ -615,8 +615,22 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 
 		LatLng point = new LatLng(mSavedSpot.getLatitude(), mSavedSpot.getLongitude());
-		mSavedMarker = mMap.addMarker(new MarkerOptions().position(point).title("Your car"));
+		mSavedMarker = mMap.addMarker(new MarkerOptions().position(point).
+				title("Your car is here").
+				snippet("Click on marker for directions"));
+		mSavedMarker.showInfoWindow();
+
 //		mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
+
+		mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+			@Override
+			public boolean onMarkerClick(Marker marker) {
+				if(marker.getTitle().equals("Your car is here")) {
+					drawRouteToSavedSpotButton();
+				}
+				return false;
+			}
+		});
 	}
 
 	public void buttonSaveSpot(View view) {
@@ -640,11 +654,16 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
 
 		mSavedSpot = null;
-		mSavedMarker.remove();
-		mSavedMarker = null;
+		if(mSavedMarker != null) {
+			mSavedMarker.remove();
+			mSavedMarker = null;
+		}
 
-		mDirectionsPolyline.remove();
-		mDirectionsPolyline = null;
+		mDirectionsPolylineOptions = null;
+		if(mDirectionsPolyline != null) {
+			mDirectionsPolyline.remove();
+			mDirectionsPolyline = null;
+		}
 
 		toggleLeaveSaveSpot();
 
@@ -696,8 +715,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonHistory(View view) {
 
-		// test
-		drawRouteToSavedSpotButton(new TextView(this));
 	}
 
 	public void buttonHelp(View view) {
@@ -724,7 +741,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mapUpdateService.sendMapStatus(mLastLocation, Constants.STATUS_RED_TEXT);
 	}
 
-	public void drawRouteToSavedSpotButton(View view) {
+	public void drawRouteToSavedSpotButton() {
 
 		if(mSavedSpot == null) {
 			return;
