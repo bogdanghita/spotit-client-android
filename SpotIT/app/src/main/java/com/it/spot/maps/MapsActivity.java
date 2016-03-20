@@ -16,6 +16,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
@@ -38,15 +39,20 @@ import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.identity.IdentityActivity;
+import com.it.spot.identity.IdentityManager;
+import com.it.spot.identity.ImageLoaderAsyncTask;
 import com.it.spot.identity.LoginActivity;
 import com.it.spot.identity.TokenRequestAsyncTask;
 import com.it.spot.identity.TokenRequestEventListener;
+import com.it.spot.identity.UserInfo;
 import com.it.spot.services.PolygonUI;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -91,6 +97,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		buildGoogleApiClient();
 
 		createLocationRequest();
+
+		createUserProfile();
 
 		mapUpdateService = new MapUpdateService(this);
 	}
@@ -303,6 +311,25 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
 		mDrawerToggle.syncState();
+	}
+
+	private void createUserProfile() {
+
+		IdentityManager identityManager = ServiceManager.getInstance().getIdentityManager();
+
+		if (identityManager.hasUserInfo()) {
+
+			// Setting up user profile
+			UserInfo userInfo = identityManager.getUserInfo();
+
+			TextView name = (TextView) findViewById(R.id.name);
+			TextView email = (TextView) findViewById(R.id.email);
+			CircleImageView image = (CircleImageView) findViewById(R.id.circleView);
+
+			name.setText(userInfo.getName());
+			email.setText(userInfo.getEmail());
+			new ImageLoaderAsyncTask(image).execute(userInfo.getPicture());
+		}
 	}
 
 	private void updateUI() {
