@@ -312,7 +312,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	}
 
 	private void centerCameraOnLastLocation() {
-		mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
+		//mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
+
+		CameraPosition cameraPosition = new CameraPosition.Builder()
+				.target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
+				.zoom(Constants.DEFAULT_ZOOM)
+				.build();
+		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 	}
 
 // -------------------------------------------------------------------------------------------------
