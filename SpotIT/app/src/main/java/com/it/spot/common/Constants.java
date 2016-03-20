@@ -63,4 +63,6 @@ public class Constants {
 
 	public final static String MODE_DRIVING = "driving";
 	public final static String MODE_WALKING = "walking";
+
+	public static final int DEFAULT_ZOOM = 15;
 }
