@@ -40,11 +40,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.common.SavedSpot;
 import com.it.spot.common.ServiceManager;
+import com.it.spot.directions.DirectionsAsyncTask;
+import com.it.spot.directions.DirectionsListener;
+import com.it.spot.directions.RouteOptions;
 import com.it.spot.identity.IdentityActivity;
 import com.it.spot.identity.IdentityManager;
 import com.it.spot.identity.ImageLoaderAsyncTask;
@@ -74,7 +79,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-		LocationListener, TokenRequestEventListener, MapUpdateCallbackClient {
+		LocationListener, TokenRequestEventListener, MapUpdateCallbackClient, DirectionsListener {
 
 	private ActionBarDrawerToggle mDrawerToggle;
 
@@ -88,6 +93,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	private Location mSavedSpot = null;
 	private Marker mSavedMarker = null;
+	private PolylineOptions mDirectionsPolylineOptions = null;
+	private Polyline mDirectionsPolyline = null;
 
 	private boolean firstTimeLocation = true;
 
@@ -536,6 +543,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				mMap.clear();
 
 				drawSavedSpot();
+				drawDirectionsPolyline();
 
 				// Drawing all polygons
 				for (PolygonUI polygon : polygons) {
@@ -635,6 +643,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mSavedMarker.remove();
 		mSavedMarker = null;
 
+		mDirectionsPolyline.remove();
+		mDirectionsPolyline = null;
+
 		toggleLeaveSaveSpot();
 
 		toggleNavigationDrawer();
@@ -685,7 +696,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonHistory(View view) {
 
-
+		// test
+		drawRouteToSavedSpotButton(new TextView(this));
 	}
 
 	public void buttonHelp(View view) {
@@ -694,7 +706,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	}
 
 // -------------------------------------------------------------------------------------------------
-// SPOT IT BUTTONS
+// ON SCREEN BUTTONS
 // -------------------------------------------------------------------------------------------------
 
 	public void spotItButtonFree(View view) {
@@ -710,5 +722,46 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void spotItButtonFull(View view) {
 
 		mapUpdateService.sendMapStatus(mLastLocation, Constants.STATUS_RED_TEXT);
+	}
+
+	public void drawRouteToSavedSpotButton(View view) {
+
+		if(mSavedSpot == null) {
+			return;
+		}
+
+		// Get directions from source to destination as PolylineOptions.
+		DirectionsAsyncTask directions = new DirectionsAsyncTask(this);
+
+		LatLng source = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+		LatLng destination = new LatLng(mSavedSpot.getLatitude(), mSavedSpot.getLongitude());
+
+		directions.execute(new RouteOptions(source, destination, Constants.MODE_WALKING));
+	}
+
+	void drawDirectionsPolyline() {
+
+		if(mDirectionsPolyline != null) {
+			mDirectionsPolyline.remove();
+		}
+
+		if(mDirectionsPolylineOptions == null) {
+			return;
+		}
+
+		mDirectionsPolyline = mMap.addPolyline(mDirectionsPolylineOptions);
+	}
+
+	@Override
+	public void notifyDirectionsResponse(final PolylineOptions polylineOptions) {
+
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+
+				mDirectionsPolylineOptions = polylineOptions;
+				drawDirectionsPolyline();
+			}
+		});
 	}
 }
