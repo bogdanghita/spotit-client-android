@@ -105,6 +105,10 @@ public class ServerAPI {
 
 				Log.d(Constants.APP + Constants.SERVER_API, error.toString());
 
+				if(error.getResponse() == null) {
+					return;
+				}
+
 				if(error.getResponse().getStatus() == Constants.HTTP_UNAUTHORIZED) {
 					updateClient.notifyRequestFailure();
 				}

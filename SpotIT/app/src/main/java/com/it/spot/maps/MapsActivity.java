@@ -34,9 +34,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.gson.Gson;
 import com.it.spot.R;
 import com.it.spot.common.Constants;
+import com.it.spot.common.SavedSpot;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.identity.IdentityActivity;
 import com.it.spot.identity.IdentityManager;
@@ -47,6 +50,16 @@ import com.it.spot.identity.TokenRequestEventListener;
 import com.it.spot.identity.UserInfo;
 import com.it.spot.services.PolygonUI;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,6 +80,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private String mLastUpdateTime;
 	private LocationRequest mLocationRequest;
 	private LatLngBounds cameraBounds;
+
+	private Location mSavedSpot = null;
 
 	private boolean firstTimeLocation = true;
 
@@ -99,6 +114,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		createLocationRequest();
 
 		createUserProfile();
+
+		loadSavedSpot();
 
 		mapUpdateService = new MapUpdateService(this);
 	}
@@ -179,6 +196,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (checkAndRequestPermissionACCESS_FINE_LOCATION()) {
 			enableLocation();
 		}
+
+		drawSavedSpot();
 	}
 
 	void enableLocation() {
@@ -524,5 +543,122 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				.strokeColor(color)
 				.strokeWidth(0)
 				.fillColor(color));
+	}
+
+
+// -------------------------------------------------------------------------------------------------
+// SIDEBAR OPTIONS
+// -------------------------------------------------------------------------------------------------
+
+	void loadSavedSpot() {
+
+		SavedSpot savedSpot = readSavedSpotFile(Constants.SAVED_SPOT_FILE);
+
+		if(savedSpot != null && savedSpot.hasSavedSpot) {
+			mSavedSpot = savedSpot.location;
+		}
+	}
+
+	void drawSavedSpot() {
+
+		if(mSavedSpot == null) {
+			return;
+		}
+
+		LatLng point = new LatLng(mSavedSpot.getLatitude(), mSavedSpot.getLongitude());
+		mMap.addMarker(new MarkerOptions().position(point).title("Marker in Sydney"));
+		mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
+	}
+
+	public void buttonSaveSpot(View view) {
+
+		SavedSpot spot = new SavedSpot(true, mLastLocation);
+
+		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
+
+//		mSavedSpot = spot.location;
+//
+//		drawSavedSpot();
+
+		loadSavedSpot();
+	}
+
+	private void writeSavedSpotFile(SavedSpot spot, String filename) {
+
+		File file = getFileStreamPath(filename);
+		try {
+			OutputStream os = new FileOutputStream(file);
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
+
+			Gson gson = new Gson();
+
+			String jsonString = gson.toJson(spot);
+
+			Log.d("BLA", jsonString);
+
+			writer.write(jsonString);
+
+			writer.close();
+			os.close();
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error writing saved spot to file: " + filename);
+		}
+	}
+
+	private SavedSpot readSavedSpotFile(String filename) {
+
+		SavedSpot result = null;
+
+		try {
+			InputStream is = getAssets().open(filename);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+			Gson gson = new Gson();
+
+			result = gson.fromJson(reader, SavedSpot.class);
+			result = gson.fromJson(reader, SavedSpot.class);
+			reader.close();
+			is.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error reading saved spot from file: " + filename);
+		}
+
+		return result;
+	}
+
+	public void buttonHistory(View view) {
+
+
+	}
+
+	public void buttonHelp(View view) {
+
+
+	}
+
+// -------------------------------------------------------------------------------------------------
+// SPOT IT BUTTONS
+// -------------------------------------------------------------------------------------------------
+
+	public void spotItButtonFree(View view) {
+
+		mapUpdateService.sendMapStatus(mLastLocation, Constants.STATUS_GREEN_TEXT);
+	}
+
+	public void spotItButtonMedium(View view) {
+
+		mapUpdateService.sendMapStatus(mLastLocation, Constants.STATUS_YELLOW_TEXT);
+	}
+
+	public void spotItButtonFull(View view) {
+
+		mapUpdateService.sendMapStatus(mLastLocation, Constants.STATUS_RED_TEXT);
 	}
 }
