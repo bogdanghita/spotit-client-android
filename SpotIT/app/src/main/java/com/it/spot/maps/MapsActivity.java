@@ -235,6 +235,12 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		Log.d(Constants.APP + Constants.CONNECTION, "onConnected");
 
+		// TODO: Problem here. FINE_LOCATION is needed in 2 different places. However there is only
+		// one callback on permission granted. Solve this...
+		if (!checkAndRequestPermissionACCESS_FINE_LOCATION()) {
+			return;
+		}
+
 		mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
 		if (mLastLocation != null) {
 			onLocationChanged(mLastLocation);
@@ -454,7 +460,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		mServiceManager.getIdentityManager().setToken(token);
 
-		Log.d(Constants.APP + Constants.TOKEN, "Token obtained successfully: " + token);
+		Log.d(Constants.APP + Constants.TOKEN, "Token obtained successfully.");
 	}
 
 // -------------------------------------------------------------------------------------------------
