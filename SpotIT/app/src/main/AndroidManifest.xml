@@ -39,7 +39,8 @@
 
 		<activity
 			android:name=".maps.MapsActivity"
-			android:label="@string/title_activity_maps">
+			android:label="@string/title_activity_maps"
+			android:screenOrientation="portrait">
 		</activity>
 
 		<activity
