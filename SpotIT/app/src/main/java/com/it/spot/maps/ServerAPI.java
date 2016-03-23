@@ -12,13 +12,8 @@ import com.it.spot.services.RetrofitInterceptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -45,7 +40,7 @@ public class ServerAPI {
         this.updateClient = updateClient;
 
         RestAdapter retrofit = new RestAdapter.Builder()
-                .setEndpoint(Constants.API)
+                .setEndpoint(Constants.SERVER_IP_PORT)
                 .setRequestInterceptor(new RetrofitInterceptor())
                 .build();
 
