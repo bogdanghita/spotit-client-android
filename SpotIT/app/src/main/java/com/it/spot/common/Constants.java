@@ -19,7 +19,10 @@ public class Constants {
 	public final static String MAP_UPDATE = "MAP_UPDATE-";
 	public final static String SERVER_API = "SERVER_API-";
 	public final static String DRAW = "DRAW-";
-	public final static String SAVED_SPOT = "SAVED-";
+    public final static String SAVED_SPOT = "SAVED-";
+    public final static String DIRECTIONS = "DIRECT-";
+    public final static String URL = "URL-";
+    public final static String DIRECTION_TYPE = "DIR_TYPE-";
 
 	public final static int RC_SIGN_IN = 9001;
 	public final static int USER_RECOVERABLE_AUTH_EXCEPTION = 7001;
@@ -55,7 +58,7 @@ public class Constants {
 	public static final int COLOR_YELLOW = Color.argb(ALPHA, 255, 255, 0);
 	public static final int COLOR_ERROR = Color.argb(255, 0, 0, 0);
 
-	public static final String API = "http://192.168.1.105:3000";
+	public static final String SERVER_IP_PORT = "http://46.101.223.73:3000";
 	public static final int MAP_UPDATE_INTERVAL = 3 * 1000;
 	public static final int HTTP_UNAUTHORIZED = 401;
 
@@ -65,4 +68,6 @@ public class Constants {
 	public final static String MODE_WALKING = "walking";
 
 	public static final int DEFAULT_ZOOM = 15;
+    public static final int DIRECTIONS_LINE_WIDTH = 12;
+    public static final int DIRECTIONS_LINE_COLOR = Color.BLUE;
 }
