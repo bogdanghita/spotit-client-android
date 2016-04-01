@@ -623,67 +623,67 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonOpenParkingStateOptions(View v) {
 
-//		int visibility;
-//
-//		if (parking_state_button_flag) {
-//			// Open
-//			visibility = View.VISIBLE;
-//		}
-//		else {
-//			// Close
-//			visibility = View.GONE;
-//		}
-//
-//		parking_state_button_flag = !parking_state_button_flag;
-//
-//		findViewById(R.id.fab_free_2).setVisibility(visibility);
-//		findViewById(R.id.fab_moderate_2).setVisibility(visibility);
-//		findViewById(R.id.fab_full_2).setVisibility(visibility);
+		int visibility;
+
+		if (parking_state_button_flag) {
+			// Open
+			visibility = View.VISIBLE;
+		}
+		else {
+			// Close
+			visibility = View.GONE;
+		}
+
+		parking_state_button_flag = !parking_state_button_flag;
+
+		findViewById(R.id.fab_free_2).setVisibility(visibility);
+		findViewById(R.id.fab_moderate_2).setVisibility(visibility);
+		findViewById(R.id.fab_full_2).setVisibility(visibility);
 	}
 
 	public void buttonReportParkingState(View v) {
 
-//		findViewById(R.id.fab_free_2).setVisibility(View.GONE);
-//		findViewById(R.id.fab_moderate_2).setVisibility(View.GONE);
-//		findViewById(R.id.fab_full_2).setVisibility(View.GONE);
-//
-//		parking_state_button_flag = true;
-//
-//		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
-//		if (lastLocation == null) {
-//			return;
-//		}
-//
-//		switch (v.getId()) {
-//			case R.id.fab_free_2:
-//				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
-//				break;
-//			case R.id.fab_moderate_2:
-//				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
-//				break;
-//			case R.id.fab_full_2:
-//				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
-//				break;
-//		}
+		findViewById(R.id.fab_free_2).setVisibility(View.GONE);
+		findViewById(R.id.fab_moderate_2).setVisibility(View.GONE);
+		findViewById(R.id.fab_full_2).setVisibility(View.GONE);
+
+		parking_state_button_flag = true;
+
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		if (lastLocation == null) {
+			return;
+		}
+
+		switch (v.getId()) {
+			case R.id.fab_free_2:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
+				break;
+			case R.id.fab_moderate_2:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
+				break;
+			case R.id.fab_full_2:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
+				break;
+		}
 	}
 
 	public void toggleLocationAddressBar(View v) {
 
-//		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.bottom_layout);
-//		View directions_fab = findViewById(R.id.directions_fab);
-//
-//		if(location_address_bar_flag) {
-//			// Open it
-//			bottom_layout.setTranslationY(0);
-//			directions_fab.setVisibility(View.VISIBLE);
-//		}
-//		else {
-//			// Close it
-//			bottom_layout.setTranslationY(bottom_layout.getHeight());
-//			directions_fab.setVisibility(View.INVISIBLE);
-//		}
-//
-//		location_address_bar_flag = !location_address_bar_flag;
+		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.bottom_layout);
+		View directions_fab = findViewById(R.id.directions_fab);
+
+		if(location_address_bar_flag) {
+			// Open it
+			bottom_layout.setTranslationY(0);
+			directions_fab.setVisibility(View.VISIBLE);
+		}
+		else {
+			// Close it
+			bottom_layout.setTranslationY(bottom_layout.getHeight());
+			directions_fab.setVisibility(View.INVISIBLE);
+		}
+
+		location_address_bar_flag = !location_address_bar_flag;
 	}
 
 // -------------------------------------------------------------------------------------------------
