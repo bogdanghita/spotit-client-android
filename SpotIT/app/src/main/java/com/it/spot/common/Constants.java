@@ -23,6 +23,7 @@ public class Constants {
     public final static String DIRECTIONS = "DIRECT-";
     public final static String URL = "URL-";
     public final static String DIRECTION_TYPE = "DIR_TYPE-";
+    public final static String ADDRESS = "ADDR-";
 
 	public final static int RC_SIGN_IN = 9001;
 	public final static int USER_RECOVERABLE_AUTH_EXCEPTION = 7001;
@@ -63,6 +64,7 @@ public class Constants {
 	public static final int HTTP_UNAUTHORIZED = 401;
 
 	public static final String SAVED_SPOT_FILE = "saved_spot.json";
+    public static final String GOOGLE_MAPS_API = "http://maps.googleapis.com";
 
 	public final static String MODE_DRIVING = "driving";
 	public final static String MODE_WALKING = "walking";

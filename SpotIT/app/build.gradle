@@ -33,6 +33,7 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'org.glassfish:javax.annotation:10.0-b28'
 
     compile 'de.hdodenhof:circleimageview:1.2.1'
 
