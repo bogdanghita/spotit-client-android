@@ -16,17 +16,17 @@ public class ParkingStateButtonsBehavior extends CoordinatorLayout.Behavior<Line
 	public ParkingStateButtonsBehavior(Context context, AttributeSet attrs) {
 	}
 
-//	@Override
-//	public boolean layoutDependsOn(CoordinatorLayout parent, LinearLayout child, View dependency) {
-//		return dependency.getId() == R.id.bottom_layout;
-//	}
-//
-//	@Override
-//	public boolean onDependentViewChanged(CoordinatorLayout parent, LinearLayout child, View dependency) {
-//
-//		float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight());
-//		child.setTranslationY(translationY);
-//
-//		return true;
-//	}
+	@Override
+	public boolean layoutDependsOn(CoordinatorLayout parent, LinearLayout child, View dependency) {
+		return dependency.getId() == R.id.bottom_layout;
+	}
+
+	@Override
+	public boolean onDependentViewChanged(CoordinatorLayout parent, LinearLayout child, View dependency) {
+
+		float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight());
+		child.setTranslationY(translationY);
+
+		return true;
+	}
 }
