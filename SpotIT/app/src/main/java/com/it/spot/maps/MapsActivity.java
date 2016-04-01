@@ -34,7 +34,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -577,6 +576,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	void toggleSaveSpotButton() {
 
+		// TODO: remove this from here and implement the functionality correctly
+		toggleLocationAddressBar();
+
 		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
 		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
 
@@ -636,7 +638,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			return;
 		}
 
+		// TODO: keep the desired set and remove the other one
 		switch (v.getId()) {
+			// First set of buttons
 			case R.id.fab_free_2:
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
 				break;
@@ -644,6 +648,16 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
 				break;
 			case R.id.fab_full_2:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
+				break;
+			// Second set of buttons
+			case R.id.fab_free:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
+				break;
+			case R.id.fab_moderate:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
+				break;
+			case R.id.fab_full:
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
 				break;
 		}
@@ -654,12 +668,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		centerCameraOnLastLocation();
 	}
 
-	public void toggleLocationAddressBar(View v) {
+	// TODO: implement the functionality correctly
+	public void toggleLocationAddressBar() {
 
-		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.bottom_layout);
+		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_address_bar);
 		View directions_fab = findViewById(R.id.directions_fab);
 
-		if(location_address_bar_flag) {
+		if (location_address_bar_flag) {
 			// Open it
 			bottom_layout.setTranslationY(0);
 			directions_fab.setVisibility(View.VISIBLE);
