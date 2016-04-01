@@ -58,7 +58,7 @@ public class Constants {
 	public static final int COLOR_YELLOW = Color.argb(ALPHA, 255, 255, 0);
 	public static final int COLOR_ERROR = Color.argb(255, 0, 0, 0);
 
-	public static final String SERVER_IP_PORT = "http://46.101.223.73:3000";
+	public static final String SERVER_IP_PORT = "http://188.166.167.139:3000";
 	public static final int MAP_UPDATE_INTERVAL = 3 * 1000;
 	public static final int HTTP_UNAUTHORIZED = 401;
 

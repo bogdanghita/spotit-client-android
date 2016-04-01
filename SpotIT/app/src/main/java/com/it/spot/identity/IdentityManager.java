@@ -11,8 +11,8 @@ public class IdentityManager {
 	public synchronized void setUserInfo(UserInfo userInfo) {
 		this.userInfo = userInfo;
 	}
-	public synchronized UserInfo getUserInfo() {
 
+	public synchronized UserInfo getUserInfo() {
 		if (userInfo != null) {
 			return userInfo.clone();
 		}
@@ -20,24 +20,18 @@ public class IdentityManager {
 			return null;
 		}
 	}
-	public synchronized boolean hasUserInfo() {
-		return userInfo != null;
-	}
 
 	public synchronized void setToken(String token) {
 		this.token = token;
 	}
-	public synchronized String getToken() {
 
+	public synchronized String getToken() {
 		if (token != null) {
 			return token;
 		}
 		else {
 			return null;
 		}
-	}
-	public synchronized boolean hasToken() {
-		return token != null;
 	}
 
 	public synchronized void clear() {

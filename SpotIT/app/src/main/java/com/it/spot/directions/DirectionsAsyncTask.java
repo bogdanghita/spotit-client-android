@@ -20,7 +20,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.it.spot.common.Constants;
 
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 
