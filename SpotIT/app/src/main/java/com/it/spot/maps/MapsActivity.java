@@ -577,7 +577,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	void toggleSaveSpotButton() {
 
 		// TODO: remove this from here and implement the functionality correctly
-		toggleLocationAddressBar();
+		toggleLocationInfoBar();
 
 		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
 		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
@@ -669,9 +669,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	}
 
 	// TODO: implement the functionality correctly
-	public void toggleLocationAddressBar() {
+	public void toggleLocationInfoBar() {
 
-		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_address_bar);
+		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
 		View directions_fab = findViewById(R.id.directions_fab);
 
 		if (location_address_bar_flag) {
