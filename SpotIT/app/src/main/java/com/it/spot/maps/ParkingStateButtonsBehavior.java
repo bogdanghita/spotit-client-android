@@ -18,7 +18,7 @@ public class ParkingStateButtonsBehavior extends CoordinatorLayout.Behavior<Line
 
 	@Override
 	public boolean layoutDependsOn(CoordinatorLayout parent, LinearLayout child, View dependency) {
-		return dependency.getId() == R.id.location_address_bar;
+		return dependency.getId() == R.id.location_info_bar;
 	}
 
 	@Override
