@@ -1,5 +1,7 @@
 package com.it.spot.services;
 
+import com.it.spot.address.Address;
+
 import java.util.List;
 import java.util.Map;
 
@@ -23,4 +25,7 @@ public interface HttpService {
 
 	@POST("/api/spot/status")
 	public void postStatus(@Body Message.StatusMessage statusMessage, Callback<Message.StatusMessageID> response);
+
+    @GET("/maps/api/geocode/json")
+    public void getAddress(@Query("latlng") String latlng, Callback<Address> response);
 }
