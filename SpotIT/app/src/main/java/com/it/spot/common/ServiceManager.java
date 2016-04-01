@@ -1,6 +1,7 @@
 package com.it.spot.common;
 
 import com.it.spot.identity.IdentityManager;
+import com.it.spot.maps.LocationManager;
 
 /**
  * Created by Bogdan on 19/03/2016.
@@ -11,13 +12,14 @@ public class ServiceManager {
 
 	private IdentityManager identityManager;
 
-	private ServiceManager() {
+	private LocationManager locationManager;
 
+	private ServiceManager() {
 		identityManager = new IdentityManager();
+		locationManager = new LocationManager();
 	}
 
 	public synchronized static ServiceManager getInstance() {
-
 		if (instance == null) {
 			instance = new ServiceManager();
 		}
@@ -28,8 +30,12 @@ public class ServiceManager {
 		return identityManager;
 	}
 
-	public void clear() {
+	public LocationManager getLocationManager() {
+		return locationManager;
+	}
 
+	public void clear() {
 		identityManager.clear();
+		locationManager.clear();
 	}
 }

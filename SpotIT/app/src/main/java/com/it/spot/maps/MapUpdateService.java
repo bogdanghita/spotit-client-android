@@ -1,6 +1,5 @@
 package com.it.spot.maps;
 
-import android.location.Location;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -64,7 +63,7 @@ public class MapUpdateService {
 		serverAPI.getMapStatus(cameraBounds.getCenter(), radius);
 	}
 
-	public void sendMapStatus(Location location, String status) {
+	public void sendMapStatus(BasicLocation location, String status) {
 
 		int intStatus;
 		switch (status) {

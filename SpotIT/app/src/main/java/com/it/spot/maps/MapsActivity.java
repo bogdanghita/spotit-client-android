@@ -2,7 +2,6 @@ package com.it.spot.maps;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -42,14 +41,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.gson.Gson;
 import com.it.spot.R;
 import com.it.spot.common.Constants;
-import com.it.spot.common.SavedSpot;
 import com.it.spot.common.ServiceManager;
-import com.it.spot.directions.DirectionsAsyncTask;
-import com.it.spot.directions.DirectionsListener;
-import com.it.spot.directions.RouteOptions;
 import com.it.spot.identity.IdentityActivity;
 import com.it.spot.identity.IdentityManager;
 import com.it.spot.identity.ImageLoaderAsyncTask;
@@ -59,12 +53,6 @@ import com.it.spot.identity.TokenRequestEventListener;
 import com.it.spot.identity.UserInfo;
 import com.it.spot.services.PolygonUI;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,25 +62,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-		LocationListener, TokenRequestEventListener, MapUpdateCallbackClient, DirectionsListener {
+		LocationListener, TokenRequestEventListener {
 
 	private ActionBarDrawerToggle mDrawerToggle;
 
 	private GoogleMap mMap;
 	private GoogleApiClient mMapsGoogleApiClient;
 
-	private Location mLastLocation;
 	private String mLastUpdateTime;
 	private LocationRequest mLocationRequest;
 	private LatLngBounds cameraBounds;
-
-	private Location mSavedSpot = null;
-	private Marker mSavedMarker = null;
-	private PolylineOptions mDirectionsPolylineOptions = null;
-	private Polyline mDirectionsPolyline = null;
-
-	private LatLng destinationSpot = null;
-	private Marker destinationMarker = null;
 
 	private boolean firstTimeLocation = true;
 
@@ -100,6 +79,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private boolean mResolvingError = false;
 
 	private MapUpdateService mapUpdateService;
+	RouteService routeService;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -120,17 +100,17 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		mResolvingError = savedInstanceState != null && savedInstanceState.getBoolean(Constants.STATE_RESOLVING_ERROR, false);
 
+		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
+		routeService = new RouteService(this, routeUpdateCallbackClient);
+
 		buildGoogleApiClient();
 
 		createLocationRequest();
 
 		createUserProfile();
 
-		loadSavedSpot();
-
-		toggleLeaveSaveSpot();
-
-		mapUpdateService = new MapUpdateService(this);
+		routeService.loadSavedSpot();
+		toggleSaveSpotButton();
 	}
 
 	@Override
@@ -143,7 +123,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void onStart() {
 		super.onStart();
 
-		if (!mServiceManager.getIdentityManager().hasToken()) {
+		if (mServiceManager.getIdentityManager().getToken() == null) {
 			updateToken();
 		}
 
@@ -210,12 +190,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			@Override
 			public void onMapClick(final LatLng latLng) {
 
-				if (mSavedSpot != null) {
-					return;
-				}
-
-				destinationSpot = latLng;
-				drawDestinationSpot();
+				routeService.setDestination(latLng);
 			}
 		});
 
@@ -223,7 +198,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			enableLocation();
 		}
 
-		drawSavedSpot();
+		routeService.drawSavedSpot();
 	}
 
 	void enableLocation() {
@@ -241,9 +216,12 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			return;
 		}
 
-		mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
-		if (mLastLocation != null) {
-			onLocationChanged(mLastLocation);
+		Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
+		if (lastLocation != null) {
+			mServiceManager.getLocationManager().setLastLocation(
+					new BasicLocation(lastLocation.getLatitude(), lastLocation.getLongitude()));
+
+			onLocationChanged(lastLocation);
 		}
 
 		startLocationUpdates();
@@ -297,7 +275,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	@Override
 	public void onLocationChanged(Location location) {
 
-		mLastLocation = location;
+		mServiceManager.getLocationManager().setLastLocation(
+				new BasicLocation(location.getLatitude(), location.getLongitude()));
+
 		mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
 		if (firstTimeLocation) {
@@ -331,8 +311,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private void centerCameraOnLastLocation() {
 		//mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
 
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
 		CameraPosition cameraPosition = new CameraPosition.Builder()
-				.target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()))
+				.target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
 				.zoom(Constants.DEFAULT_ZOOM)
 				.build();
 		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -386,7 +367,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		IdentityManager identityManager = ServiceManager.getInstance().getIdentityManager();
 
-		if (identityManager.hasUserInfo()) {
+		if (identityManager.getUserInfo() != null) {
 
 			// Setting up user profile
 			UserInfo userInfo = identityManager.getUserInfo();
@@ -402,8 +383,24 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	}
 
 	private void updateUI() {
-		Log.d(Constants.APP + Constants.LOCATION, mLastUpdateTime + ": " + mLastLocation.getLatitude() +
-				", " + mLastLocation.getLongitude());
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		Log.d(Constants.APP + Constants.LOCATION, mLastUpdateTime + ": " + lastLocation.getLatitude() +
+				", " + lastLocation.getLongitude());
+	}
+
+	private void drawPolygon(Iterable<LatLng> points, int color) {
+
+		String text = "";
+		for (LatLng point : points) {
+			text += point.toString() + ", ";
+		}
+		Log.d(Constants.APP + Constants.DRAW, text);
+
+		mMap.addPolygon(new PolygonOptions()
+				.addAll(points)
+				.strokeColor(color)
+				.strokeWidth(0)
+				.fillColor(color));
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -439,7 +436,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	private void updateToken() {
 
-		if (!mServiceManager.getIdentityManager().hasUserInfo()) {
+		if (mServiceManager.getIdentityManager().getUserInfo() == null) {
 			Log.d(Constants.APP, "No user info available.");
 			return;
 		}
@@ -550,234 +547,40 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	}
 
 // -------------------------------------------------------------------------------------------------
-// SPOTS MAP
-// -------------------------------------------------------------------------------------------------
-
-	@Override
-	public void updateMapStatus(final List<PolygonUI> polygons) {
-
-		Log.d(Constants.APP + Constants.MAP_UPDATE, "Received update map status. Polygons: " + polygons.size());
-
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-
-				// Clearing polygons
-				mMap.clear();
-
-				drawSavedSpot();
-				drawDestinationSpot();
-				drawDirectionsPolyline();
-
-				// Drawing all polygons
-				for (PolygonUI polygon : polygons) {
-
-					drawPolygon(polygon.getPoints(), polygon.getColor());
-				}
-			}
-		});
-	}
-
-	@Override
-	public void notifyRequestFailure() {
-
-		updateToken();
-	}
-
-	private void drawPolygon(Iterable<LatLng> points, int color) {
-
-		String text = "";
-		for (LatLng point : points) {
-			text += point.toString() + ", ";
-		}
-		Log.d(Constants.APP + Constants.DRAW, text);
-
-		mMap.addPolygon(new PolygonOptions()
-				.addAll(points)
-				.strokeColor(color)
-				.strokeWidth(0)
-				.fillColor(color));
-	}
-
-
-// -------------------------------------------------------------------------------------------------
 // SIDEBAR OPTIONS
 // -------------------------------------------------------------------------------------------------
 
-	void toggleLeaveSaveSpot() {
-
-		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
-		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
-
-		if (mSavedSpot == null) {
-			buttonLeaveSpot.setVisibility(View.GONE);
-			buttonSaveSpot.setVisibility(View.VISIBLE);
-		}
-		else {
-			buttonLeaveSpot.setVisibility(View.VISIBLE);
-			buttonSaveSpot.setVisibility(View.GONE);
-		}
-	}
-
-	void loadSavedSpot() {
-
-		SavedSpot savedSpot = readSavedSpotFile(Constants.SAVED_SPOT_FILE);
-
-		if (savedSpot != null && savedSpot.hasSavedSpot) {
-			mSavedSpot = savedSpot.location;
-		}
-	}
-
-	void drawSavedSpot() {
-
-		if (mSavedMarker != null) {
-			mSavedMarker.remove();
-		}
-
-		if (mSavedSpot == null) {
-			return;
-		}
-
-		LatLng point = new LatLng(mSavedSpot.getLatitude(), mSavedSpot.getLongitude());
-		mSavedMarker = mMap.addMarker(new MarkerOptions().position(point).
-				title("Your car is here").
-				snippet("Click on marker for directions"));
-		mSavedMarker.showInfoWindow();
-
-//		mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
-
-		mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-			@Override
-			public boolean onMarkerClick(Marker marker) {
-				if (marker.getTitle().equals("Your car is here")) {
-					drawRouteToSavedSpotButton();
-				}
-				return false;
-			}
-		});
-	}
-
-	void drawDestinationSpot() {
-
-		if (destinationMarker != null) {
-			destinationMarker.remove();
-		}
-
-		if (destinationSpot == null) {
-			return;
-		}
-
-		if(mDirectionsPolyline != null) {
-			mDirectionsPolyline.remove();
-			mDirectionsPolyline = null;
-			mDirectionsPolylineOptions = null;
-		}
-
-		destinationMarker = mMap.addMarker(new MarkerOptions().position(destinationSpot).
-				title("Your parking spot").
-				snippet("Click on marker for directions"));
-		destinationMarker.showInfoWindow();
-
-		mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-			@Override
-			public boolean onMarkerClick(Marker marker) {
-				if (marker.getTitle().equals("Your parking spot")) {
-					drawRouteToDestinationSpot(destinationSpot);
-				}
-				return false;
-			}
-		});
-	}
-
 	public void buttonSaveSpot(View view) {
 
-		if(destinationSpot != null) {
-			destinationMarker.remove();
-			destinationMarker = null;
-			destinationSpot = null;
-		}
-		if(mDirectionsPolylineOptions != null) {
-			mDirectionsPolyline.remove();
-			mDirectionsPolyline = null;
-			mDirectionsPolylineOptions = null;
-		}
+		routeService.saveSpot();
 
-		SavedSpot spot = new SavedSpot(true, mLastLocation);
-
-		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
-
-		mSavedSpot = spot.location;
-		drawSavedSpot();
-
-		toggleLeaveSaveSpot();
+		toggleSaveSpotButton();
 
 		toggleNavigationDrawer();
 	}
 
 	public void buttonLeaveSpot(View view) {
 
-		SavedSpot spot = new SavedSpot(false, mLastLocation);
+		routeService.leaveSpot();
 
-		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
-
-		mSavedSpot = null;
-		if (mSavedMarker != null) {
-			mSavedMarker.remove();
-			mSavedMarker = null;
-		}
-
-		mDirectionsPolylineOptions = null;
-		if (mDirectionsPolyline != null) {
-			mDirectionsPolyline.remove();
-			mDirectionsPolyline = null;
-		}
-
-		toggleLeaveSaveSpot();
+		toggleSaveSpotButton();
 
 		toggleNavigationDrawer();
 	}
 
-	private void writeSavedSpotFile(SavedSpot spot, String filename) {
+	void toggleSaveSpotButton() {
 
-		try {
-			FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
+		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
+		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
 
-			Gson gson = new Gson();
-			String jsonString = gson.toJson(spot);
-
-			fos.write(jsonString.getBytes());
-
-			fos.close();
+		if (routeService.isSpotSaved()) {
+			buttonLeaveSpot.setVisibility(View.VISIBLE);
+			buttonSaveSpot.setVisibility(View.GONE);
 		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
+		else {
+			buttonLeaveSpot.setVisibility(View.GONE);
+			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error writing saved spot to file: " + filename);
-		}
-	}
-
-	private SavedSpot readSavedSpotFile(String filename) {
-
-		SavedSpot result = null;
-
-		try {
-			FileInputStream fis = openFileInput(filename);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-
-			Gson gson = new Gson();
-			result = gson.fromJson(reader, SavedSpot.class);
-
-			reader.close();
-			fis.close();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error reading saved spot from file: " + filename);
-		}
-
-		return result;
 	}
 
 	public void buttonHistory(View view) {
@@ -794,68 +597,103 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // -------------------------------------------------------------------------------------------------
 
 	public void spotItButtonFree(View view) {
-
-		mapUpdateService.sendMapStatus(mLastLocation, Constants.STATUS_GREEN_TEXT);
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		if (lastLocation != null) {
+			mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
+		}
 	}
 
 	public void spotItButtonMedium(View view) {
-
-		mapUpdateService.sendMapStatus(mLastLocation, Constants.STATUS_YELLOW_TEXT);
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		if (lastLocation != null) {
+			mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
+		}
 	}
 
 	public void spotItButtonFull(View view) {
-
-		mapUpdateService.sendMapStatus(mLastLocation, Constants.STATUS_RED_TEXT);
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		if (lastLocation != null) {
+			mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
+		}
 	}
 
-	public void drawRouteToSavedSpotButton() {
+// -------------------------------------------------------------------------------------------------
+// UPDATE CALLBACK CLIENT
+// -------------------------------------------------------------------------------------------------
 
-		if (mSavedSpot == null) {
-			return;
+	MapUpdateCallbackClient mapUpdateCallbackClient = new MapUpdateCallbackClient() {
+		@Override
+		public void updateMapStatus(final List<PolygonUI> polygons) {
+
+			Log.d(Constants.APP + Constants.MAP_UPDATE, "Received update map status. Polygons: " + polygons.size());
+
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+
+					// Clearing polygons
+					mMap.clear();
+
+					// Notify route service
+					routeService.notifyMapCleared();
+
+					// Drawing all polygons
+					for (PolygonUI polygon : polygons) {
+
+						drawPolygon(polygon.getPoints(), polygon.getColor());
+					}
+				}
+			});
 		}
 
-		// Get directions from source to destination as PolylineOptions.
-		DirectionsAsyncTask directions = new DirectionsAsyncTask(this);
+		@Override
+		public void notifyRequestFailure() {
+			updateToken();
+		}
+	};
 
-		LatLng source = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-		LatLng destination = new LatLng(mSavedSpot.getLatitude(), mSavedSpot.getLongitude());
+	RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
 
-		directions.execute(new RouteOptions(source, destination, Constants.MODE_WALKING));
-	}
+		public void drawRoute(final PolylineOptions directionsPolylineOptions, final RouteUpdateResultCallbackClient client) {
 
-	public void drawRouteToDestinationSpot(LatLng position) {
-
-		// Get directions from source to destination as PolylineOptions.
-		DirectionsAsyncTask directions = new DirectionsAsyncTask(this);
-
-		LatLng source = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
-		directions.execute(new RouteOptions(source, position, Constants.MODE_WALKING));
-	}
-
-	void drawDirectionsPolyline() {
-
-		if (mDirectionsPolyline != null) {
-			mDirectionsPolyline.remove();
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Polyline result = mMap.addPolyline(directionsPolylineOptions);
+					client.notifyPolylineResult(result);
+				}
+			});
 		}
 
-		if (mDirectionsPolylineOptions == null) {
-			return;
+		public void removeRoute(final Polyline directionsPolyline) {
+
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					directionsPolyline.remove();
+				}
+			});
 		}
 
-		mDirectionsPolyline = mMap.addPolyline(mDirectionsPolylineOptions);
-	}
+		public void drawMarker(final MarkerOptions markerOptions, final RouteUpdateResultCallbackClient client) {
 
-	@Override
-	public void notifyDirectionsResponse(final PolylineOptions polylineOptions) {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Marker result = mMap.addMarker(markerOptions);
+					client.notifyMarkerResult(result);
+				}
+			});
+		}
 
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
+		public void removeMarker(final Marker marker) {
 
-				mDirectionsPolylineOptions = polylineOptions;
-				drawDirectionsPolyline();
-			}
-		});
-	}
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					marker.remove();
+				}
+			});
+		}
+	};
 }

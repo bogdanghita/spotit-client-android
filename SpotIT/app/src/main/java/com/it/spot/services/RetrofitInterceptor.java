@@ -12,8 +12,8 @@ public class RetrofitInterceptor implements RequestInterceptor  {
 	@Override
 	public void intercept(RequestInterceptor.RequestFacade req) {
 
-		if(ServiceManager.getInstance().getIdentityManager().hasToken()) {
-			String token = ServiceManager.getInstance().getIdentityManager().getToken();
+		String token = ServiceManager.getInstance().getIdentityManager().getToken();
+		if(token != null) {
 			req.addHeader("Authorization", "Bearer " + token);
 		}
 	}
