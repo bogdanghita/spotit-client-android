@@ -34,6 +34,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -198,6 +199,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			}
 		});
 
+		// TODO: solve the permissions problem
 		if (checkAndRequestPermissionACCESS_FINE_LOCATION()) {
 			enableLocation();
 		}
@@ -207,6 +209,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	void enableLocation() {
 		mMap.setMyLocationEnabled(true);
+		mMap.getUiSettings().setMyLocationButtonEnabled(false);
 	}
 
 	@Override
@@ -600,27 +603,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // ON SCREEN BUTTONS
 // -------------------------------------------------------------------------------------------------
 
-	public void spotItButtonFree(View view) {
-		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
-		if (lastLocation != null) {
-			mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
-		}
-	}
-
-	public void spotItButtonMedium(View view) {
-		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
-		if (lastLocation != null) {
-			mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
-		}
-	}
-
-	public void spotItButtonFull(View view) {
-		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
-		if (lastLocation != null) {
-			mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
-		}
-	}
-
 	public void buttonOpenParkingStateOptions(View v) {
 
 		int visibility;
@@ -665,6 +647,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
 				break;
 		}
+	}
+
+	public void buttonCenterOnLocation(View v) {
+
+		centerCameraOnLastLocation();
 	}
 
 	public void toggleLocationAddressBar(View v) {

@@ -30,7 +30,8 @@
 		android:layout_gravity="end|bottom"
 		android:layout_margin="@dimen/fab_margin"
 		android:src="@android:drawable/ic_dialog_map"
-		app:layout_behavior="com.it.spot.maps.CenterOnLocationButtonBehavior"/>
+		app:layout_behavior="com.it.spot.maps.CenterOnLocationButtonBehavior"
+		android:onClick="buttonCenterOnLocation"/>
 
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/directions_fab"
