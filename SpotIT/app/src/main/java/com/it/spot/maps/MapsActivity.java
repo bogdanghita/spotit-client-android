@@ -43,6 +43,8 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.it.spot.R;
+import com.it.spot.address.AddressAsyncTask;
+import com.it.spot.address.AddressListener;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.identity.IdentityActivity;
@@ -487,7 +489,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mResolvingError = false;
 	}
 
-	/* A fragment to display an error dialog */
+    /* A fragment to display an error dialog */
 	public static class ErrorDialogFragment extends DialogFragment {
 		public ErrorDialogFragment() {
 		}
