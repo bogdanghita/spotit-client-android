@@ -165,6 +165,17 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	}
 
+	@Override
+	public void onBackPressed() {
+		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+			locationRouteService.removeDestination();
+			setDirectionsButtonIcon(false);
+		}
+		else {
+			super.onBackPressed();
+		}
+	}
+
 	/**
 	 * Manipulates the map once available.
 	 * This callback is triggered when the map is ready to be used.

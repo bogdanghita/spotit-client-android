@@ -63,6 +63,10 @@ public class LocationRouteService {
 		return hasDirectionsPolyline;
 	}
 
+	public MarkerType getMarkerType() {
+		return markerType;
+	}
+
 	private void updateMarkerMapState() {
 
 		switch (markerType) {
@@ -121,6 +125,9 @@ public class LocationRouteService {
 
 		markerType = MarkerType.NONE;
 
+		hasDirectionsPolyline = false;
+		clearDirectionsPolyline();
+
 		updateMarkerMapState();
 	}
 
@@ -132,6 +139,19 @@ public class LocationRouteService {
 
 		markerType = MarkerType.DESTINATION;
 		mMarkerLocation = new BasicLocation(latLng.latitude, latLng.longitude);
+
+		hasDirectionsPolyline = false;
+		clearDirectionsPolyline();
+
+		updateMarkerMapState();
+	}
+
+	public void removeDestination() {
+		if (markerType != MarkerType.DESTINATION) {
+			return;
+		}
+
+		markerType = MarkerType.NONE;
 
 		hasDirectionsPolyline = false;
 		clearDirectionsPolyline();
@@ -262,7 +282,7 @@ public class LocationRouteService {
 	}
 
 	public void removeRouteToMarker() {
-		
+
 		hasDirectionsPolyline = false;
 		clearDirectionsPolyline();
 	}
