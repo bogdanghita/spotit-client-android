@@ -59,12 +59,8 @@ public class LocationRouteService {
 // SAVED SPOT & DESTINATION ACTIONS
 // -------------------------------------------------------------------------------------------------
 
-	public MarkerType getMarkerType() {
-		return markerType;
-	}
-
-	public BasicLocation getMarkerLocation() {
-		return mMarkerLocation;
+	public boolean hasDirectionsPolyline() {
+		return hasDirectionsPolyline;
 	}
 
 	private void updateMarkerMapState() {
@@ -263,6 +259,12 @@ public class LocationRouteService {
 		LatLng destination = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
 		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsListener);
 		directions.execute(new RouteOptions(source, destination, directions_mode));
+	}
+
+	public void removeRouteToMarker() {
+		
+		hasDirectionsPolyline = false;
+		clearDirectionsPolyline();
 	}
 
 	private boolean checkSameRoute(BasicLocation source, BasicLocation destination) {
