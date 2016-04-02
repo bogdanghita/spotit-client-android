@@ -675,6 +675,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
 				break;
 		}
+
+		// Request map update status to give the user instant feedback
+		mapUpdateService.requestMapStatusUpdate();
 	}
 
 	public void buttonCenterOnLocation(View v) {
@@ -728,7 +731,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // UPDATE CALLBACK CLIENT
 // -------------------------------------------------------------------------------------------------
 
-	MapUpdateCallbackClient mapUpdateCallbackClient = new MapUpdateCallbackClient() {
+	private MapUpdateCallbackClient mapUpdateCallbackClient = new MapUpdateCallbackClient() {
 		@Override
 		public void updateMapStatus(final List<PolygonUI> polygons) {
 
@@ -763,7 +766,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 	};
 
-	RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
+	private RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
 
 		@Override
 		public void drawRoute(final PolylineOptions directionsPolylineOptions, final RouteUpdateResultCallbackClient client) {
@@ -825,7 +828,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 	};
 
-	AddressResponseListener addressResponseListener = new AddressResponseListener() {
+	private AddressResponseListener addressResponseListener = new AddressResponseListener() {
 		@Override
 		public void notifyAddressResponse(final String address) {
 

@@ -40,7 +40,7 @@ public class ServerAPI {
         this.updateClient = updateClient;
 
         RestAdapter retrofit = new RestAdapter.Builder()
-                .setEndpoint(Constants.SERVER_IP_PORT)
+                .setEndpoint(Constants.SERVER_ADDRESS)
                 .setRequestInterceptor(new RetrofitInterceptor())
                 .build();
 
