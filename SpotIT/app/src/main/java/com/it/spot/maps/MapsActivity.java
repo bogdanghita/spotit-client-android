@@ -80,7 +80,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private boolean mResolvingError = false;
 
 	private MapUpdateService mapUpdateService;
-	RouteService routeService;
+	private LocationRouteService locationRouteService;
 
 	private boolean location_address_bar_flag = true;
 	private boolean parking_state_button_flag = true;
@@ -105,7 +105,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mResolvingError = savedInstanceState != null && savedInstanceState.getBoolean(Constants.STATE_RESOLVING_ERROR, false);
 
 		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
-		routeService = new RouteService(this, routeUpdateCallbackClient);
+		locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
 
 		buildGoogleApiClient();
 
@@ -113,7 +113,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		createUserProfile();
 
-		routeService.loadSavedSpot();
+		locationRouteService.loadSavedSpot();
 		toggleSaveSpotButton();
 	}
 
@@ -194,7 +194,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			@Override
 			public void onMapClick(final LatLng latLng) {
 
-				routeService.setDestination(latLng);
+				locationRouteService.setDestination(latLng);
 			}
 		});
 
@@ -203,7 +203,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			enableLocation();
 		}
 
-		routeService.drawSavedSpot();
+		locationRouteService.drawSavedSpot();
 	}
 
 	void enableLocation() {
@@ -558,7 +558,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonSaveSpot(View view) {
 
-		routeService.saveSpot();
+		locationRouteService.saveSpot();
 
 		toggleSaveSpotButton();
 
@@ -567,7 +567,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonLeaveSpot(View view) {
 
-		routeService.leaveSpot();
+		locationRouteService.leaveSpot();
 
 		toggleSaveSpotButton();
 
@@ -582,7 +582,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
 		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
 
-		if (routeService.isSpotSaved()) {
+		if (locationRouteService.isSpotSaved()) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
 		}
@@ -688,6 +688,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		location_address_bar_flag = !location_address_bar_flag;
 	}
 
+	public void buttonDirections(View v) {
+
+	}
+
 // -------------------------------------------------------------------------------------------------
 // UPDATE CALLBACK CLIENT
 // -------------------------------------------------------------------------------------------------
@@ -702,11 +706,15 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				@Override
 				public void run() {
 
+					if(mMap == null) {
+						return;
+					}
+
 					// Clearing polygons
 					mMap.clear();
 
 					// Notify route service
-					routeService.notifyMapCleared();
+					locationRouteService.notifyMapCleared();
 
 					// Drawing all polygons
 					for (PolygonUI polygon : polygons) {
@@ -730,7 +738,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					Polyline result = mMap.addPolyline(directionsPolylineOptions);
+					Polyline result = null;
+					if(mMap != null) {
+						result = mMap.addPolyline(directionsPolylineOptions);
+					}
 					client.notifyPolylineResult(result);
 				}
 			});
@@ -751,7 +762,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					Marker result = mMap.addMarker(markerOptions);
+					Marker result = null;
+					if(mMap != null) {
+						result = mMap.addMarker(markerOptions);
+					}
 					client.notifyMarkerResult(result);
 				}
 			});
