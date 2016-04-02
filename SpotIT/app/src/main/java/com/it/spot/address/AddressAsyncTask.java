@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.it.spot.common.Constants;
+import com.it.spot.maps.BasicLocation;
 import com.it.spot.services.HttpService;
 
 import java.util.List;
@@ -17,53 +18,53 @@ import retrofit.client.Response;
 /**
  * Created by Claudiu on 01-Apr-16.
  */
-public class AddressAsyncTask extends AsyncTask<LatLng, Void, Void> {
+public class AddressAsyncTask extends AsyncTask<BasicLocation, Void, Void> {
 
-    private AddressListener mAddressListener;
-    private HttpService mHttpService;
+	private AddressResponseListener mAddressResponseListener;
+	private HttpService mHttpService;
 
-    public AddressAsyncTask(AddressListener addressListener) {
-        mAddressListener = addressListener;
+	public AddressAsyncTask(AddressResponseListener addressListener) {
+		mAddressResponseListener = addressListener;
 
-        RestAdapter retrofit = new RestAdapter.Builder()
-                .setEndpoint(Constants.GOOGLE_MAPS_API)
-                .build();
+		RestAdapter retrofit = new RestAdapter.Builder()
+				.setEndpoint(Constants.GOOGLE_MAPS_API)
+				.build();
 
-        mHttpService = retrofit.create(HttpService.class);
-    }
+		mHttpService = retrofit.create(HttpService.class);
+	}
 
-    @Override
-    protected Void doInBackground(LatLng... params) {
+	@Override
+	protected Void doInBackground(BasicLocation... params) {
 
-        if (params == null || params.length ==0){
-            return null;
-        }
+		if (params == null || params.length == 0) {
+			return null;
+		}
 
-        String latlng = params[0].latitude + "," + params[0].longitude;
+		String latlng = params[0].getLatitude() + "," + params[0].getLongitude();
 
-        mHttpService.getAddress(latlng, new Callback<Address>() {
-            @Override
-            public void success(Address address, Response response) {
+		mHttpService.getAddress(latlng, new Callback<Address>() {
+			@Override
+			public void success(Address address, Response response) {
 
-                Log.d(Constants.ADDRESS, "success");
+				Log.d(Constants.ADDRESS, "success");
 
-                String formattedAddress;
-                List<Result> results = address.getResults();
+				String formattedAddress;
+				List<Result> results = address.getResults();
 
-                if (results == null || results.size() == 0)
-                    return;
+				if (results == null || results.size() == 0)
+					return;
 
-                formattedAddress = results.get(0).getFormattedAddress();
+				formattedAddress = results.get(0).getFormattedAddress();
 
-                mAddressListener.notifyAddressResponse(formattedAddress);
-            }
+				mAddressResponseListener.notifyAddressResponse(formattedAddress);
+			}
 
-            @Override
-            public void failure(RetrofitError error) {
-                Log.d(Constants.ADDRESS, "failure "+error.toString());
-            }
-        });
+			@Override
+			public void failure(RetrofitError error) {
+				Log.d(Constants.ADDRESS, "failure " + error.toString());
+			}
+		});
 
-        return null;
-    }
+		return null;
+	}
 }

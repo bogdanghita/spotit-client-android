@@ -45,7 +45,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.it.spot.R;
 import com.it.spot.address.AddressAsyncTask;
-import com.it.spot.address.AddressListener;
+import com.it.spot.address.AddressResponseListener;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.identity.IdentityActivity;
@@ -700,8 +700,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		bottom_layout.setTranslationY(0);
 		directions_fab.setVisibility(View.VISIBLE);
 
-		TextView locationAddress = (TextView) findViewById(R.id.location_address);
-		locationAddress.setText(location.toString());
+		AddressAsyncTask addressAsyncTask = new AddressAsyncTask(addressResponseListener);
+		addressAsyncTask.execute(location);
 	}
 
 	private void closeLocationInfoBar() {
@@ -711,6 +711,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		bottom_layout.setTranslationY(bottom_layout.getHeight());
 		directions_fab.setVisibility(View.INVISIBLE);
+
+		TextView locationAddress = (TextView) findViewById(R.id.location_address);
+		locationAddress.setText("");
 	}
 
 	private void setDirectionsButtonIcon(boolean iconClosed) {
@@ -821,4 +824,19 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			});
 		}
 	};
+
+	AddressResponseListener addressResponseListener = new AddressResponseListener() {
+		@Override
+		public void notifyAddressResponse(final String address) {
+
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					TextView locationAddress = (TextView) findViewById(R.id.location_address);
+					locationAddress.setText(address);
+				}
+			});
+		}
+	};
+
 }
