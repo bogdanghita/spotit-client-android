@@ -3,7 +3,6 @@ package com.it.spot.maps;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -27,15 +26,15 @@ import java.io.InputStreamReader;
 /**
  * Created by Bogdan on 31/03/2016.
  */
-public class RouteService {
+public class LocationRouteService {
 
-	private BasicLocation mSavedSpot = null;
-	private Marker mSavedMarker = null;
+	private enum MarkerType {SAVED_SPOT, DESTINATION, NONE}
+
+	private MarkerType markerType;
+	private BasicLocation mMarkerLocation = null;
+	private Marker mMarker = null;
 	private PolylineOptions mDirectionsPolylineOptions = null;
 	private Polyline mDirectionsPolyline = null;
-
-	private LatLng destinationSpot = null;
-	private Marker destinationMarker = null;
 
 	private LocationManager mLocationManager;
 
@@ -43,74 +42,93 @@ public class RouteService {
 
 	private Context mContext;
 
-	public RouteService(Context context, RouteUpdateCallbackClient routeUpdateClient) {
+	public LocationRouteService(Context context, RouteUpdateCallbackClient routeUpdateClient) {
 
 		this.mContext = context;
 		this.mRouteUpdateClient = routeUpdateClient;
 
 		mLocationManager = ServiceManager.getInstance().getLocationManager();
+		markerType = MarkerType.NONE;
 	}
 
 // -------------------------------------------------------------------------------------------------
 // SAVED SPOT ACTIONS
 // -------------------------------------------------------------------------------------------------
 
-	public void saveSpot() {
+	private void updateMarkerMapState() {
 
-		if (destinationSpot != null) {
-			destinationMarker.remove();
-			destinationMarker = null;
-			destinationSpot = null;
+		switch (markerType) {
+			case NONE:
+
+				mMarkerLocation = null;
+				mDirectionsPolylineOptions = null;
+				clearMapItems();
+
+				break;
+			case SAVED_SPOT:
+
+				clearMapItems();
+				drawSavedSpot();
+
+				break;
+			case DESTINATION:
+
+				break;
 		}
-		if (mDirectionsPolylineOptions != null) {
-			mDirectionsPolyline.remove();
-			mDirectionsPolyline = null;
-			mDirectionsPolylineOptions = null;
-		}
-
-		BasicLocation lastLocation = mLocationManager.getLastLocation();
-		if(lastLocation == null) {
-			return;
-		}
-
-		SavedSpot spot = new SavedSpot(true, lastLocation);
-
-		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
-
-		mSavedSpot = spot.location;
-		drawSavedSpot();
 	}
 
-	public void leaveSpot() {
+	private void clearMapItems() {
 
-		writeSavedSpotFile(new SavedSpot(false, null), Constants.SAVED_SPOT_FILE);
-
-		mSavedSpot = null;
-		if (mSavedMarker != null) {
-			mSavedMarker.remove();
-			mSavedMarker = null;
+		if (mMarker != null) {
+			mMarker.remove();
+			mMarker = null;
 		}
-
-		mDirectionsPolylineOptions = null;
 		if (mDirectionsPolyline != null) {
 			mDirectionsPolyline.remove();
 			mDirectionsPolyline = null;
 		}
 	}
 
-	public void setDestination(LatLng latLng) {
+	public void saveSpot() {
 
-		if (mSavedSpot != null) {
+		BasicLocation lastLocation = mLocationManager.getLastLocation();
+		if (lastLocation == null) {
 			return;
 		}
 
-		destinationSpot = latLng;
-		drawDestinationSpot();
+		markerType = MarkerType.SAVED_SPOT;
+		mMarkerLocation = lastLocation;
+
+		SavedSpot spot = new SavedSpot(true, lastLocation);
+		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
+
+		updateMarkerMapState();
+	}
+
+	public void leaveSpot() {
+
+		writeSavedSpotFile(new SavedSpot(false, null), Constants.SAVED_SPOT_FILE);
+
+		markerType = MarkerType.NONE;
+
+		updateMarkerMapState();
+	}
+
+	public void setDestination(LatLng latLng) {
+
+		if (markerType == MarkerType.SAVED_SPOT) {
+			return;
+		}
+
+		markerType = MarkerType.DESTINATION;
+		mMarkerLocation = new BasicLocation(latLng.latitude, latLng.longitude);
+
+		updateMarkerMapState();
 	}
 
 	public boolean isSpotSaved() {
 
-		return mSavedSpot != null;
+		return markerType == MarkerType.SAVED_SPOT;
 	}
 
 	public void loadSavedSpot() {
@@ -118,8 +136,11 @@ public class RouteService {
 		SavedSpot savedSpot = readSavedSpotFile(Constants.SAVED_SPOT_FILE);
 
 		if (savedSpot != null && savedSpot.hasSavedSpot) {
-			mSavedSpot = savedSpot.location;
+			markerType = MarkerType.SAVED_SPOT;
+			mMarkerLocation = savedSpot.location;
 		}
+
+		updateMarkerMapState();
 	}
 
 	private void writeSavedSpotFile(SavedSpot spot, String filename) {
@@ -171,54 +192,33 @@ public class RouteService {
 
 	public void notifyMapCleared() {
 
-		drawSavedSpot();
-		drawDestinationSpot();
+		updateMarkerMapState();
 	}
 
 	public void drawSavedSpot() {
 
-		if (mSavedMarker != null) {
-			mRouteUpdateClient.removeMarker(mSavedMarker);
+		if (mMarker != null) {
+			mRouteUpdateClient.removeMarker(mMarker);
 		}
 
-		if (mSavedSpot == null) {
+		if (mMarkerLocation == null) {
 			return;
 		}
 
-		LatLng point = new LatLng(mSavedSpot.getLatitude(), mSavedSpot.getLongitude());
+		LatLng point = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
 
 		MarkerOptions markerOptions = new MarkerOptions().position(point);
 		mRouteUpdateClient.drawMarker(markerOptions, savedSpotClient);
 	}
 
-	private void drawDestinationSpot() {
-
-		if (destinationMarker != null) {
-			mRouteUpdateClient.removeMarker(destinationMarker);
-		}
-
-		if (destinationSpot == null) {
-			return;
-		}
-
-		if (mDirectionsPolyline != null) {
-			mDirectionsPolyline.remove();
-			mDirectionsPolyline = null;
-			mDirectionsPolylineOptions = null;
-		}
-
-		MarkerOptions markerOptions = new MarkerOptions().position(destinationSpot);
-		mRouteUpdateClient.drawMarker(markerOptions, destinationClient);
-	}
-
 	private void drawRouteToSavedSpotButton() {
 
-		if (mSavedSpot == null) {
+		if (mMarkerLocation == null) {
 			return;
 		}
 
 		BasicLocation lastLocation = mLocationManager.getLastLocation();
-		if(lastLocation == null) {
+		if (lastLocation == null) {
 			return;
 		}
 
@@ -226,7 +226,7 @@ public class RouteService {
 		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsListener);
 
 		LatLng source = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-		LatLng destination = new LatLng(mSavedSpot.getLatitude(), mSavedSpot.getLongitude());
+		LatLng destination = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
 
 		directions.execute(new RouteOptions(source, destination, Constants.MODE_WALKING));
 	}
@@ -234,7 +234,7 @@ public class RouteService {
 	private void drawRouteToDestinationSpot(LatLng position) {
 
 		BasicLocation lastLocation = mLocationManager.getLastLocation();
-		if(lastLocation == null) {
+		if (lastLocation == null) {
 			return;
 		}
 
@@ -277,26 +277,27 @@ public class RouteService {
 	private RouteUpdateResultCallbackClient savedSpotClient = new RouteUpdateResultCallbackClient() {
 		@Override
 		public void notifyPolylineResult(Polyline polyline) {
-			// TODO: ...
+			// TODO: see above
 			mDirectionsPolyline = polyline;
 		}
 
 		@Override
 		public void notifyMarkerResult(Marker marker) {
-			mSavedMarker = marker;
+			mMarker = marker;
 		}
 	};
 
 	private RouteUpdateResultCallbackClient destinationClient = new RouteUpdateResultCallbackClient() {
 		@Override
 		public void notifyPolylineResult(Polyline polyline) {
-			// TODO: ...
+			// TODO: see above
 			mDirectionsPolyline = polyline;
 		}
 
 		@Override
 		public void notifyMarkerResult(Marker marker) {
-			destinationMarker = marker;
+//			destinationMarker = marker;
+			// TODO: ...
 		}
 	};
 }

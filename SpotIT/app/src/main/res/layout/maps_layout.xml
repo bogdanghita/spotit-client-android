@@ -30,9 +30,10 @@
 		android:layout_height="90dp"
 		android:layout_gravity="bottom|end"
 		android:background="@color/colorLight"
+		android:clickable="true"
+		android:elevation="6dp"
 		android:orientation="vertical"
-		android:translationY="90dp"
-		android:elevation="6dp">
+		android:translationY="90dp">
 
 	</LinearLayout>
 
@@ -52,6 +53,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_margin="@dimen/fab_margin"
+		android:onClick="buttonDirections"
 		android:src="@drawable/ic_directions_white_24dp"
 		android:visibility="invisible"
 		app:backgroundTint="@color/colorPrimary"
