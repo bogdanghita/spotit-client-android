@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -489,7 +490,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mResolvingError = false;
 	}
 
-    /* A fragment to display an error dialog */
+	/* A fragment to display an error dialog */
 	public static class ErrorDialogFragment extends DialogFragment {
 		public ErrorDialogFragment() {
 		}
@@ -668,7 +669,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonDirections(View v) {
 
-//		locationRouteService.drawRouteToMarker();
+		locationRouteService.drawRouteToMarker();
 	}
 
 	public void openLocationInfoBar(BasicLocation location) {
@@ -749,13 +750,12 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 
 		@Override
-		public void removeRoute(final Polyline directionsPolyline, final Object eventWait) {
+		public void removeRoute(final Polyline directionsPolyline) {
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					directionsPolyline.remove();
-//					eventWait.notify();
 				}
 			});
 		}
@@ -779,13 +779,12 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 
 		@Override
-		public void removeMarker(final Marker marker, final Object eventWait) {
+		public void removeMarker(final Marker marker) {
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					marker.remove();
-//					eventWait.notify();
 
 					closeLocationInfoBar();
 				}

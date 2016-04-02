@@ -37,6 +37,7 @@ public class LocationRouteService {
 	private Marker mMarker = null;
 	private PolylineOptions mDirectionsPolylineOptions = null;
 	private Polyline mDirectionsPolyline = null;
+	private BasicLocation lastDirectionsSource, lastDirectionsDestination;
 
 	private LocationManager mLocationManager;
 
@@ -94,30 +95,8 @@ public class LocationRouteService {
 	private void clearMapItems() {
 
 		if (mMarker != null) {
-			Object eventWait = new Object();
-			mRouteUpdateClient.removeMarker(mMarker, eventWait);
-//			try {
-//				eventWait.wait();
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();
-//				// TODO: ...
-//			}
+			mRouteUpdateClient.removeMarker(mMarker);
 			mMarker = null;
-		}
-
-		hasDirectionsPolyline = false;
-		if (mDirectionsPolyline != null) {
-			Object eventWait = new Object();
-			mRouteUpdateClient.removeRoute(mDirectionsPolyline, eventWait);
-//			try {
-//				eventWait.wait();
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();
-//				// TODO: ...
-//			}
-			mDirectionsPolyline = null;
 		}
 	}
 
@@ -133,6 +112,9 @@ public class LocationRouteService {
 
 		SavedSpot spot = new SavedSpot(true, lastLocation);
 		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
+
+		hasDirectionsPolyline = false;
+		clearDirectionsPolyline();
 
 		updateMarkerMapState();
 	}
@@ -154,6 +136,9 @@ public class LocationRouteService {
 
 		markerType = MarkerType.DESTINATION;
 		mMarkerLocation = new BasicLocation(latLng.latitude, latLng.longitude);
+
+		hasDirectionsPolyline = false;
+		clearDirectionsPolyline();
 
 		updateMarkerMapState();
 	}
@@ -224,6 +209,9 @@ public class LocationRouteService {
 
 	public void notifyMapCleared() {
 
+		mMarker = null;
+		mDirectionsPolyline = null;
+
 		updateMarkerMapState();
 		drawDirectionsPolyline();
 	}
@@ -231,15 +219,7 @@ public class LocationRouteService {
 	public void drawMarker() {
 
 		if (mMarker != null) {
-			Object eventWait = new Object();
-			mRouteUpdateClient.removeMarker(mMarker, eventWait);
-//			try {
-//				eventWait.wait();
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();
-//				// TODO: ...
-//			}
+			mRouteUpdateClient.removeMarker(mMarker);
 		}
 
 		if (mMarkerLocation == null) {
@@ -270,48 +250,47 @@ public class LocationRouteService {
 			return;
 		}
 
-		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsListener);
+		// Not drawing the same polyline again
+		if (hasDirectionsPolyline && checkSameRoute(lastLocation, mMarkerLocation)) {
+			return;
+		}
+		lastDirectionsSource = lastLocation.clone();
+		lastDirectionsDestination = mMarkerLocation.clone();
 
+		// Get route
+		hasDirectionsPolyline = true;
 		LatLng source = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 		LatLng destination = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
-
+		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsListener);
 		directions.execute(new RouteOptions(source, destination, directions_mode));
+	}
+
+	private boolean checkSameRoute(BasicLocation source, BasicLocation destination) {
+
+		if (lastDirectionsSource == null || lastDirectionsDestination == null) {
+			return false;
+		}
+
+		return !(source.equals(lastDirectionsSource) && destination.equals(lastDirectionsDestination));
 	}
 
 	private void drawDirectionsPolyline() {
 
 		if (mDirectionsPolyline != null) {
-			Object eventWait = new Object();
-			mRouteUpdateClient.removeRoute(mDirectionsPolyline, eventWait);
-//			try {
-//				eventWait.wait();
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();
-//				// TODO: ...
-//			}
+			mRouteUpdateClient.removeRoute(mDirectionsPolyline);
 		}
 
 		if (mDirectionsPolylineOptions == null) {
 			return;
 		}
-
-		hasDirectionsPolyline = true;
 		mRouteUpdateClient.drawRoute(mDirectionsPolylineOptions, locationRouteUpdateClient);
 	}
 
 	private void clearDirectionsPolyline() {
 
-		hasDirectionsPolyline = false;
-		Object eventWait = new Object();
-		mRouteUpdateClient.removeRoute(mDirectionsPolyline, eventWait);
-//		try {
-//			eventWait.wait();
-//		}
-//		catch (InterruptedException e) {
-//			e.printStackTrace();
-//			// TODO: ...
-//		}
+		if (mDirectionsPolyline != null) {
+			mRouteUpdateClient.removeRoute(mDirectionsPolyline);
+		}
 
 		mDirectionsPolyline = null;
 		mDirectionsPolylineOptions = null;
