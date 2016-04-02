@@ -31,6 +31,7 @@ public class LocationRouteService {
 	private enum MarkerType {SAVED_SPOT, DESTINATION, NONE}
 
 	private MarkerType markerType;
+	private boolean hasDirectionsPolyline;
 
 	private BasicLocation mMarkerLocation = null;
 	private Marker mMarker = null;
@@ -50,6 +51,7 @@ public class LocationRouteService {
 
 		mLocationManager = ServiceManager.getInstance().getLocationManager();
 		markerType = MarkerType.NONE;
+		hasDirectionsPolyline = false;
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -84,11 +86,29 @@ public class LocationRouteService {
 	private void clearMapItems() {
 
 		if (mMarker != null) {
-			mMarker.remove();
+			Object eventWait = new Object();
+			mRouteUpdateClient.removeMarker(mMarker, eventWait);
+//			try {
+//				eventWait.wait();
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//				// TODO: ...
+//			}
 			mMarker = null;
 		}
+
+		hasDirectionsPolyline = false;
 		if (mDirectionsPolyline != null) {
-			mDirectionsPolyline.remove();
+			Object eventWait = new Object();
+			mRouteUpdateClient.removeRoute(mDirectionsPolyline, eventWait);
+//			try {
+//				eventWait.wait();
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//				// TODO: ...
+//			}
 			mDirectionsPolyline = null;
 		}
 	}
@@ -197,12 +217,21 @@ public class LocationRouteService {
 	public void notifyMapCleared() {
 
 		updateMarkerMapState();
+		drawDirectionsPolyline();
 	}
 
 	public void drawMarker() {
 
 		if (mMarker != null) {
-			mRouteUpdateClient.removeMarker(mMarker);
+			Object eventWait = new Object();
+			mRouteUpdateClient.removeMarker(mMarker, eventWait);
+//			try {
+//				eventWait.wait();
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//				// TODO: ...
+//			}
 		}
 
 		if (mMarkerLocation == null) {
@@ -215,10 +244,17 @@ public class LocationRouteService {
 		mRouteUpdateClient.drawMarker(markerOptions, locationRouteUpdateClient);
 	}
 
-	private void drawRouteToSavedSpotButton() {
+	public void drawRouteToMarker() {
 
-		if (mMarkerLocation == null) {
+		String directions_mode;
+		if (markerType == MarkerType.NONE || mMarkerLocation == null) {
 			return;
+		}
+		if (markerType == MarkerType.SAVED_SPOT) {
+			directions_mode = Constants.MODE_WALKING;
+		}
+		else {
+			directions_mode = Constants.MODE_DRIVING;
 		}
 
 		BasicLocation lastLocation = mLocationManager.getLastLocation();
@@ -226,44 +262,51 @@ public class LocationRouteService {
 			return;
 		}
 
-		// Get directions from source to destination as PolylineOptions.
 		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsListener);
 
 		LatLng source = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 		LatLng destination = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
 
-		directions.execute(new RouteOptions(source, destination, Constants.MODE_WALKING));
-	}
-
-	private void drawRouteToDestinationSpot(LatLng position) {
-
-		BasicLocation lastLocation = mLocationManager.getLastLocation();
-		if (lastLocation == null) {
-			return;
-		}
-
-		// Get directions from source to destination as PolylineOptions.
-		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsListener);
-
-		LatLng source = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-
-		directions.execute(new RouteOptions(source, position, Constants.MODE_DRIVING));
+		directions.execute(new RouteOptions(source, destination, directions_mode));
 	}
 
 	private void drawDirectionsPolyline() {
 
 		if (mDirectionsPolyline != null) {
-//			mDirectionsPolyline.remove();
-			mRouteUpdateClient.removeRoute(mDirectionsPolyline);
+			Object eventWait = new Object();
+			mRouteUpdateClient.removeRoute(mDirectionsPolyline, eventWait);
+//			try {
+//				eventWait.wait();
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//				// TODO: ...
+//			}
 		}
 
 		if (mDirectionsPolylineOptions == null) {
 			return;
 		}
 
-//		mDirectionsPolyline = mMap.addPolyline(mDirectionsPolylineOptions);
-		// TODO: Saved spot client is used here. Solve this
+		hasDirectionsPolyline = true;
 		mRouteUpdateClient.drawRoute(mDirectionsPolylineOptions, locationRouteUpdateClient);
+	}
+
+	private void clearDirectionsPolyline() {
+
+		hasDirectionsPolyline = false;
+		Object eventWait = new Object();
+		mRouteUpdateClient.removeRoute(mDirectionsPolyline, eventWait);
+//		try {
+//			eventWait.wait();
+//		}
+//		catch (InterruptedException e) {
+//			e.printStackTrace();
+//			// TODO: ...
+//		}
+
+		mDirectionsPolyline = null;
+		mDirectionsPolylineOptions = null;
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -281,7 +324,6 @@ public class LocationRouteService {
 	private RouteUpdateResultCallbackClient locationRouteUpdateClient = new RouteUpdateResultCallbackClient() {
 		@Override
 		public void notifyPolylineResult(Polyline polyline) {
-			// TODO: see above
 			mDirectionsPolyline = polyline;
 		}
 
