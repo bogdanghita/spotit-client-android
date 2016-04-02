@@ -13,7 +13,7 @@ import com.it.spot.common.Constants;
 import com.it.spot.common.SavedSpot;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.directions.DirectionsAsyncTask;
-import com.it.spot.directions.DirectionsListener;
+import com.it.spot.directions.DirectionsResultListener;
 import com.it.spot.directions.RouteOptions;
 
 import java.io.BufferedReader;
@@ -277,7 +277,7 @@ public class LocationRouteService {
 		hasDirectionsPolyline = true;
 		LatLng source = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 		LatLng destination = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
-		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsListener);
+		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsResultListener);
 		directions.execute(new RouteOptions(source, destination, directions_mode));
 	}
 
@@ -322,7 +322,7 @@ public class LocationRouteService {
 // RESULT CALLBACKS
 // -------------------------------------------------------------------------------------------------
 
-	private DirectionsListener directionsListener = new DirectionsListener() {
+	private DirectionsResultListener directionsResultListener = new DirectionsResultListener() {
 		@Override
 		public void notifyDirectionsResponse(PolylineOptions polylineOptions) {
 			mDirectionsPolylineOptions = polylineOptions;

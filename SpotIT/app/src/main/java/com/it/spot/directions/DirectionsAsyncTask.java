@@ -28,11 +28,11 @@ import android.util.Log;
  */
 public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 
-	private DirectionsListener mDirectionsListener;
+	private DirectionsResultListener mDirectionsResultListener;
 
-	public DirectionsAsyncTask(DirectionsListener directionsListener) {
+	public DirectionsAsyncTask(DirectionsResultListener directionsResultListener) {
 
-		this.mDirectionsListener = directionsListener;
+		this.mDirectionsResultListener = directionsResultListener;
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 		RouteOptions routeOptions = params[0];
 		PolylineOptions options = getDirections(routeOptions.source, routeOptions.destination, routeOptions.mode);
 
-		mDirectionsListener.notifyDirectionsResponse(options);
+		mDirectionsResultListener.notifyDirectionsResponse(options);
 
 		return null;
 	}
