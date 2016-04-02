@@ -59,7 +59,7 @@ public class Constants {
 	public static final int COLOR_YELLOW = Color.argb(ALPHA, 255, 255, 0);
 	public static final int COLOR_ERROR = Color.argb(255, 0, 0, 0);
 
-	public static final String SERVER_IP_PORT = "http://188.166.167.139";
+	public static final String SERVER_ADDRESS = "http://188.166.167.139";
 	public static final int MAP_UPDATE_INTERVAL = 3 * 1000;
 	public static final int HTTP_UNAUTHORIZED = 401;
 
@@ -69,7 +69,7 @@ public class Constants {
 	public final static String MODE_DRIVING = "driving";
 	public final static String MODE_WALKING = "walking";
 
-	public static final int DEFAULT_ZOOM = 15;
+	public static final float DEFAULT_ZOOM = 17.3f;
 	public static final int DIRECTIONS_LINE_WIDTH = 12;
 	public static final int DIRECTIONS_LINE_COLOR = Color.BLUE;
 }
