@@ -28,7 +28,7 @@ import java.io.InputStreamReader;
  */
 public class LocationRouteService {
 
-	private enum MarkerType {SAVED_SPOT, DESTINATION, NONE}
+	public enum MarkerType {SAVED_SPOT, DESTINATION, NONE}
 
 	private MarkerType markerType;
 	private boolean hasDirectionsPolyline;
@@ -55,8 +55,13 @@ public class LocationRouteService {
 	}
 
 // -------------------------------------------------------------------------------------------------
-// SAVED SPOT ACTIONS
+// SAVED SPOT & DESTINATION ACTIONS
 // -------------------------------------------------------------------------------------------------
+
+	public MarkerType getMarkerType() {
+
+		return markerType;
+	}
 
 	private void updateMarkerMapState() {
 

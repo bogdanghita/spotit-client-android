@@ -82,7 +82,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private MapUpdateService mapUpdateService;
 	private LocationRouteService locationRouteService;
 
-	private boolean location_address_bar_flag = true;
 	private boolean parking_state_button_flag = true;
 
 	@Override
@@ -114,6 +113,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		createUserProfile();
 
 		locationRouteService.loadSavedSpot();
+		if(locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+			openLocationInfoBar();
+		}
 		toggleSaveSpotButton();
 	}
 
@@ -194,7 +196,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			@Override
 			public void onMapClick(final LatLng latLng) {
 
-				locationRouteService.setDestination(latLng);
+				if(locationRouteService.getMarkerType() != LocationRouteService.MarkerType.SAVED_SPOT) {
+					locationRouteService.setDestination(latLng);
+					openLocationInfoBar();
+				}
 			}
 		});
 
@@ -563,6 +568,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleSaveSpotButton();
 
 		toggleNavigationDrawer();
+
+		openLocationInfoBar();
 	}
 
 	public void buttonLeaveSpot(View view) {
@@ -572,12 +579,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleSaveSpotButton();
 
 		toggleNavigationDrawer();
+
+		closeLocationInfoBar();
 	}
 
 	void toggleSaveSpotButton() {
-
-		// TODO: remove this from here and implement the functionality correctly
-		toggleLocationInfoBar();
 
 		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
 		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
@@ -668,29 +674,27 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		centerCameraOnLastLocation();
 	}
 
-	// TODO: implement the functionality correctly
-	public void toggleLocationInfoBar() {
+	public void buttonDirections(View v) {
+
+//		locationRouteService.drawRouteToMarker();
+	}
+
+	public void openLocationInfoBar() {
 
 		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
 		View directions_fab = findViewById(R.id.directions_fab);
 
-		if (location_address_bar_flag) {
-			// Open it
-			bottom_layout.setTranslationY(0);
-			directions_fab.setVisibility(View.VISIBLE);
-		}
-		else {
-			// Close it
-			bottom_layout.setTranslationY(bottom_layout.getHeight());
-			directions_fab.setVisibility(View.INVISIBLE);
-		}
-
-		location_address_bar_flag = !location_address_bar_flag;
+		bottom_layout.setTranslationY(0);
+		directions_fab.setVisibility(View.VISIBLE);
 	}
 
-	public void buttonDirections(View v) {
+	public void closeLocationInfoBar() {
 
-//		locationRouteService.drawRouteToMarker();
+		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
+		View directions_fab = findViewById(R.id.directions_fab);
+
+		bottom_layout.setTranslationY(bottom_layout.getHeight());
+		directions_fab.setVisibility(View.INVISIBLE);
 	}
 
 // -------------------------------------------------------------------------------------------------
