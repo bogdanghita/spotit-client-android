@@ -31,6 +31,7 @@ public class LocationRouteService {
 	private enum MarkerType {SAVED_SPOT, DESTINATION, NONE}
 
 	private MarkerType markerType;
+
 	private BasicLocation mMarkerLocation = null;
 	private Marker mMarker = null;
 	private PolylineOptions mDirectionsPolylineOptions = null;
@@ -68,10 +69,13 @@ public class LocationRouteService {
 			case SAVED_SPOT:
 
 				clearMapItems();
-				drawSavedSpot();
+				drawMarker();
 
 				break;
 			case DESTINATION:
+
+				clearMapItems();
+				drawMarker();
 
 				break;
 		}
@@ -195,7 +199,7 @@ public class LocationRouteService {
 		updateMarkerMapState();
 	}
 
-	public void drawSavedSpot() {
+	public void drawMarker() {
 
 		if (mMarker != null) {
 			mRouteUpdateClient.removeMarker(mMarker);
@@ -208,7 +212,7 @@ public class LocationRouteService {
 		LatLng point = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
 
 		MarkerOptions markerOptions = new MarkerOptions().position(point);
-		mRouteUpdateClient.drawMarker(markerOptions, savedSpotClient);
+		mRouteUpdateClient.drawMarker(markerOptions, locationRouteUpdateClient);
 	}
 
 	private void drawRouteToSavedSpotButton() {
@@ -259,7 +263,7 @@ public class LocationRouteService {
 
 //		mDirectionsPolyline = mMap.addPolyline(mDirectionsPolylineOptions);
 		// TODO: Saved spot client is used here. Solve this
-		mRouteUpdateClient.drawRoute(mDirectionsPolylineOptions, savedSpotClient);
+		mRouteUpdateClient.drawRoute(mDirectionsPolylineOptions, locationRouteUpdateClient);
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -274,7 +278,7 @@ public class LocationRouteService {
 		}
 	};
 
-	private RouteUpdateResultCallbackClient savedSpotClient = new RouteUpdateResultCallbackClient() {
+	private RouteUpdateResultCallbackClient locationRouteUpdateClient = new RouteUpdateResultCallbackClient() {
 		@Override
 		public void notifyPolylineResult(Polyline polyline) {
 			// TODO: see above
@@ -284,20 +288,6 @@ public class LocationRouteService {
 		@Override
 		public void notifyMarkerResult(Marker marker) {
 			mMarker = marker;
-		}
-	};
-
-	private RouteUpdateResultCallbackClient destinationClient = new RouteUpdateResultCallbackClient() {
-		@Override
-		public void notifyPolylineResult(Polyline polyline) {
-			// TODO: see above
-			mDirectionsPolyline = polyline;
-		}
-
-		@Override
-		public void notifyMarkerResult(Marker marker) {
-//			destinationMarker = marker;
-			// TODO: ...
 		}
 	};
 }

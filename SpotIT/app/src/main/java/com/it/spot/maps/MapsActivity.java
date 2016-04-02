@@ -203,7 +203,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			enableLocation();
 		}
 
-		locationRouteService.drawSavedSpot();
+		locationRouteService.drawMarker();
 	}
 
 	void enableLocation() {
@@ -690,6 +690,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonDirections(View v) {
 
+		// TODO: ...
 	}
 
 // -------------------------------------------------------------------------------------------------
