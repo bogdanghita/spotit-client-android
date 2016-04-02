@@ -13,9 +13,9 @@ public interface RouteUpdateCallbackClient {
 
 	void drawRoute(PolylineOptions directionsPolylineOptions, RouteUpdateResultCallbackClient client);
 
-	void removeRoute(Polyline directionsPolyline, Object eventWait);
+	void removeRoute(Polyline directionsPolyline);
 
 	void drawMarker(MarkerOptions markerOptions, RouteUpdateResultCallbackClient client);
 
-	void removeMarker(Marker marker, Object eventWait);
+	void removeMarker(Marker marker);
 }
