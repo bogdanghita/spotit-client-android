@@ -690,7 +690,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonDirections(View v) {
 
-		// TODO: ...
+//		locationRouteService.drawRouteToMarker();
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -707,7 +707,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				@Override
 				public void run() {
 
-					if(mMap == null) {
+					if (mMap == null) {
 						return;
 					}
 
@@ -734,13 +734,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
 
+		@Override
 		public void drawRoute(final PolylineOptions directionsPolylineOptions, final RouteUpdateResultCallbackClient client) {
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					Polyline result = null;
-					if(mMap != null) {
+					if (mMap != null) {
 						result = mMap.addPolyline(directionsPolylineOptions);
 					}
 					client.notifyPolylineResult(result);
@@ -748,23 +749,26 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			});
 		}
 
-		public void removeRoute(final Polyline directionsPolyline) {
+		@Override
+		public void removeRoute(final Polyline directionsPolyline, final Object eventWait) {
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					directionsPolyline.remove();
+//					eventWait.notify();
 				}
 			});
 		}
 
+		@Override
 		public void drawMarker(final MarkerOptions markerOptions, final RouteUpdateResultCallbackClient client) {
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					Marker result = null;
-					if(mMap != null) {
+					if (mMap != null) {
 						result = mMap.addMarker(markerOptions);
 					}
 					client.notifyMarkerResult(result);
@@ -772,12 +776,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			});
 		}
 
-		public void removeMarker(final Marker marker) {
+		@Override
+		public void removeMarker(final Marker marker, final Object eventWait) {
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					marker.remove();
+//					eventWait.notify();
 				}
 			});
 		}
