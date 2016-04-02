@@ -35,6 +35,12 @@
 		android:orientation="vertical"
 		android:translationY="90dp">
 
+		<TextView
+			android:id="@+id/location_address"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Address"/>
+
 	</LinearLayout>
 
 	<android.support.design.widget.FloatingActionButton

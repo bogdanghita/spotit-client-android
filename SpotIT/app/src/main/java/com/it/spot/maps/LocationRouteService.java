@@ -59,8 +59,11 @@ public class LocationRouteService {
 // -------------------------------------------------------------------------------------------------
 
 	public MarkerType getMarkerType() {
-
 		return markerType;
+	}
+
+	public BasicLocation getMarkerLocation() {
+		return mMarkerLocation;
 	}
 
 	private void updateMarkerMapState() {

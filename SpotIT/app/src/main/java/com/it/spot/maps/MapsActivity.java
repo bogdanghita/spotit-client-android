@@ -113,9 +113,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		createUserProfile();
 
 		locationRouteService.loadSavedSpot();
-		if(locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
-			openLocationInfoBar();
-		}
 		toggleSaveSpotButton();
 	}
 
@@ -196,10 +193,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			@Override
 			public void onMapClick(final LatLng latLng) {
 
-				if(locationRouteService.getMarkerType() != LocationRouteService.MarkerType.SAVED_SPOT) {
-					locationRouteService.setDestination(latLng);
-					openLocationInfoBar();
-				}
+				locationRouteService.setDestination(latLng);
 			}
 		});
 
@@ -568,8 +562,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleSaveSpotButton();
 
 		toggleNavigationDrawer();
-
-		openLocationInfoBar();
 	}
 
 	public void buttonLeaveSpot(View view) {
@@ -579,8 +571,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleSaveSpotButton();
 
 		toggleNavigationDrawer();
-
-		closeLocationInfoBar();
 	}
 
 	void toggleSaveSpotButton() {
@@ -679,13 +669,16 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 //		locationRouteService.drawRouteToMarker();
 	}
 
-	public void openLocationInfoBar() {
+	public void openLocationInfoBar(BasicLocation location) {
 
 		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
 		View directions_fab = findViewById(R.id.directions_fab);
 
 		bottom_layout.setTranslationY(0);
 		directions_fab.setVisibility(View.VISIBLE);
+
+		TextView locationAddress = (TextView) findViewById(R.id.location_address);
+		locationAddress.setText(location.toString());
 	}
 
 	public void closeLocationInfoBar() {
@@ -776,6 +769,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 						result = mMap.addMarker(markerOptions);
 					}
 					client.notifyMarkerResult(result);
+
+					LatLng position = markerOptions.getPosition();
+					openLocationInfoBar(new BasicLocation(position.latitude, position.longitude));
 				}
 			});
 		}
@@ -788,6 +784,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				public void run() {
 					marker.remove();
 //					eventWait.notify();
+
+					closeLocationInfoBar();
 				}
 			});
 		}
