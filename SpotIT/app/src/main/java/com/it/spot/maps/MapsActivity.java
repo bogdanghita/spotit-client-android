@@ -8,6 +8,7 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -17,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -565,6 +565,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleSaveSpotButton();
 
 		toggleNavigationDrawer();
+
+		setDirectionsButtonIcon(false);
 	}
 
 	public void buttonLeaveSpot(View view) {
@@ -574,6 +576,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleSaveSpotButton();
 
 		toggleNavigationDrawer();
+
+		setDirectionsButtonIcon(false);
 	}
 
 	void toggleSaveSpotButton() {
@@ -669,10 +673,15 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonDirections(View v) {
 
-		locationRouteService.drawRouteToMarker();
+		if (!locationRouteService.hasDirectionsPolyline()) {
+			locationRouteService.drawRouteToMarker();
+		}
+		else {
+			locationRouteService.removeRouteToMarker();
+		}
 	}
 
-	public void openLocationInfoBar(BasicLocation location) {
+	private void openLocationInfoBar(BasicLocation location) {
 
 		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
 		View directions_fab = findViewById(R.id.directions_fab);
@@ -684,13 +693,21 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		locationAddress.setText(location.toString());
 	}
 
-	public void closeLocationInfoBar() {
+	private void closeLocationInfoBar() {
 
 		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
 		View directions_fab = findViewById(R.id.directions_fab);
 
 		bottom_layout.setTranslationY(bottom_layout.getHeight());
 		directions_fab.setVisibility(View.INVISIBLE);
+	}
+
+	private void setDirectionsButtonIcon(boolean iconClosed) {
+
+		int icon_id = iconClosed ? R.drawable.ic_close_white_24dp : R.drawable.ic_directions_white_24dp;
+
+		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.directions_fab);
+		fab.setImageDrawable(getResources().getDrawable(icon_id));
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -743,6 +760,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 					Polyline result = null;
 					if (mMap != null) {
 						result = mMap.addPolyline(directionsPolylineOptions);
+						setDirectionsButtonIcon(true);
 					}
 					client.notifyPolylineResult(result);
 				}
@@ -756,6 +774,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				@Override
 				public void run() {
 					directionsPolyline.remove();
+					setDirectionsButtonIcon(false);
 				}
 			});
 		}
