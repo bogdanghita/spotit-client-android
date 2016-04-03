@@ -70,15 +70,15 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="start|bottom"
-		android:layout_margin="@dimen/fab_margin"
-		android:orientation="vertical"
-		android:visibility="invisible"
+		android:orientation="horizontal"
+		android:visibility="visible"
 		app:layout_behavior="com.it.spot.maps.ParkingStateButtonsBehavior">
 
 		<android.support.design.widget.FloatingActionButton
 			android:id="@+id/fab_free"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			app:backgroundTint="@color/colorLight"/>
@@ -87,6 +87,7 @@
 			android:id="@+id/fab_moderate"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			app:backgroundTint="@color/colorLight"/>
@@ -95,6 +96,7 @@
 			android:id="@+id/fab_full"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			app:backgroundTint="@color/colorLight"/>
@@ -105,9 +107,8 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="start|bottom"
-		android:layout_margin="@dimen/fab_margin"
 		android:orientation="vertical"
-		android:visibility="visible"
+		android:visibility="gone"
 		app:layout_behavior="com.it.spot.maps.ParkingStateButtonsBehavior">
 
 		<android.support.design.widget.FloatingActionButton
@@ -115,6 +116,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_horizontal"
+			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			android:visibility="gone"
@@ -126,6 +128,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_horizontal"
+			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			android:visibility="gone"
@@ -137,6 +140,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_horizontal"
+			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			android:visibility="gone"
@@ -147,6 +151,7 @@
 			android:id="@+id/fab_state"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonOpenParkingStateOptions"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			app:backgroundTint="@color/colorLight"/>
