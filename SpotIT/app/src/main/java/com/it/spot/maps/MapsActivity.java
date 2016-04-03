@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -66,721 +69,745 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, TokenRequestEventListener {
+		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+		LocationListener, TokenRequestEventListener {
 
-    private ActionBarDrawerToggle mDrawerToggle;
+	private ActionBarDrawerToggle mDrawerToggle;
 
-    private GoogleMap mMap;
-    private GoogleApiClient mMapsGoogleApiClient;
+	private GoogleMap mMap;
+	private GoogleApiClient mMapsGoogleApiClient;
 
-    private String mLastUpdateTime;
-    private LocationRequest mLocationRequest;
-    private LatLngBounds cameraBounds;
+	private String mLastUpdateTime;
+	private LocationRequest mLocationRequest;
+	private LatLngBounds cameraBounds;
 
-    private boolean firstTimeLocation = true;
+	private boolean firstTimeLocation = true;
 
-    // Bool to track whether the app is already resolving an error
-    private boolean mResolvingError = false;
+	// Bool to track whether the app is already resolving an error
+	private boolean mResolvingError = false;
 
-    private MapUpdateService mapUpdateService;
-    private LocationRouteService locationRouteService;
+	private MapUpdateService mapUpdateService;
+	private LocationRouteService locationRouteService;
 
-    private boolean parking_state_button_flag = true;
+	private boolean parking_state_button_flag = true;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_maps);
 
-        // Configure toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+		// Configure toolbar
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 
-        // Configure sidebar
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        configureNavigationDrawer(drawerLayout, toolbar);
+		// Configure sidebar
+		DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		configureNavigationDrawer(drawerLayout, toolbar);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+		// Obtain the SupportMapFragment and get notified when the map is ready to be used.
+		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+		mapFragment.getMapAsync(this);
 
-        mResolvingError = savedInstanceState != null && savedInstanceState.getBoolean(Constants.STATE_RESOLVING_ERROR, false);
+		mResolvingError = savedInstanceState != null && savedInstanceState.getBoolean(Constants.STATE_RESOLVING_ERROR, false);
 
-        mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
-        locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
+		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
+		locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
 
-        buildGoogleApiClient();
+		buildGoogleApiClient();
 
-        createLocationRequest();
+		createLocationRequest();
 
-        createUserProfile();
+		createUserProfile();
 
-        locationRouteService.loadSavedSpot();
-        toggleSaveSpotButton();
-    }
+		locationRouteService.loadSavedSpot();
+		toggleSaveSpotButton();
+	}
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(Constants.STATE_RESOLVING_ERROR, mResolvingError);
-    }
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(Constants.STATE_RESOLVING_ERROR, mResolvingError);
+	}
 
-    @Override
-    public void onStart() {
-        super.onStart();
+	@Override
+	public void onStart() {
+		super.onStart();
 
-        if (mServiceManager.getIdentityManager().getToken() == null) {
-            updateToken();
-        }
+		if (mServiceManager.getIdentityManager().getToken() == null) {
+			updateToken();
+		}
 
-        if (!mResolvingError) {
-            mMapsGoogleApiClient.connect();
-        }
-    }
+		if (!mResolvingError) {
+			mMapsGoogleApiClient.connect();
+		}
+	}
 
-    @Override
-    public void onResume() {
-        super.onResume();
+	@Override
+	public void onResume() {
+		super.onResume();
 
-        mapUpdateService.startMapStatusUpdateLoop();
-    }
+		mapUpdateService.startMapStatusUpdateLoop();
+	}
 
-    @Override
-    public void onPause() {
-        super.onPause();
+	@Override
+	public void onPause() {
+		super.onPause();
 
-        mapUpdateService.stopMapStatusUpdateLoop();
-    }
+		mapUpdateService.stopMapStatusUpdateLoop();
+	}
 
-    @Override
-    public void onStop() {
-        super.onStop();
+	@Override
+	public void onStop() {
+		super.onStop();
 
-        mMapsGoogleApiClient.disconnect();
-    }
+		mMapsGoogleApiClient.disconnect();
+	}
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
 
-    }
+	}
 
-    @Override
-    public void onBackPressed() {
-        if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
-            locationRouteService.removeDestination();
-            setDirectionsButtonIcon(false);
-        } else {
-            super.onBackPressed();
-        }
-    }
+	@Override
+	public void onBackPressed() {
+		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+			locationRouteService.removeDestination();
+			setDirectionsButtonIcon(false);
+		}
+		else {
+			super.onBackPressed();
+		}
+	}
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
+	/**
+	 * Manipulates the map once available.
+	 * This callback is triggered when the map is ready to be used.
+	 * This is where we can add markers or lines, add listeners or move the camera. In this case,
+	 * we just add a marker near Sydney, Australia.
+	 * If Google Play services is not installed on the device, the user will be prompted to install
+	 * it inside the SupportMapFragment. This method will only be triggered once the user has
+	 * installed Google Play services and returned to the app.
+	 */
+	@Override
+	public void onMapReady(GoogleMap googleMap) {
 
-        mMap = googleMap;
+		mMap = googleMap;
 
-        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition position) {
-                cameraBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+		mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+			@Override
+			public void onCameraChange(CameraPosition position) {
+				cameraBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
 
-                Log.d(Constants.APP + Constants.CAMERA_CHANGE, cameraBounds.getCenter() + " - " + cameraBounds.southwest + ", " + cameraBounds.northeast);
+				Log.d(Constants.APP + Constants.CAMERA_CHANGE, cameraBounds.getCenter() + " - " + cameraBounds.southwest + ", " + cameraBounds.northeast);
 
-                // Setting camera position and requesting a map status update
-                mapUpdateService.setCameraPosition(cameraBounds);
-                mapUpdateService.requestMapStatusUpdate();
-            }
-        });
+				// Setting camera position and requesting a map status update
+				mapUpdateService.setCameraPosition(cameraBounds);
+				mapUpdateService.requestMapStatusUpdate();
+			}
+		});
 
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(final LatLng latLng) {
+		mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+			@Override
+			public void onMapClick(final LatLng latLng) {
 
-                locationRouteService.setDestination(latLng);
-            }
-        });
+				locationRouteService.setDestination(latLng);
+			}
+		});
 
-        // TODO: solve the permissions problem
-        if (checkAndRequestPermissionACCESS_FINE_LOCATION()) {
-            enableLocation();
-        }
+		// TODO: solve the permissions problem
+		if (checkAndRequestPermissionACCESS_FINE_LOCATION()) {
+			enableLocation();
+		}
 
-        locationRouteService.drawMarker();
-    }
+		locationRouteService.drawMarker();
+	}
 
-    void enableLocation() {
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
-    }
+	void enableLocation() {
+		mMap.setMyLocationEnabled(true);
+		mMap.getUiSettings().setMyLocationButtonEnabled(false);
+	}
 
-    @Override
-    public void onConnected(Bundle bundle) {
+	@Override
+	public void onConnected(Bundle bundle) {
 
-        Log.d(Constants.APP + Constants.CONNECTION, "onConnected");
+		Log.d(Constants.APP + Constants.CONNECTION, "onConnected");
 
-        // TODO: Problem here. FINE_LOCATION is needed in 2 different places. However there is only
-        // one callback on permission granted. Solve this...
-        if (!checkAndRequestPermissionACCESS_FINE_LOCATION()) {
-            return;
-        }
+		// TODO: Problem here. FINE_LOCATION is needed in 2 different places. However there is only
+		// one callback on permission granted. Solve this...
+		if (!checkAndRequestPermissionACCESS_FINE_LOCATION()) {
+			return;
+		}
 
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
-        if (lastLocation != null) {
-            mServiceManager.getLocationManager().setLastLocation(
-                    new BasicLocation(lastLocation.getLatitude(), lastLocation.getLongitude()));
+		Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
+		if (lastLocation != null) {
+			mServiceManager.getLocationManager().setLastLocation(
+					new BasicLocation(lastLocation.getLatitude(), lastLocation.getLongitude()));
 
-            onLocationChanged(lastLocation);
-        }
+			onLocationChanged(lastLocation);
+		}
 
-        startLocationUpdates();
-    }
+		startLocationUpdates();
+	}
 
-    @Override
-    public void onConnectionSuspended(int i) {
+	@Override
+	public void onConnectionSuspended(int i) {
 
-        Log.d(Constants.APP + Constants.CONNECTION, "onConnectionSuspended: " + i);
-    }
+		Log.d(Constants.APP + Constants.CONNECTION, "onConnectionSuspended: " + i);
+	}
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
 
-        Log.d(Constants.APP + Constants.CONNECTION, "onConnectionFailed");
+		Log.d(Constants.APP + Constants.CONNECTION, "onConnectionFailed");
 
-        if (mResolvingError) {
-            // Already attempting to resolve an error.
-            return;
-        } else if (connectionResult.hasResolution()) {
-            try {
-                mResolvingError = true;
-                connectionResult.startResolutionForResult(this, Constants.REQUEST_RESOLVE_ERROR);
-            } catch (IntentSender.SendIntentException e) {
-                // There was an error with the resolution intent. Try again.
-                mMapsGoogleApiClient.connect();
-            }
-        } else {
-            // Show dialog using GoogleApiAvailability.getErrorDialog()
-            showErrorDialog(connectionResult.getErrorCode());
-            mResolvingError = true;
-        }
-    }
+		if (mResolvingError) {
+			// Already attempting to resolve an error.
+			return;
+		}
+		else if (connectionResult.hasResolution()) {
+			try {
+				mResolvingError = true;
+				connectionResult.startResolutionForResult(this, Constants.REQUEST_RESOLVE_ERROR);
+			}
+			catch (IntentSender.SendIntentException e) {
+				// There was an error with the resolution intent. Try again.
+				mMapsGoogleApiClient.connect();
+			}
+		}
+		else {
+			// Show dialog using GoogleApiAvailability.getErrorDialog()
+			showErrorDialog(connectionResult.getErrorCode());
+			mResolvingError = true;
+		}
+	}
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.REQUEST_RESOLVE_ERROR) {
-            mResolvingError = false;
-            if (resultCode == RESULT_OK) {
-                // Make sure the app is not already connected or attempting to connect
-                if (!mMapsGoogleApiClient.isConnecting() && !mMapsGoogleApiClient.isConnected()) {
-                    mMapsGoogleApiClient.connect();
-                }
-            }
-        }
-    }
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == Constants.REQUEST_RESOLVE_ERROR) {
+			mResolvingError = false;
+			if (resultCode == RESULT_OK) {
+				// Make sure the app is not already connected or attempting to connect
+				if (!mMapsGoogleApiClient.isConnecting() && !mMapsGoogleApiClient.isConnected()) {
+					mMapsGoogleApiClient.connect();
+				}
+			}
+		}
+	}
 
-    @Override
-    public void onLocationChanged(Location location) {
+	@Override
+	public void onLocationChanged(Location location) {
 
-        mServiceManager.getLocationManager().setLastLocation(
-                new BasicLocation(location.getLatitude(), location.getLongitude()));
+		mServiceManager.getLocationManager().setLastLocation(
+				new BasicLocation(location.getLatitude(), location.getLongitude()));
 
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+		mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
-        if (firstTimeLocation) {
+		if (firstTimeLocation) {
 
-            centerCameraOnLastLocation();
-            firstTimeLocation = false;
-        }
+			centerCameraOnLastLocation();
+			firstTimeLocation = false;
+		}
 
-        updateUI();
-    }
+		updateUI();
+	}
 
-    protected synchronized void buildGoogleApiClient() {
-        mMapsGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
+	protected synchronized void buildGoogleApiClient() {
+		mMapsGoogleApiClient = new GoogleApiClient.Builder(this)
+				.addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(LocationServices.API)
+				.build();
+	}
 
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(Constants.LOCATION_REQUEST_INTERVAL);
-        mLocationRequest.setFastestInterval(Constants.LOCATION_REQUEST_FASTEST_INTERVAL);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
+	protected void createLocationRequest() {
+		mLocationRequest = new LocationRequest();
+		mLocationRequest.setInterval(Constants.LOCATION_REQUEST_INTERVAL);
+		mLocationRequest.setFastestInterval(Constants.LOCATION_REQUEST_FASTEST_INTERVAL);
+		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+	}
 
-    protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(mMapsGoogleApiClient, mLocationRequest, this);
-    }
+	protected void startLocationUpdates() {
+		LocationServices.FusedLocationApi.requestLocationUpdates(mMapsGoogleApiClient, mLocationRequest, this);
+	}
 
-    private void centerCameraOnLastLocation() {
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
+	private void centerCameraOnLastLocation() {
+		//mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
 
-        BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
-                .zoom(Constants.DEFAULT_ZOOM)
-                .build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-    }
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		CameraPosition cameraPosition = new CameraPosition.Builder()
+				.target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
+				.zoom(Constants.DEFAULT_ZOOM)
+				.build();
+		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+	}
 
 // -------------------------------------------------------------------------------------------------
 // GUI
 // -------------------------------------------------------------------------------------------------
 
-    private void configureNavigationDrawer(DrawerLayout mDrawerLayout, Toolbar toolbar) {
+	private void configureNavigationDrawer(DrawerLayout mDrawerLayout, Toolbar toolbar) {
 
-        // Setting up Navigation Drawer
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+		// Setting up Navigation Drawer
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
 
-            @Override
-            public void onDrawerOpened(View v) {
-                super.onDrawerOpened(v);
+			@Override
+			public void onDrawerOpened(View v) {
+				super.onDrawerOpened(v);
 
-                invalidateOptionsMenu();
-                syncState();
-            }
+				invalidateOptionsMenu();
+				syncState();
+			}
 
-            @Override
-            public void onDrawerClosed(View v) {
-                super.onDrawerClosed(v);
+			@Override
+			public void onDrawerClosed(View v) {
+				super.onDrawerClosed(v);
 
-                invalidateOptionsMenu();
-                syncState();
-            }
-        };
+				invalidateOptionsMenu();
+				syncState();
+			}
+		};
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        mDrawerToggle.syncState();
-    }
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setHomeButtonEnabled(true);
+		mDrawerToggle.syncState();
+	}
 
-    private void toggleNavigationDrawer() {
+	private void toggleNavigationDrawer() {
 
-        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
-            mDrawerLayout.closeDrawer(Gravity.LEFT);
-        } else {
-            mDrawerLayout.openDrawer(Gravity.LEFT);
-        }
-    }
+		if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
+			mDrawerLayout.closeDrawer(Gravity.LEFT);
+		}
+		else {
+			mDrawerLayout.openDrawer(Gravity.LEFT);
+		}
+	}
 
-    private void createUserProfile() {
+	private void createUserProfile() {
 
-        IdentityManager identityManager = ServiceManager.getInstance().getIdentityManager();
+		IdentityManager identityManager = ServiceManager.getInstance().getIdentityManager();
 
-        if (identityManager.getUserInfo() != null) {
+		if (identityManager.getUserInfo() != null) {
 
-            // Setting up user profile
-            UserInfo userInfo = identityManager.getUserInfo();
+			// Setting up user profile
+			UserInfo userInfo = identityManager.getUserInfo();
 
-            TextView name = (TextView) findViewById(R.id.name);
-            TextView email = (TextView) findViewById(R.id.email);
-            CircleImageView image = (CircleImageView) findViewById(R.id.circleView);
+			TextView name = (TextView) findViewById(R.id.name);
+			TextView email = (TextView) findViewById(R.id.email);
+			CircleImageView image = (CircleImageView) findViewById(R.id.circleView);
 
-            name.setText(userInfo.getName());
-            email.setText(userInfo.getEmail());
-            new ImageLoaderAsyncTask(image).execute(userInfo.getPicture());
-        }
-    }
+			name.setText(userInfo.getName());
+			email.setText(userInfo.getEmail());
+			new ImageLoaderAsyncTask(image).execute(userInfo.getPicture());
+		}
+	}
 
-    private void updateUI() {
-        BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
-        Log.d(Constants.APP + Constants.LOCATION, mLastUpdateTime + ": " + lastLocation.getLatitude() +
-                ", " + lastLocation.getLongitude());
-    }
+	private void updateUI() {
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		Log.d(Constants.APP + Constants.LOCATION, mLastUpdateTime + ": " + lastLocation.getLatitude() +
+				", " + lastLocation.getLongitude());
+	}
 
-    private void drawPolygon(Iterable<LatLng> points, int color) {
+	private void drawPolygon(Iterable<LatLng> points, int color) {
 
-        String text = "";
-        for (LatLng point : points) {
-            text += point.toString() + ", ";
-        }
-        Log.d(Constants.APP + Constants.DRAW, text);
+		String text = "";
+		for (LatLng point : points) {
+			text += point.toString() + ", ";
+		}
+		Log.d(Constants.APP + Constants.DRAW, text);
 
-        mMap.addPolygon(new PolygonOptions()
-                .addAll(points)
-                .strokeColor(color)
-                .strokeWidth(0)
-                .fillColor(color));
-    }
+		mMap.addPolygon(new PolygonOptions()
+				.addAll(points)
+				.strokeColor(color)
+				.strokeWidth(0)
+				.fillColor(color));
+	}
 
 // -------------------------------------------------------------------------------------------------
 // LOGIN
 // -------------------------------------------------------------------------------------------------
 
-    public void buttonSignOut(View view) {
+	public void buttonSignOut(View view) {
 
-        Log.d(Constants.APP + Constants.MENU, "Button Sign out");
+		Log.d(Constants.APP + Constants.MENU, "Button Sign out");
 
-        // Signing out from Google
-        Auth.GoogleSignInApi.signOut(mIdentityGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(Status status) {
+		// Signing out from Google
+		Auth.GoogleSignInApi.signOut(mIdentityGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+			@Override
+			public void onResult(Status status) {
 
-                Log.d("Identity logout status", status.toString());
+				Log.d("Identity logout status", status.toString());
 
-                // Clearing state of service manager
-                ServiceManager.getInstance().clear();
+				// Clearing state of service manager
+				ServiceManager.getInstance().clear();
 
-                // Starting sign in activity
-                startSignInActivity();
-            }
-        });
-    }
+				// Starting sign in activity
+				startSignInActivity();
+			}
+		});
+	}
 
-    private void startSignInActivity() {
+	private void startSignInActivity() {
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-    }
+		Intent intent = new Intent(this, LoginActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		startActivity(intent);
+	}
 
-    private void updateToken() {
+	private void updateToken() {
 
-        if (mServiceManager.getIdentityManager().getUserInfo() == null) {
-            Log.d(Constants.APP, "No user info available.");
-            return;
-        }
+		if (mServiceManager.getIdentityManager().getUserInfo() == null) {
+			Log.d(Constants.APP, "No user info available.");
+			return;
+		}
 
-        String email = mServiceManager.getIdentityManager().getUserInfo().getEmail();
+		String email = mServiceManager.getIdentityManager().getUserInfo().getEmail();
 
-        new TokenRequestAsyncTask(this, this, email, Constants.TOKEN_REQUEST_SCOPE).execute();
-    }
+		new TokenRequestAsyncTask(this, this, email, Constants.TOKEN_REQUEST_SCOPE).execute();
+	}
 
-    @Override
-    public void requestFailed() {
+	@Override
+	public void requestFailed() {
 
-        Log.d(Constants.APP + Constants.TOKEN, "Token request failed.");
-    }
+		Log.d(Constants.APP + Constants.TOKEN, "Token request failed.");
+	}
 
-    @Override
-    public void requestSucceeded(String token) {
+	@Override
+	public void requestSucceeded(String token) {
 
-        mServiceManager.getIdentityManager().setToken(token);
+		mServiceManager.getIdentityManager().setToken(token);
 
-        Log.d(Constants.APP + Constants.TOKEN, "Token obtained successfully.");
-    }
+		Log.d(Constants.APP + Constants.TOKEN, "Token obtained successfully.");
+	}
 
 // -------------------------------------------------------------------------------------------------
 // MAPS ERROR DIALOG
 // -------------------------------------------------------------------------------------------------
 
-    // The rest of this code is all about building the error dialog
+	// The rest of this code is all about building the error dialog
 
-    /* Creates a dialog for an error message */
-    private void showErrorDialog(int errorCode) {
-        // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // Pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(Constants.DIALOG_ERROR, errorCode);
-        dialogFragment.setArguments(args);
-        dialogFragment.show(getSupportFragmentManager(), Constants.DIALOG_ERROR);
-    }
+	/* Creates a dialog for an error message */
+	private void showErrorDialog(int errorCode) {
+		// Create a fragment for the error dialog
+		ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+		// Pass the error that should be displayed
+		Bundle args = new Bundle();
+		args.putInt(Constants.DIALOG_ERROR, errorCode);
+		dialogFragment.setArguments(args);
+		dialogFragment.show(getSupportFragmentManager(), Constants.DIALOG_ERROR);
+	}
 
-    /* Called from ErrorDialogFragment when the dialog is dismissed. */
-    public void onDialogDismissed() {
-        mResolvingError = false;
-    }
+	/* Called from ErrorDialogFragment when the dialog is dismissed. */
+	public void onDialogDismissed() {
+		mResolvingError = false;
+	}
 
-    /* A fragment to display an error dialog */
-    public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() {
-        }
+	/* A fragment to display an error dialog */
+	public static class ErrorDialogFragment extends DialogFragment {
+		public ErrorDialogFragment() {
+		}
 
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(Constants.DIALOG_ERROR);
-            return GoogleApiAvailability.getInstance().getErrorDialog(
-                    this.getActivity(), errorCode, Constants.REQUEST_RESOLVE_ERROR);
-        }
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			// Get the error code and retrieve the appropriate dialog
+			int errorCode = this.getArguments().getInt(Constants.DIALOG_ERROR);
+			return GoogleApiAvailability.getInstance().getErrorDialog(
+					this.getActivity(), errorCode, Constants.REQUEST_RESOLVE_ERROR);
+		}
 
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            ((MapsActivity) getActivity()).onDialogDismissed();
-        }
-    }
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			((MapsActivity) getActivity()).onDialogDismissed();
+		}
+	}
 
 // -------------------------------------------------------------------------------------------------
 // PERMISSIONS
 // -------------------------------------------------------------------------------------------------
 
-    private boolean checkAndRequestPermissionACCESS_FINE_LOCATION() {
+	private boolean checkAndRequestPermissionACCESS_FINE_LOCATION() {
 
-        List<String> listPermissionsNeeded = new ArrayList<>();
+		List<String> listPermissionsNeeded = new ArrayList<>();
 
-        int permissionGetAccounts = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
+		int permissionGetAccounts = ContextCompat.checkSelfPermission(this,
+				Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (permissionGetAccounts != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
+		if (permissionGetAccounts != PackageManager.PERMISSION_GRANTED) {
+			listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+		}
 
-        if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this,
-                    listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),
-                    Constants.REQUEST_ID_ACCESS_FINE_LOCATION);
-            return false;
-        }
-        return true;
-    }
+		if (!listPermissionsNeeded.isEmpty()) {
+			ActivityCompat.requestPermissions(this,
+					listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),
+					Constants.REQUEST_ID_ACCESS_FINE_LOCATION);
+			return false;
+		}
+		return true;
+	}
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 
-        switch (requestCode) {
-            case Constants.REQUEST_ID_ACCESS_FINE_LOCATION: {
+		switch (requestCode) {
+			case Constants.REQUEST_ID_ACCESS_FINE_LOCATION: {
 
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    enableLocation();
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-        }
-    }
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					// permission was granted, yay! Do the
+					// contacts-related task you need to do.
+					enableLocation();
+				}
+				else {
+					// permission denied, boo! Disable the
+					// functionality that depends on this permission.
+				}
+				return;
+			}
+		}
+	}
 
 // -------------------------------------------------------------------------------------------------
 // SIDEBAR OPTIONS
 // -------------------------------------------------------------------------------------------------
 
-    public void buttonSaveSpot(View view) {
+	public void buttonSaveSpot(View view) {
 
-        locationRouteService.saveSpot();
+		locationRouteService.saveSpot();
 
-        toggleSaveSpotButton();
+		toggleSaveSpotButton();
 
-        toggleNavigationDrawer();
+		toggleNavigationDrawer();
 
-        setDirectionsButtonIcon(false);
-    }
+		setDirectionsButtonIcon(false);
+	}
 
-    public void buttonLeaveSpot(View view) {
+	public void buttonLeaveSpot(View view) {
 
-        locationRouteService.leaveSpot();
+		locationRouteService.leaveSpot();
 
-        toggleSaveSpotButton();
+		toggleSaveSpotButton();
 
-        toggleNavigationDrawer();
+		toggleNavigationDrawer();
 
-        setDirectionsButtonIcon(false);
-    }
+		setDirectionsButtonIcon(false);
+	}
 
-    void toggleSaveSpotButton() {
+	void toggleSaveSpotButton() {
 
-        RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
-        RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
+		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
+		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
 
-        if (locationRouteService.isSpotSaved()) {
-            buttonLeaveSpot.setVisibility(View.VISIBLE);
-            buttonSaveSpot.setVisibility(View.GONE);
-        } else {
-            buttonLeaveSpot.setVisibility(View.GONE);
-            buttonSaveSpot.setVisibility(View.VISIBLE);
-        }
-    }
+		if (locationRouteService.isSpotSaved()) {
+			buttonLeaveSpot.setVisibility(View.VISIBLE);
+			buttonSaveSpot.setVisibility(View.GONE);
+		}
+		else {
+			buttonLeaveSpot.setVisibility(View.GONE);
+			buttonSaveSpot.setVisibility(View.VISIBLE);
+		}
+	}
 
-    public void buttonHistory(View view) {
+	public void buttonHistory(View view) {
 
-    }
+	}
 
-    public void buttonHelp(View view) {
+	public void buttonHelp(View view) {
 
 
-    }
+	}
 
 // -------------------------------------------------------------------------------------------------
 // ON SCREEN BUTTONS
 // -------------------------------------------------------------------------------------------------
 
-    public void buttonOpenParkingStateOptions(View v) {
+	public void buttonOpenParkingStateOptions(View v) {
 
-        int visibility;
+		int visibility;
 
-        if (parking_state_button_flag) {
-            // Open
-            visibility = View.VISIBLE;
-        } else {
-            // Close
-            visibility = View.GONE;
-        }
+		if (parking_state_button_flag) {
+			// Open
+			visibility = View.VISIBLE;
+		}
+		else {
+			// Close
+			visibility = View.GONE;
+		}
 
-        parking_state_button_flag = !parking_state_button_flag;
+		parking_state_button_flag = !parking_state_button_flag;
 
-        findViewById(R.id.fab_free_2).setVisibility(visibility);
-        findViewById(R.id.fab_moderate_2).setVisibility(visibility);
-        findViewById(R.id.fab_full_2).setVisibility(visibility);
-    }
+		findViewById(R.id.fab_free_2).setVisibility(visibility);
+		findViewById(R.id.fab_moderate_2).setVisibility(visibility);
+		findViewById(R.id.fab_full_2).setVisibility(visibility);
+	}
 
 	public void buttonOpenParkingStateOptionsV2(View v) {
 
+		Dialog alertDialog = new Dialog(this);
+		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		alertDialog.setContentView(R.layout.report_parking_spot_layout);
+		alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+		alertDialog.show();
 	}
 
-    public void buttonReportParkingState(View v) {
+	public void buttonReportParkingState(View v) {
 
-        findViewById(R.id.fab_free_2).setVisibility(View.GONE);
-        findViewById(R.id.fab_moderate_2).setVisibility(View.GONE);
-        findViewById(R.id.fab_full_2).setVisibility(View.GONE);
+		findViewById(R.id.fab_free_2).setVisibility(View.GONE);
+		findViewById(R.id.fab_moderate_2).setVisibility(View.GONE);
+		findViewById(R.id.fab_full_2).setVisibility(View.GONE);
 
-        parking_state_button_flag = true;
+		parking_state_button_flag = true;
 
-        BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
-        if (lastLocation == null) {
-            return;
-        }
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		if (lastLocation == null) {
+			return;
+		}
 
-        // TODO: keep the desired set and remove the other one
-        switch (v.getId()) {
-            // First set of buttons
-            case R.id.fab_free_2:
-                mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
-                break;
-            case R.id.fab_moderate_2:
-                mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
-                break;
-            case R.id.fab_full_2:
-                mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
-                break;
-            // Second set of buttons
-            case R.id.fab_free:
-                mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
-                break;
-            case R.id.fab_moderate:
-                mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
-                break;
-            case R.id.fab_full:
-                mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
-                break;
-        }
+		// TODO: keep the desired set and remove the other one
+		switch (v.getId()) {
+			// First set of buttons
+			case R.id.fab_free_2:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
+				break;
+			case R.id.fab_moderate_2:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
+				break;
+			case R.id.fab_full_2:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
+				break;
+			// Second set of buttons
+			case R.id.fab_free:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
+				break;
+			case R.id.fab_moderate:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
+				break;
+			case R.id.fab_full:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
+				break;
+			// Third set of buttons
+			case R.id.fab_free_3:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
+				break;
+			case R.id.fab_moderate_3:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
+				break;
+			case R.id.fab_full_3:
+				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
+				break;
+		}
 
-        // Request map update status to give the user instant feedback
-        mapUpdateService.requestMapStatusUpdate();
-    }
+		// Request map update status to give the user instant feedback
+		mapUpdateService.requestMapStatusUpdate();
+	}
 
-    public void buttonCenterOnLocation(View v) {
+	public void buttonCenterOnLocation(View v) {
 
-        centerCameraOnLastLocation();
-    }
+		centerCameraOnLastLocation();
+	}
 
-    public void buttonDirections(View v) {
+	public void buttonDirections(View v) {
 
-        if (!locationRouteService.hasDirectionsPolyline()) {
-            locationRouteService.drawRouteToMarker();
-        } else {
-            locationRouteService.removeRouteToMarker();
-        }
-    }
+		if (!locationRouteService.hasDirectionsPolyline()) {
+			locationRouteService.drawRouteToMarker();
+		}
+		else {
+			locationRouteService.removeRouteToMarker();
+		}
+	}
 
-    private void openLocationInfoBar(BasicLocation location) {
+	private void openLocationInfoBar(BasicLocation location) {
 
-        LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
-        View directions_fab = findViewById(R.id.directions_fab);
+		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
+		View directions_fab = findViewById(R.id.directions_fab);
 
-        bottom_layout.setTranslationY(0);
-        directions_fab.setVisibility(View.VISIBLE);
+		bottom_layout.setTranslationY(0);
+		directions_fab.setVisibility(View.VISIBLE);
 
-        AddressAsyncTask addressAsyncTask = new AddressAsyncTask(addressResponseListener);
-        addressAsyncTask.execute(location);
-    }
+		AddressAsyncTask addressAsyncTask = new AddressAsyncTask(addressResponseListener);
+		addressAsyncTask.execute(location);
+	}
 
-    private void closeLocationInfoBar() {
+	private void closeLocationInfoBar() {
 
-        LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
-        View directions_fab = findViewById(R.id.directions_fab);
+		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
+		View directions_fab = findViewById(R.id.directions_fab);
 
-        bottom_layout.setTranslationY(bottom_layout.getHeight());
-        directions_fab.setVisibility(View.INVISIBLE);
+		bottom_layout.setTranslationY(bottom_layout.getHeight());
+		directions_fab.setVisibility(View.INVISIBLE);
 
-        TextView locationAddress = (TextView) findViewById(R.id.location_address);
-        locationAddress.setText("");
-    }
+		TextView locationAddress = (TextView) findViewById(R.id.location_address);
+		locationAddress.setText("");
+	}
 
-    private void setDirectionsButtonIcon(boolean iconClosed) {
+	private void setDirectionsButtonIcon(boolean iconClosed) {
 
-        int icon_id = iconClosed ? R.drawable.ic_close_white_24dp : R.drawable.ic_directions_white_24dp;
+		int icon_id = iconClosed ? R.drawable.ic_close_white_24dp : R.drawable.ic_directions_white_24dp;
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.directions_fab);
-        fab.setImageDrawable(getResources().getDrawable(icon_id));
-    }
+		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.directions_fab);
+		fab.setImageDrawable(getResources().getDrawable(icon_id));
+	}
 
 // -------------------------------------------------------------------------------------------------
 // UPDATE CALLBACK CLIENT
 // -------------------------------------------------------------------------------------------------
 
-    private MapUpdateCallbackClient mapUpdateCallbackClient = new MapUpdateCallbackClient() {
-        @Override
-        public void updateMapStatus(final List<PolygonUI> polygons) {
+	private MapUpdateCallbackClient mapUpdateCallbackClient = new MapUpdateCallbackClient() {
+		@Override
+		public void updateMapStatus(final List<PolygonUI> polygons) {
 
-            Log.d(Constants.APP + Constants.MAP_UPDATE, "Received update map status. Polygons: " + polygons.size());
+			Log.d(Constants.APP + Constants.MAP_UPDATE, "Received update map status. Polygons: " + polygons.size());
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
 
-                    if (mMap == null) {
-                        return;
-                    }
+					if (mMap == null) {
+						return;
+					}
 
-                    // Clearing polygons
-                    mMap.clear();
+					// Clearing polygons
+					mMap.clear();
 
-                    // Notify route service
-                    locationRouteService.notifyMapCleared();
+					// Notify route service
+					locationRouteService.notifyMapCleared();
 
-                    // Drawing all polygons
-                    for (PolygonUI polygon : polygons) {
+					// Drawing all polygons
+					for (PolygonUI polygon : polygons) {
 
-                        drawPolygon(polygon.getPoints(), polygon.getColor());
-                    }
-                }
-            });
-        }
+						drawPolygon(polygon.getPoints(), polygon.getColor());
+					}
+				}
+			});
+		}
 
-        @Override
-        public void notifyRequestFailure() {
-            updateToken();
-        }
-    };
+		@Override
+		public void notifyRequestFailure() {
+			updateToken();
+		}
+	};
 
-    private RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
+	private RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
 
-        @Override
-        public void drawRoute(final PolylineOptions directionsPolylineOptions, final RouteUpdateResultCallbackClient client) {
+		@Override
+		public void drawRoute(final PolylineOptions directionsPolylineOptions, final RouteUpdateResultCallbackClient client) {
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Polyline result = null;
-                    if (mMap != null) {
-                        // Draw stroke.
-                        directionsPolylineOptions.width(Constants.DIRECTIONS_STROKE_WIDTH);
-                        directionsPolylineOptions.color(Constants.DIRECTIONS_STROKE_COLOR);
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Polyline result = null;
+					if (mMap != null) {
+						// Draw stroke.
+						directionsPolylineOptions.width(Constants.DIRECTIONS_STROKE_WIDTH);
+						directionsPolylineOptions.color(Constants.DIRECTIONS_STROKE_COLOR);
 						result = mMap.addPolyline(directionsPolylineOptions);
-                        // Draw actual line.
-                        directionsPolylineOptions.width(Constants.DIRECTIONS_LINE_WIDTH);
-                        directionsPolylineOptions.color(Constants.DIRECTIONS_LINE_COLOR);
-                        mMap.addPolyline(directionsPolylineOptions);
-                        // TODO: Draw circles.
+						// Draw actual line.
+						directionsPolylineOptions.width(Constants.DIRECTIONS_LINE_WIDTH);
+						directionsPolylineOptions.color(Constants.DIRECTIONS_LINE_COLOR);
+						mMap.addPolyline(directionsPolylineOptions);
+						// TODO: Draw circles.
 //                        List<LatLng> points = directionsPolylineOptions.getPoints();
 //
 //                        for (LatLng point : points) {
@@ -791,69 +818,69 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 //                                    .radius(10));
 //                        }
 
-                        setDirectionsButtonIcon(true);
-                    }
-                    client.notifyPolylineResult(result);
-                }
-            });
-        }
+						setDirectionsButtonIcon(true);
+					}
+					client.notifyPolylineResult(result);
+				}
+			});
+		}
 
-        @Override
-        public void removeRoute(final Polyline directionsPolyline) {
+		@Override
+		public void removeRoute(final Polyline directionsPolyline) {
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    directionsPolyline.remove();
-                    setDirectionsButtonIcon(false);
-                }
-            });
-        }
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					directionsPolyline.remove();
+					setDirectionsButtonIcon(false);
+				}
+			});
+		}
 
-        @Override
-        public void drawMarker(final MarkerOptions markerOptions, final RouteUpdateResultCallbackClient client) {
+		@Override
+		public void drawMarker(final MarkerOptions markerOptions, final RouteUpdateResultCallbackClient client) {
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Marker result = null;
-                    if (mMap != null) {
-                        result = mMap.addMarker(markerOptions);
-                    }
-                    client.notifyMarkerResult(result);
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Marker result = null;
+					if (mMap != null) {
+						result = mMap.addMarker(markerOptions);
+					}
+					client.notifyMarkerResult(result);
 
-                    LatLng position = markerOptions.getPosition();
-                    openLocationInfoBar(new BasicLocation(position.latitude, position.longitude));
-                }
-            });
-        }
+					LatLng position = markerOptions.getPosition();
+					openLocationInfoBar(new BasicLocation(position.latitude, position.longitude));
+				}
+			});
+		}
 
-        @Override
-        public void removeMarker(final Marker marker) {
+		@Override
+		public void removeMarker(final Marker marker) {
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    marker.remove();
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					marker.remove();
 
-                    closeLocationInfoBar();
-                }
-            });
-        }
-    };
+					closeLocationInfoBar();
+				}
+			});
+		}
+	};
 
-    private AddressResponseListener addressResponseListener = new AddressResponseListener() {
-        @Override
-        public void notifyAddressResponse(final String address) {
+	private AddressResponseListener addressResponseListener = new AddressResponseListener() {
+		@Override
+		public void notifyAddressResponse(final String address) {
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    TextView locationAddress = (TextView) findViewById(R.id.location_address);
-                    locationAddress.setText(address);
-                }
-            });
-        }
-    };
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					TextView locationAddress = (TextView) findViewById(R.id.location_address);
+					locationAddress.setText(address);
+				}
+			});
+		}
+	};
 
 }
