@@ -41,6 +41,9 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 		RouteOptions routeOptions = params[0];
 		PolylineOptions options = getDirections(routeOptions.source, routeOptions.destination, routeOptions.mode);
 
+        if (options == null)
+            return null;
+
 		mDirectionsResultListener.notifyDirectionsResponse(options);
 
 		return null;
@@ -176,6 +179,10 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 
 	public PolylineOptions getDirections(LatLng start, LatLng end, String mode) {
 		Document doc = getDocument(start, end, mode);
+
+        if (doc == null)
+            return null;
+
 		ArrayList<LatLng> directions = getDirection(doc);
 
 		PolylineOptions rectLine = new PolylineOptions().width(Constants.DIRECTIONS_LINE_WIDTH).color(
