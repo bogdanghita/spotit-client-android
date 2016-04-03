@@ -48,6 +48,8 @@ public class LoginActivity extends IdentityActivity {
 		if (pendingResult.isDone()) {
 			// There's immediate result available.
 			handleSignInResult(pendingResult.get());
+
+			Log.d(Constants.SIGN_IN, "pendingResult DONE");
 		}
 		else {
 			// There's no immediate result ready, displays some progress indicator and waits for the
@@ -63,6 +65,8 @@ public class LoginActivity extends IdentityActivity {
 					hideProgressIndicator();
 				}
 			});
+
+			Log.d(Constants.SIGN_IN, "pendingResult NOT DONE");
 		}
 	}
 
