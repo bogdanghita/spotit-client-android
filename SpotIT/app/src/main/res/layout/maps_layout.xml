@@ -57,7 +57,7 @@
 		android:onClick="buttonDirections"
 		android:src="@drawable/ic_directions_white_24dp"
 		android:visibility="invisible"
-		app:backgroundTint="@color/colorPrimary"
+		app:backgroundTint="#ff4e5c"
 		app:layout_anchor="@id/location_info_bar"
 		app:layout_anchorGravity="top|end"/>
 
@@ -73,8 +73,8 @@
 			android:id="@+id/fab_free"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
+			android:layout_margin="@dimen/fab_margin"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			app:backgroundTint="@color/colorLight"/>
 
@@ -82,8 +82,8 @@
 			android:id="@+id/fab_moderate"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
+			android:layout_margin="@dimen/fab_margin"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			app:backgroundTint="@color/colorLight"/>
 
@@ -91,8 +91,8 @@
 			android:id="@+id/fab_full"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_margin="@dimen/fab_margin"
 			android:onClick="buttonReportParkingState"
+			android:layout_margin="@dimen/fab_margin"
 			android:src="@drawable/ic_local_parking_black_24dp"
 			app:backgroundTint="@color/colorLight"/>
 
