@@ -185,8 +185,8 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 
 		ArrayList<LatLng> directions = getDirection(doc);
 
-		PolylineOptions rectLine = new PolylineOptions().width(Constants.DIRECTIONS_LINE_WIDTH).color(
-				Constants.DIRECTIONS_LINE_COLOR);
+		PolylineOptions rectLine = new PolylineOptions().width(Constants.DIRECTIONS_STROKE_WIDTH).color(
+				Constants.DIRECTIONS_STROKE_COLOR);
 
 		for (int i = 0; i < directions.size(); i++) {
 			rectLine.add(directions.get(i));
