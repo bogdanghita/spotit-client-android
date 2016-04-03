@@ -794,6 +794,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
                             return;
 
                         double padding = 0;
+                        double scaleFactor = Math.pow(2, Constants.DEFAULT_ZOOM - mMap.getCameraPosition().zoom) * Constants.SCALE_FACTOR_RECTIFIER;
 
                         for (int i = 1; i < points.size(); i++) {
                             pointA = points.get(i - 1);
@@ -822,7 +823,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
                                         .center(intermPoint)
                                         .fillColor(Constants.DIRECTIONS_LINE_COLOR)
                                         .strokeColor(Constants.DIRECTIONS_STROKE_COLOR)
-                                        .radius(Constants.CIRCLE_SIZE)
+                                        .radius(Constants.CIRCLE_SIZE * scaleFactor)
                                         .strokeWidth(Constants.CIRCLE_STROKE_WIDTH));
                                 // Prepare the next one.
                                 chunks++;
@@ -830,7 +831,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
                                 intermPoint = Utils.calculateDerivedPosition(
                                         pointA,
                                         pointB,
-                                        chunks * Constants.CIRCLE_DISTANCE + padding);
+                                        (chunks * Constants.CIRCLE_DISTANCE + padding) * scaleFactor);
 
                                 intermLocation.setLatitude(intermPoint.latitude);
                                 intermLocation.setLongitude(intermPoint.longitude);
