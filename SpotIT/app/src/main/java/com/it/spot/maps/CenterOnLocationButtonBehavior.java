@@ -1,9 +1,11 @@
 package com.it.spot.maps;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 
 import com.it.spot.R;
@@ -25,7 +27,14 @@ public class CenterOnLocationButtonBehavior extends CoordinatorLayout.Behavior<F
 	public boolean onDependentViewChanged(CoordinatorLayout parent, FloatingActionButton child, View dependency) {
 
 		if (dependency.getVisibility() == View.VISIBLE) {
-			child.setY(dependency.getY() - dependency.getHeight());
+
+			// TODO: this is R.dimen.fab_margin, but it returns huge value if accessed from code
+			float fab_margin = 8;
+			float spacing_dp = 2 * fab_margin;
+
+			float spacing_px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, spacing_dp, child.getResources().getDisplayMetrics());
+
+			child.setY(dependency.getY() - dependency.getHeight() - spacing_px);
 		}
 		else {
 			child.setY(dependency.getY());
