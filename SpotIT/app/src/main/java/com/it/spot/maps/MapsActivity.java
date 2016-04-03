@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -35,6 +38,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -49,6 +53,7 @@ import com.it.spot.address.AddressAsyncTask;
 import com.it.spot.address.AddressResponseListener;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
+import com.it.spot.common.Utils;
 import com.it.spot.identity.IdentityActivity;
 import com.it.spot.identity.IdentityManager;
 import com.it.spot.identity.ImageLoaderAsyncTask;
@@ -768,24 +773,71 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
                 public void run() {
                     Polyline result = null;
                     if (mMap != null) {
-                        // Draw stroke.
-                        directionsPolylineOptions.width(Constants.DIRECTIONS_STROKE_WIDTH);
-                        directionsPolylineOptions.color(Constants.DIRECTIONS_STROKE_COLOR);
-						result = mMap.addPolyline(directionsPolylineOptions);
-                        // Draw actual line.
-                        directionsPolylineOptions.width(Constants.DIRECTIONS_LINE_WIDTH);
-                        directionsPolylineOptions.color(Constants.DIRECTIONS_LINE_COLOR);
-                        mMap.addPolyline(directionsPolylineOptions);
+                        // Directions for driving.
+//                        // Draw stroke.
+//                        directionsPolylineOptions.width(Constants.DIRECTIONS_STROKE_WIDTH);
+//                        directionsPolylineOptions.color(Constants.DIRECTIONS_STROKE_COLOR);
+//						result = mMap.addPolyline(directionsPolylineOptions);
+//                        // Draw actual line.
+//                        directionsPolylineOptions.width(Constants.DIRECTIONS_LINE_WIDTH);
+//                        directionsPolylineOptions.color(Constants.DIRECTIONS_LINE_COLOR);
+//                        result = mMap.addPolyline(directionsPolylineOptions);
+
                         // TODO: Draw circles.
-//                        List<LatLng> points = directionsPolylineOptions.getPoints();
-//
-//                        for (LatLng point : points) {
-//                            mMap.addCircle(new CircleOptions()
-//                                    .center(point)
-//                                    .fillColor(Constants.DIRECTIONS_LINE_COLOR)
-//                                    .strokeColor(Constants.DIRECTIONS_STROKE_COLOR)
-//                                    .radius(10));
-//                        }
+                        List<LatLng> points = directionsPolylineOptions.getPoints();
+                        LatLng pointA, pointB, intermPoint;
+                        Location locationA = new Location("");
+                        Location locationB = new Location("");
+                        Location intermLocation = new Location("");
+
+                        if (points.size() < 2)
+                            return;
+
+                        double padding = 0;
+
+                        for (int i = 1; i < points.size(); i++) {
+                            pointA = points.get(i - 1);
+                            pointB = points.get(i);
+
+                            locationA.setLatitude(pointA.latitude);
+                            locationA.setLongitude(pointA.longitude);
+                            locationB.setLatitude(pointB.latitude);
+                            locationB.setLongitude(pointB.longitude);
+
+                            // Compute first intermediate point based on previous padding.
+                            intermPoint = Utils.calculateDerivedPosition(
+                                    pointA,
+                                    pointB,
+                                    padding);
+
+                            intermLocation.setLatitude(intermPoint.latitude);
+                            intermLocation.setLongitude(intermPoint.longitude);
+
+                            int chunks = 0;
+
+                            // While intermPoint is still on segment AB.
+                            while (locationA.distanceTo(locationB) > locationA.distanceTo(intermLocation)) {
+                                // Draw current circle.
+                                mMap.addCircle(new CircleOptions()
+                                        .center(intermPoint)
+                                        .fillColor(Constants.DIRECTIONS_LINE_COLOR)
+                                        .strokeColor(Constants.DIRECTIONS_STROKE_COLOR)
+                                        .radius(Constants.CIRCLE_SIZE)
+                                        .strokeWidth(Constants.CIRCLE_STROKE_WIDTH));
+                                // Prepare the next one.
+                                chunks++;
+
+                                intermPoint = Utils.calculateDerivedPosition(
+                                        pointA,
+                                        pointB,
+                                        chunks * Constants.CIRCLE_DISTANCE + padding);
+
+                                intermLocation.setLatitude(intermPoint.latitude);
+                                intermLocation.setLongitude(intermPoint.longitude);
+                            }
+                            // Prepair padding for the next draw.
+                            padding = locationB.distanceTo(intermLocation);
+                        }
 
                         setDirectionsButtonIcon(true);
                     }
