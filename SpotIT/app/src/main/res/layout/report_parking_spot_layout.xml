@@ -3,27 +3,77 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:gravity="center"
 	android:orientation="horizontal">
 
-	<Button
-		android:id="@+id/fab_free_3"
+	<!--<Button-->
+		<!--android:id="@+id/fab_free_3"-->
+		<!--android:layout_width="wrap_content"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:onClick="buttonReportParkingState"-->
+		<!--android:text="Button1"/>-->
+	<LinearLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:onClick="buttonReportParkingState"
-		android:text="Button1"/>
+		android:paddingRight="18dp"
+		android:paddingLeft="18dp">
 
-	<Button
-		android:id="@+id/fab_moderate_3"
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/fab_free_3"
+			android:src="@drawable/ic_local_parking_black_48dp"
+			android:onClick="buttonReportParkingState"
+			android:background="@drawable/round_corner_green"
+			android:padding="1dp"
+			android:tint="#00FF00"
+			android:minWidth="72dp"
+			android:minHeight="72dp" />
+
+		</LinearLayout>
+	<!--<Button-->
+		<!--android:id="@+id/fab_moderate_3"-->
+		<!--android:layout_width="wrap_content"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:onClick="buttonReportParkingState"-->
+		<!--android:text="Button1"/>-->
+
+	<LinearLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:onClick="buttonReportParkingState"
-		android:text="Button1"/>
+		android:paddingRight="18dp"
+		android:paddingLeft="18dp">
 
-	<Button
-		android:id="@+id/fab_full_3"
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/fab_moderate_3"
+			android:src="@drawable/ic_local_parking_black_48dp"
+			android:onClick="buttonReportParkingState"
+			android:background="@drawable/round_corner_yellow"
+			android:padding="1dp"
+			android:tint="#FFFF00"
+			android:minWidth="72dp"
+			android:minHeight="72dp" />
+
+	</LinearLayout>
+
+	<LinearLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:onClick="buttonReportParkingState"
-		android:text="Button1"/>
+		android:paddingRight="18dp"
+		android:paddingLeft="18dp">
 
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/fab_full_3"
+			android:src="@drawable/ic_local_parking_black_48dp"
+			android:onClick="buttonReportParkingState"
+			android:background="@drawable/round_corner_red"
+			android:padding="1dp"
+			android:tint="#FF0000"
+			android:minWidth="72dp"
+			android:minHeight="72dp" />
+	</LinearLayout>
 </LinearLayout>
