@@ -44,6 +44,17 @@
 	</LinearLayout>
 
 	<android.support.design.widget.FloatingActionButton
+		android:id="@+id/fab_state_v2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="end|bottom"
+		android:layout_margin="@dimen/fab_margin"
+		android:onClick="buttonOpenParkingStateOptionsV2"
+		android:src="@drawable/ic_local_parking_black_24dp"
+		app:backgroundTint="@color/colorLight"
+		app:layout_behavior="com.it.spot.maps.ParkingStateV2ButtonBehavior"/>
+
+	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/my_location"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -71,7 +82,7 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="start|bottom"
 		android:orientation="horizontal"
-		android:visibility="visible"
+		android:visibility="gone"
 		app:layout_behavior="com.it.spot.maps.ParkingStateButtonsBehavior">
 
 		<android.support.design.widget.FloatingActionButton

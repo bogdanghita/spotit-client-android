@@ -639,6 +639,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		findViewById(R.id.fab_full_2).setVisibility(visibility);
 	}
 
+	public void buttonOpenParkingStateOptionsV2(View v) {
+
+	}
+
 	public void buttonReportParkingState(View v) {
 
 		findViewById(R.id.fab_free_2).setVisibility(View.GONE);
