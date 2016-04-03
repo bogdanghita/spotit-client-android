@@ -3,4 +3,5 @@
 	<string name="title_activity_maps">Spot.IT</string>
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
+	<string name="google_maps_key">AIzaSyAGUJLAOjfTDbt4WStuHuLayVamD8MxY18</string>
 </resources>
