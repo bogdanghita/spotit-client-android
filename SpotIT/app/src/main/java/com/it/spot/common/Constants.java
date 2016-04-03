@@ -72,8 +72,11 @@ public class Constants {
 	public static final float DEFAULT_ZOOM = 17.3f;
     public static final int DIRECTIONS_STROKE_WIDTH = 30;
     public static final int DIRECTIONS_STROKE_COLOR = 0xFF3A7EC5;
-//    public static final int DIRECTIONS_STROKE_COLOR = 0xFF3A7EC5;
     public static final int DIRECTIONS_LINE_WIDTH = 20;
     public static final int DIRECTIONS_LINE_COLOR = 0xFF00B3FD;
-//    public static final int DIRECTIONS_LINE_COLOR = 0xFF00B3FD;
+    public static final double CIRCLE_DISTANCE = 40;
+    public static final int CIRCLE_STROKE_WIDTH = 5;
+    public static final int CIRCLE_SIZE = 15;
+
+    public static final int EARTH_RADIUS_M = 6371000;
 }
