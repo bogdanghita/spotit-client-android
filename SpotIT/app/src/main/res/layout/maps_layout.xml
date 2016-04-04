@@ -34,7 +34,7 @@
 		android:layout_gravity="end|bottom"
 		android:layout_margin="@dimen/fab_margin"
 		android:onClick="buttonOpenParkingStateOptionsV2"
-		android:src="@drawable/ic_local_parking_black_24dp"
+		android:src="@drawable/logo_spot_it"
 		app:backgroundTint="@color/colorLight"
 		app:layout_behavior="com.it.spot.maps.ParkingStateV2ButtonBehavior"/>
 
