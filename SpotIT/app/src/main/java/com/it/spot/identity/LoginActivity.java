@@ -54,7 +54,7 @@ public class LoginActivity extends IdentityActivity {
 		else {
 			// There's no immediate result ready, displays some progress indicator and waits for the
 			// async callback.
-			showProgressIndicator();
+//			showProgressIndicator();
 
 			pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
 				@Override
@@ -62,7 +62,7 @@ public class LoginActivity extends IdentityActivity {
 
 					handleSignInResult(result);
 
-					hideProgressIndicator();
+//					hideProgressIndicator();
 				}
 			});
 
@@ -70,7 +70,7 @@ public class LoginActivity extends IdentityActivity {
 		}
 	}
 
-	public void configureSignInButton() {
+	private void configureSignInButton() {
 
 		SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
 		signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -84,6 +84,14 @@ public class LoginActivity extends IdentityActivity {
 				buttonSignIn(v);
 			}
 		});
+
+		signInButton.setVisibility(View.INVISIBLE);
+	}
+
+	private void showSignInButton() {
+
+		SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+		signInButton.setVisibility(View.VISIBLE);
 	}
 
 	private void configureSignInButtonText(SignInButton signInButton, String buttonText) {
@@ -154,6 +162,10 @@ public class LoginActivity extends IdentityActivity {
 
 			// Login successful. Starting main activity
 			startMainActivity();
+		}
+		else {
+
+			showSignInButton();
 		}
 	}
 
