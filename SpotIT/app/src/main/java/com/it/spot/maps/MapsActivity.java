@@ -95,6 +95,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// Disable activity start transition
+		overridePendingTransition(0, 0);
 		setContentView(R.layout.activity_maps);
 
 		// Configure toolbar
