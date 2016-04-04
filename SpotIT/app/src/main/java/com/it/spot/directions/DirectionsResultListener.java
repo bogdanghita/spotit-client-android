@@ -7,5 +7,5 @@ import com.google.android.gms.maps.model.PolylineOptions;
  */
 public interface DirectionsResultListener {
 
-	void notifyDirectionsResponse(PolylineOptions polylineOptions);
+	void notifyDirectionsResponse(RouteData routeData);
 }

@@ -77,7 +77,9 @@ public class Constants {
 	public static final int DIRECTIONS_LINE_WIDTH = 20;
 	public static final int DIRECTIONS_LINE_COLOR = 0xFF00B3FD;
 
-	public static final double CIRCLE_DISTANCE = 38;
+	// Good value for circle distance
+//	public static final double CIRCLE_DISTANCE = 38;
+	public static final double CIRCLE_DISTANCE = 50;
 	public static final int CIRCLE_STROKE_WIDTH = 6;
 	public static final int CIRCLE_SIZE = 15;
 	public static final double SCALE_FACTOR_RECTIFIER = 1 / 3.7;
