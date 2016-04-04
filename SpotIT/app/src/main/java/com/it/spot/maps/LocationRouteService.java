@@ -121,7 +121,7 @@ public class LocationRouteService {
 
 	public void leaveSpot() {
 
-		writeSavedSpotFile(new SavedSpot(false, null), Constants.SAVED_SPOT_FILE);
+		clearSavedSpotFile();
 
 		markerType = MarkerType.NONE;
 
@@ -129,6 +129,11 @@ public class LocationRouteService {
 		clearDirectionsPolyline();
 
 		updateMarkerMapState();
+	}
+
+	public void clearSavedSpotFile() {
+
+		writeSavedSpotFile(new SavedSpot(false, null), Constants.SAVED_SPOT_FILE);
 	}
 
 	public void setDestination(LatLng latLng) {
