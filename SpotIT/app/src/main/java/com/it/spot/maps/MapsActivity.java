@@ -262,8 +262,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		Log.d(Constants.APP + Constants.CONNECTION, "onConnected");
 
-		// TODO: Problem here. FINE_LOCATION is needed in 2 different places. However there is only
-		// one callback on permission granted. Solve this...
 		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT_LOCATION)) {
 			return;
 		}
@@ -815,10 +813,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		String text;
 
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
-			text = "Your destination";
+			text = getResources().getString(R.string.location_info_bar_title_destination);
 		}
 		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
-			text = "Your car";
+			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
 		}
 		else {
 			return;
