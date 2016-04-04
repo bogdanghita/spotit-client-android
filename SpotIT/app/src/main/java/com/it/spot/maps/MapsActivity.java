@@ -233,6 +233,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		});
 
 		onMapReadyEvent.set();
+		Log.d(Constants.APP + Constants.STATE_MONITOR, "onMapReadyEvent.set()");
 
 //		enableLocation();
 
@@ -280,6 +281,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	@Override
 	public void notifyStateReady() {
 
+		Log.d(Constants.APP + Constants.STATE_MONITOR, "notifyStateReady()");
+
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -304,6 +307,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		Log.d(Constants.APP + Constants.CONNECTION, "onConnected");
 
 		onConnectedEvent.set();
+		Log.d(Constants.APP + Constants.STATE_MONITOR, "onConnectedEvent.set()");
 
 //		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT_LOCATION)) {
 //			return;
