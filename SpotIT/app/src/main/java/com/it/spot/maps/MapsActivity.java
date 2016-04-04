@@ -217,6 +217,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				locationRouteService.setDestination(latLng);
 
 				setDirectionsButtonIcon(false);
+				setLocationInfoBarTitle();
 			}
 		});
 
@@ -590,6 +591,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleNavigationDrawer();
 
 		setDirectionsButtonIcon(false);
+		setLocationInfoBarTitle();
 	}
 
 	public void buttonLeaveSpot(View view) {
@@ -601,6 +603,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleNavigationDrawer();
 
 		setDirectionsButtonIcon(false);
+		setLocationInfoBarTitle();
 	}
 
 	void toggleSaveSpotButton() {
@@ -769,6 +772,24 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.directions_fab);
 		fab.setImageDrawable(getResources().getDrawable(icon_id));
+	}
+
+	private void setLocationInfoBarTitle() {
+
+		String text;
+
+		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+			text = "Your destination";
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+			text = "Your car";
+		}
+		else {
+			return;
+		}
+
+		TextView tv = (TextView) findViewById(R.id.location_title);
+		tv.setText(text);
 	}
 
 // -------------------------------------------------------------------------------------------------
