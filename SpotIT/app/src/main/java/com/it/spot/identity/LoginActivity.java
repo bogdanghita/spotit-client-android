@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -42,6 +43,16 @@ public class LoginActivity extends IdentityActivity {
 	public void onStart() {
 		super.onStart();
 
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			public void run() {
+				startSilentSignIn();
+			}
+		}, Constants.INITIAL_LOGIN_DELAY);
+	}
+
+	private void startSilentSignIn() {
+
 		// Silent sign in
 		OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(mIdentityGoogleApiClient);
 
@@ -54,15 +65,11 @@ public class LoginActivity extends IdentityActivity {
 		else {
 			// There's no immediate result ready, displays some progress indicator and waits for the
 			// async callback.
-			showProgressIndicator();
-
 			pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
 				@Override
 				public void onResult(GoogleSignInResult result) {
 
 					handleSignInResult(result);
-
-					hideProgressIndicator();
 				}
 			});
 
@@ -70,7 +77,7 @@ public class LoginActivity extends IdentityActivity {
 		}
 	}
 
-	public void configureSignInButton() {
+	private void configureSignInButton() {
 
 		SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
 		signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -84,6 +91,14 @@ public class LoginActivity extends IdentityActivity {
 				buttonSignIn(v);
 			}
 		});
+
+		signInButton.setVisibility(View.INVISIBLE);
+	}
+
+	private void showSignInButton() {
+
+		SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+		signInButton.setVisibility(View.VISIBLE);
 	}
 
 	private void configureSignInButtonText(SignInButton signInButton, String buttonText) {
@@ -112,6 +127,8 @@ public class LoginActivity extends IdentityActivity {
 
 	public void startSignIn() {
 
+//		showProgressIndicator();
+
 		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mIdentityGoogleApiClient);
 		startActivityForResult(signInIntent, Constants.RC_SIGN_IN);
 	}
@@ -119,6 +136,8 @@ public class LoginActivity extends IdentityActivity {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+
+//		hideProgressIndicator();
 
 		// Result returned from launching the Intent from GoogleSignInApi.getSignInIntent()
 		if (requestCode == Constants.RC_SIGN_IN) {
@@ -155,6 +174,10 @@ public class LoginActivity extends IdentityActivity {
 			// Login successful. Starting main activity
 			startMainActivity();
 		}
+		else {
+
+			showSignInButton();
+		}
 	}
 
 	private void showProgressIndicator() {
@@ -180,6 +203,8 @@ public class LoginActivity extends IdentityActivity {
 		Intent intent = new Intent(this, MapsActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		startActivity(intent);
+		// Disable activity end transition
+		overridePendingTransition(0, 0);
 	}
 
 // -------------------------------------------------------------------------------------------------
