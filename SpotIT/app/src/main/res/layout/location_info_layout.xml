@@ -17,7 +17,7 @@
 		android:layout_height="wrap_content"
 		android:paddingLeft="15dp"
 		android:paddingTop="15dp"
-		android:text="Your car"
+		android:text="@string/location_info_bar_title_saved_spot"
 		android:textSize="20sp"/>
 
 	<LinearLayout
