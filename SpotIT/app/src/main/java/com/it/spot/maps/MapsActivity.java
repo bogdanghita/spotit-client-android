@@ -439,6 +439,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		Log.d(Constants.APP + Constants.MENU, "Button Sign out");
 
+		// Clear saved spot
+		locationRouteService.clearSavedSpotFile();
+
 		// Signing out from Google
 		Auth.GoogleSignInApi.signOut(mIdentityGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
 			@Override
