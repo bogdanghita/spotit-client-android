@@ -34,7 +34,7 @@
 		android:layout_gravity="end|bottom"
 		android:layout_margin="@dimen/fab_margin"
 		android:onClick="buttonOpenParkingStateOptionsV2"
-		android:src="@drawable/logo_spot_it"
+		android:src="@drawable/logo_spot_it_p"
 		app:backgroundTint="@color/colorLight"
 		app:layout_behavior="com.it.spot.maps.ParkingStateV2ButtonBehavior"/>
 
@@ -55,7 +55,7 @@
 		android:layout_height="wrap_content"
 		android:layout_margin="@dimen/fab_margin"
 		android:onClick="buttonDirections"
-		android:src="@drawable/ic_directions_white_24dp"
+		android:src="@drawable/ic_directions_walk_white_24dp"
 		android:visibility="invisible"
 		app:backgroundTint="#ff4e5c"
 		app:layout_anchor="@id/location_info_bar"

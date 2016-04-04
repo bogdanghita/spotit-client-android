@@ -95,6 +95,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// Disable activity start transition
+		overridePendingTransition(0, 0);
 		setContentView(R.layout.activity_maps);
 
 		// Configure toolbar
@@ -213,6 +215,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			public void onMapClick(final LatLng latLng) {
 
 				locationRouteService.setDestination(latLng);
+
+				setDirectionsButtonIcon(false);
+				setLocationInfoBarTitle();
 			}
 		});
 
@@ -435,6 +440,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		Log.d(Constants.APP + Constants.MENU, "Button Sign out");
 
+		// Clear saved spot
+		locationRouteService.clearSavedSpotFile();
+
 		// Signing out from Google
 		Auth.GoogleSignInApi.signOut(mIdentityGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
 			@Override
@@ -583,6 +591,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleNavigationDrawer();
 
 		setDirectionsButtonIcon(false);
+		setLocationInfoBarTitle();
 	}
 
 	public void buttonLeaveSpot(View view) {
@@ -594,6 +603,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleNavigationDrawer();
 
 		setDirectionsButtonIcon(false);
+		setLocationInfoBarTitle();
 	}
 
 	void toggleSaveSpotButton() {
@@ -646,7 +656,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonOpenParkingStateOptionsV2(View v) {
 
-		//Lasati chestiile comentate in caz ca vom modifica in fullscreen
+		Dialog alertDialog = new Dialog(this, R.style.AlertDialogSpotReport);
 
 		//Normal alert
 //		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#ffffff"));
@@ -760,10 +770,41 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	private void setDirectionsButtonIcon(boolean iconClosed) {
 
-		int icon_id = iconClosed ? R.drawable.ic_close_white_24dp : R.drawable.ic_directions_white_24dp;
+		int icon_id;
+
+		if (iconClosed) {
+			icon_id = R.drawable.ic_close_white_24dp;
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+			icon_id = R.drawable.ic_directions_car_white_24dp;
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+			icon_id = R.drawable.ic_directions_walk_white_24dp;
+		}
+		else {
+			return;
+		}
 
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.directions_fab);
 		fab.setImageDrawable(getResources().getDrawable(icon_id));
+	}
+
+	private void setLocationInfoBarTitle() {
+
+		String text;
+
+		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+			text = "Your destination";
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+			text = "Your car";
+		}
+		else {
+			return;
+		}
+
+		TextView tv = (TextView) findViewById(R.id.location_title);
+		tv.setText(text);
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -815,76 +856,77 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				public void run() {
 					Polyline result = null;
 					if (mMap != null) {
-                        // Directions for driving.
+						// Directions for driving.
 
-                        // TODO: Switch like a sane person would, not with if true/false.
-                        if (false) {
-                            // Draw stroke.
-                            directionsPolylineOptions.width(Constants.DIRECTIONS_STROKE_WIDTH);
-                            directionsPolylineOptions.color(Constants.DIRECTIONS_STROKE_COLOR);
-                            result = mMap.addPolyline(directionsPolylineOptions);
-                            // Draw actual line.
-                            directionsPolylineOptions.width(Constants.DIRECTIONS_LINE_WIDTH);
-                            directionsPolylineOptions.color(Constants.DIRECTIONS_LINE_COLOR);
-                            result = mMap.addPolyline(directionsPolylineOptions);
-                        } else {
-                            // Draw circles.
-                            List<LatLng> points = directionsPolylineOptions.getPoints();
-                            LatLng pointA, pointB, intermPoint;
-                            Location locationA = new Location("");
-                            Location locationB = new Location("");
-                            Location intermLocation = new Location("");
+						// TODO: Switch like a sane person would, not with if true/false.
+						if (false) {
+							// Draw stroke.
+							directionsPolylineOptions.width(Constants.DIRECTIONS_STROKE_WIDTH);
+							directionsPolylineOptions.color(Constants.DIRECTIONS_STROKE_COLOR);
+							result = mMap.addPolyline(directionsPolylineOptions);
+							// Draw actual line.
+							directionsPolylineOptions.width(Constants.DIRECTIONS_LINE_WIDTH);
+							directionsPolylineOptions.color(Constants.DIRECTIONS_LINE_COLOR);
+							result = mMap.addPolyline(directionsPolylineOptions);
+						}
+						else {
+							// Draw circles.
+							List<LatLng> points = directionsPolylineOptions.getPoints();
+							LatLng pointA, pointB, intermPoint;
+							Location locationA = new Location("");
+							Location locationB = new Location("");
+							Location intermLocation = new Location("");
 
-                            if (points.size() < 2)
-                                return;
+							if (points.size() < 2)
+								return;
 
-                            double padding = 0;
-                            double scaleFactor = Math.pow(2, Constants.DEFAULT_ZOOM - mMap.getCameraPosition().zoom) * Constants.SCALE_FACTOR_RECTIFIER;
+							double padding = 0;
+							double scaleFactor = Math.pow(2, Constants.DEFAULT_ZOOM - mMap.getCameraPosition().zoom) * Constants.SCALE_FACTOR_RECTIFIER;
 
-                            for (int i = 1; i < points.size(); i++) {
-                                pointA = points.get(i - 1);
-                                pointB = points.get(i);
+							for (int i = 1; i < points.size(); i++) {
+								pointA = points.get(i - 1);
+								pointB = points.get(i);
 
-                                locationA.setLatitude(pointA.latitude);
-                                locationA.setLongitude(pointA.longitude);
-                                locationB.setLatitude(pointB.latitude);
-                                locationB.setLongitude(pointB.longitude);
+								locationA.setLatitude(pointA.latitude);
+								locationA.setLongitude(pointA.longitude);
+								locationB.setLatitude(pointB.latitude);
+								locationB.setLongitude(pointB.longitude);
 
-                                // Compute first intermediate point based on previous padding.
-                                intermPoint = Utils.calculateDerivedPosition(
-                                        pointA,
-                                        pointB,
-                                        padding);
+								// Compute first intermediate point based on previous padding.
+								intermPoint = Utils.calculateDerivedPosition(
+										pointA,
+										pointB,
+										padding);
 
-                                intermLocation.setLatitude(intermPoint.latitude);
-                                intermLocation.setLongitude(intermPoint.longitude);
+								intermLocation.setLatitude(intermPoint.latitude);
+								intermLocation.setLongitude(intermPoint.longitude);
 
-                                int chunks = 0;
+								int chunks = 0;
 
-                                // While intermPoint is still on segment AB.
-                                while (locationA.distanceTo(locationB) > locationA.distanceTo(intermLocation)) {
-                                    // Draw current circle.
-                                    mMap.addCircle(new CircleOptions()
-                                            .center(intermPoint)
-                                            .fillColor(Constants.DIRECTIONS_LINE_COLOR)
-                                            .strokeColor(Constants.DIRECTIONS_STROKE_COLOR)
-                                            .radius(Constants.CIRCLE_SIZE * scaleFactor)
-                                            .strokeWidth(Constants.CIRCLE_STROKE_WIDTH));
-                                    // Prepare the next one.
-                                    chunks++;
+								// While intermPoint is still on segment AB.
+								while (locationA.distanceTo(locationB) > locationA.distanceTo(intermLocation)) {
+									// Draw current circle.
+									mMap.addCircle(new CircleOptions()
+											.center(intermPoint)
+											.fillColor(Constants.DIRECTIONS_LINE_COLOR)
+											.strokeColor(Constants.DIRECTIONS_STROKE_COLOR)
+											.radius(Constants.CIRCLE_SIZE * scaleFactor)
+											.strokeWidth(Constants.CIRCLE_STROKE_WIDTH));
+									// Prepare the next one.
+									chunks++;
 
-                                    intermPoint = Utils.calculateDerivedPosition(
-                                            pointA,
-                                            pointB,
-                                            (chunks * Constants.CIRCLE_DISTANCE + padding) * scaleFactor);
+									intermPoint = Utils.calculateDerivedPosition(
+											pointA,
+											pointB,
+											(chunks * Constants.CIRCLE_DISTANCE + padding) * scaleFactor);
 
-                                    intermLocation.setLatitude(intermPoint.latitude);
-                                    intermLocation.setLongitude(intermPoint.longitude);
-                                }
-                                // Prepair padding for the next draw.
-                                padding = locationB.distanceTo(intermLocation);
-                            }
-                        }
+									intermLocation.setLatitude(intermPoint.latitude);
+									intermLocation.setLongitude(intermPoint.longitude);
+								}
+								// Prepair padding for the next draw.
+								padding = locationB.distanceTo(intermLocation);
+							}
+						}
 
 						setDirectionsButtonIcon(true);
 					}
