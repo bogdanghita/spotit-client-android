@@ -1,79 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	xmlns:card_view="http://schemas.android.com/apk/res-auto"
 	android:gravity="center"
-	android:orientation="horizontal">
+	android:orientation="vertical">
 
-	<!--<Button-->
-		<!--android:id="@+id/fab_free_3"-->
-		<!--android:layout_width="wrap_content"-->
-		<!--android:layout_height="wrap_content"-->
-		<!--android:onClick="buttonReportParkingState"-->
-		<!--android:text="Button1"/>-->
 	<LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingRight="18dp"
-		android:paddingLeft="18dp">
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="300dp"
+		android:gravity="center"
+		android:paddingTop="140dp"
+		android:paddingBottom="48dp"
+		android:orientation="horizontal">
 
-		<ImageButton
+		<ImageView
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:id="@+id/imageView1"
+			android:src="@drawable/logo_only_p"
+			android:contentDescription="@string/app_name" />
+	</LinearLayout>
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:fontFamily="sans-serif-thin"
+		android:text="Report a spot"
+		android:textSize="48dp"
+		android:textColor="@color/colorLight"
+		android:paddingTop="24dp"
+		android:paddingBottom="24dp"
+	android:gravity="center"
+		/>
+
+
+	<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:gravity="center"
+		android:paddingTop="24dp"
+		android:paddingBottom="48dp"
+		android:orientation="horizontal">
+
+		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/fab_free_3"
-			android:src="@drawable/ic_local_parking_black_48dp"
-			android:onClick="buttonReportParkingState"
-			android:background="@drawable/round_corner_green"
-			android:padding="1dp"
-			android:tint="#00FF00"
-			android:minWidth="72dp"
-			android:minHeight="72dp" />
+			android:paddingRight="18dp"
+			android:paddingLeft="18dp"
+			android:gravity="center_horizontal"
+			android:orientation="vertical">
+
+			<android.support.v7.widget.CardView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				card_view:cardCornerRadius="36dp"
+				card_view:cardElevation="6dp">
+
+				<ImageButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/fab_free_3"
+					android:src="@drawable/ic_local_parking_black_48dp"
+					android:onClick="buttonReportParkingState"
+					android:background="@drawable/round_corner_green"
+					android:padding="1dp"
+					android:tint="#00FF00"
+					android:alpha="0.8"
+					android:minWidth="72dp"
+					android:minHeight="72dp" />
+			</android.support.v7.widget.CardView>
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:fontFamily="sans-serif-thin"
+				android:text="Free"
+				android:paddingTop="5dp"
+				android:textSize="16dp"
+				android:textColor="@color/colorLight"
+				android:gravity="center"
+				/>
 
 		</LinearLayout>
-	<!--<Button-->
-		<!--android:id="@+id/fab_moderate_3"-->
-		<!--android:layout_width="wrap_content"-->
-		<!--android:layout_height="wrap_content"-->
-		<!--android:onClick="buttonReportParkingState"-->
-		<!--android:text="Button1"/>-->
 
 	<LinearLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:paddingRight="18dp"
-		android:paddingLeft="18dp">
+		android:paddingLeft="18dp"
+		android:gravity="center_horizontal"
+		android:orientation="vertical">
 
-		<ImageButton
-			android:layout_width="wrap_content"
+		<android.support.v7.widget.CardView
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:id="@+id/fab_moderate_3"
-			android:src="@drawable/ic_local_parking_black_48dp"
-			android:onClick="buttonReportParkingState"
-			android:background="@drawable/round_corner_yellow"
-			android:padding="1dp"
-			android:tint="#FFFF00"
-			android:minWidth="72dp"
-			android:minHeight="72dp" />
+			card_view:cardCornerRadius="36dp"
+			card_view:cardElevation="6dp">
 
+			<ImageButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/fab_moderate_3"
+				android:src="@drawable/ic_local_parking_black_48dp"
+				android:onClick="buttonReportParkingState"
+				android:background="@drawable/round_corner_yellow"
+				android:padding="1dp"
+				android:tint="#FFFF00"
+				android:alpha="0.8"
+				android:minWidth="72dp"
+				android:minHeight="72dp" />
+
+		</android.support.v7.widget.CardView>
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:fontFamily="sans-serif-thin"
+			android:text="Medium"
+			android:paddingTop="5dp"
+			android:textSize="16dp"
+			android:textColor="@color/colorLight"
+			android:gravity="center"
+			/>
 	</LinearLayout>
 
 	<LinearLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:paddingRight="18dp"
-		android:paddingLeft="18dp">
+		android:paddingLeft="18dp"
+		android:gravity="center_horizontal"
+		android:orientation="vertical">
 
-		<ImageButton
-			android:layout_width="wrap_content"
+		<android.support.v7.widget.CardView
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:id="@+id/fab_full_3"
-			android:src="@drawable/ic_local_parking_black_48dp"
-			android:onClick="buttonReportParkingState"
-			android:background="@drawable/round_corner_red"
-			android:padding="1dp"
-			android:tint="#FF0000"
-			android:minWidth="72dp"
-			android:minHeight="72dp" />
+			card_view:cardCornerRadius="36dp"
+			card_view:cardElevation="6dp">
+
+			<ImageButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/fab_full_3"
+				android:src="@drawable/ic_local_parking_black_48dp"
+				android:onClick="buttonReportParkingState"
+				android:background="@drawable/round_corner_red"
+				android:padding="1dp"
+				android:tint="#FF0000"
+				android:alpha="0.8"
+				android:minWidth="72dp"
+				android:minHeight="72dp" />
+		</android.support.v7.widget.CardView>
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:fontFamily="sans-serif-thin"
+			android:text="Full"
+			android:paddingTop="5dp"
+			android:textSize="16dp"
+			android:textColor="@color/colorLight"
+			android:gravity="center"
+			/>
+	</LinearLayout>
 	</LinearLayout>
 </LinearLayout>
