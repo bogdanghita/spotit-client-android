@@ -87,6 +87,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	// Bool to track whether the app is already resolving an error
 	private boolean mResolvingError = false;
 
+	private boolean startedPermissionRequestACCESS_FINE_LOCATION = false;
+	private Object permissionLock = new Object();
+
 	private MapUpdateService mapUpdateService;
 	private LocationRouteService locationRouteService;
 
@@ -221,17 +224,37 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			}
 		});
 
-		// TODO: solve the permissions problem
-		if (checkAndRequestPermissionACCESS_FINE_LOCATION()) {
-			enableLocation();
-		}
+		enableLocation();
 
 		locationRouteService.drawMarker();
 	}
 
-	void enableLocation() {
+	private void enableLocation() {
+
+		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_ENABLE_LOCATION)) {
+			return;
+		}
+		enableLocationAction();
+	}
+
+	private void enableLocationAction() {
 		mMap.setMyLocationEnabled(true);
 		mMap.getUiSettings().setMyLocationButtonEnabled(false);
+	}
+
+	private void startLocationUpdates() {
+		LocationServices.FusedLocationApi.requestLocationUpdates(mMapsGoogleApiClient, mLocationRequest, this);
+	}
+
+	private void initLastLocation() {
+
+		Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
+		if (lastLocation != null) {
+			mServiceManager.getLocationManager().setLastLocation(
+					new BasicLocation(lastLocation.getLatitude(), lastLocation.getLongitude()));
+
+			onLocationChanged(lastLocation);
+		}
 	}
 
 	@Override
@@ -241,18 +264,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		// TODO: Problem here. FINE_LOCATION is needed in 2 different places. However there is only
 		// one callback on permission granted. Solve this...
-		if (!checkAndRequestPermissionACCESS_FINE_LOCATION()) {
+		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT_LOCATION)) {
 			return;
 		}
-
-		Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
-		if (lastLocation != null) {
-			mServiceManager.getLocationManager().setLastLocation(
-					new BasicLocation(lastLocation.getLatitude(), lastLocation.getLongitude()));
-
-			onLocationChanged(lastLocation);
-		}
-
+		initLastLocation();
 		startLocationUpdates();
 	}
 
@@ -318,7 +333,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		updateUI();
 	}
 
-	protected synchronized void buildGoogleApiClient() {
+	private synchronized void buildGoogleApiClient() {
 		mMapsGoogleApiClient = new GoogleApiClient.Builder(this)
 				.addConnectionCallbacks(this)
 				.addOnConnectionFailedListener(this)
@@ -326,19 +341,22 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				.build();
 	}
 
-	protected void createLocationRequest() {
+	private void createLocationRequest() {
 		mLocationRequest = new LocationRequest();
 		mLocationRequest.setInterval(Constants.LOCATION_REQUEST_INTERVAL);
 		mLocationRequest.setFastestInterval(Constants.LOCATION_REQUEST_FASTEST_INTERVAL);
 		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 	}
 
-	protected void startLocationUpdates() {
-		LocationServices.FusedLocationApi.requestLocationUpdates(mMapsGoogleApiClient, mLocationRequest, this);
+	private void centerCameraOnLastLocation() {
+
+		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_CENTER_LOCATION)) {
+			return;
+		}
+		centerCameraOnLastLocationAction();
 	}
 
-	private void centerCameraOnLastLocation() {
-		//mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
+	private void centerCameraOnLastLocationAction() {
 
 		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
 		CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -537,7 +555,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // PERMISSIONS
 // -------------------------------------------------------------------------------------------------
 
-	private boolean checkAndRequestPermissionACCESS_FINE_LOCATION() {
+	private boolean permission_FINELOCATION(int request_code) {
 
 		List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -551,7 +569,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (!listPermissionsNeeded.isEmpty()) {
 			ActivityCompat.requestPermissions(this,
 					listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),
-					Constants.REQUEST_ID_ACCESS_FINE_LOCATION);
+					request_code);
 			return false;
 		}
 		return true;
@@ -561,19 +579,24 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 
 		switch (requestCode) {
-			case Constants.REQUEST_ID_ACCESS_FINE_LOCATION: {
-
-				// If request is cancelled, the result arrays are empty.
+			case Constants.REQ_FINE_LOCATION_ENABLE_LOCATION: {
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					// permission was granted, yay! Do the
-					// contacts-related task you need to do.
-					enableLocation();
+					enableLocationAction();
 				}
-				else {
-					// permission denied, boo! Disable the
-					// functionality that depends on this permission.
+				break;
+			}
+			case Constants.REQ_FINE_LOCATION_INIT_LOCATION: {
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					initLastLocation();
+					startLocationUpdates();
 				}
-				return;
+				break;
+			}
+			case Constants.REQ_FINE_LOCATION_CENTER_LOCATION: {
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					centerCameraOnLastLocationAction();
+				}
+				break;
 			}
 		}
 	}

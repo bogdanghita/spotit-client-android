@@ -120,7 +120,7 @@ public class LoginActivity extends IdentityActivity {
 
 		Log.d(Constants.APP + Constants.SIGN_IN, "buttonSignIn()");
 
-		if (checkAndRequestPermissionGET_ACCOUNTS()) {
+		if (permission_GET_ACCOUNTS()) {
 			startSignIn();
 		}
 	}
@@ -211,7 +211,7 @@ public class LoginActivity extends IdentityActivity {
 // PERMISSIONS
 // -------------------------------------------------------------------------------------------------
 
-	private boolean checkAndRequestPermissionGET_ACCOUNTS() {
+	private boolean permission_GET_ACCOUNTS() {
 
 		List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -225,7 +225,7 @@ public class LoginActivity extends IdentityActivity {
 		if (!listPermissionsNeeded.isEmpty()) {
 			ActivityCompat.requestPermissions(this,
 					listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),
-					Constants.REQUEST_ID_GET_ACCOUNTS);
+					Constants.REQ_GET_ACCOUNTS);
 			return false;
 		}
 		return true;
@@ -235,7 +235,7 @@ public class LoginActivity extends IdentityActivity {
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 
 		switch (requestCode) {
-			case Constants.REQUEST_ID_GET_ACCOUNTS: {
+			case Constants.REQ_GET_ACCOUNTS: {
 
 				// If request is cancelled, the result arrays are empty.
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

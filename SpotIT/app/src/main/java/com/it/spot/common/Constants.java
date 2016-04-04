@@ -30,8 +30,10 @@ public class Constants {
 
 	public final static String TOKEN_REQUEST_SCOPE = "oauth2:https://www.googleapis.com/auth/userinfo.profile";
 
-	public final static int REQUEST_ID_GET_ACCOUNTS = 1;
-	public final static int REQUEST_ID_ACCESS_FINE_LOCATION = 2;
+	public final static int REQ_GET_ACCOUNTS = 1;
+	public final static int REQ_FINE_LOCATION_ENABLE_LOCATION = 2;
+	public final static int REQ_FINE_LOCATION_INIT_LOCATION = 3;
+	public final static int REQ_FINE_LOCATION_CENTER_LOCATION = 4;
 
 	public static final String STATE_RESOLVING_ERROR = "resolving_error";
 
