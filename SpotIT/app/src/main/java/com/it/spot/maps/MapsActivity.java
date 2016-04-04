@@ -645,11 +645,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	}
 
 	public void buttonOpenParkingStateOptionsV2(View v) {
-
-		Dialog alertDialog = new Dialog(this,R.style.AlertDialogSpotReport);
+		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
+		colorDrawable.setAlpha(200);
+//		Dialog alertDialog = new Dialog(this);
+		Dialog alertDialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		alertDialog.setContentView(R.layout.report_parking_spot_layout);
-		alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
 		alertDialog.show();
 	}
 
