@@ -294,7 +294,7 @@ public class LocationRouteService {
 			// !!!!!!!!!!!!!!!!!!!!!!!!
 
 			// Change this to walking to force walking route.
-			directions_mode = Constants.MODE_WALKING;
+			directions_mode = Constants.MODE_DRIVING;
 		}
 
 		BasicLocation lastLocation = mLocationManager.getLastLocation();
