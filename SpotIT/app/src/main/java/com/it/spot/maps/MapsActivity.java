@@ -867,21 +867,24 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					switch (routeData.getRouteType()) {
-						case DRIVING:
-							List<Polyline> polylines = new ArrayList<Polyline>();
-							for (PolylineOptions polylineOptions : routeData.getRoutePolylineOptionsList()) {
-								polylines.add(mMap.addPolyline(polylineOptions));
-							}
-							client.notifyDrivingResult(polylines);
-							break;
-						case WALKING:
-							List<Circle> circles = new ArrayList<Circle>();
-							for (CircleOptions circleOptions : routeData.getRouteCircleOptionsList()) {
-								circles.add(mMap.addCircle(circleOptions));
-							}
-							client.notifyWalkingResult(circles);
-							break;
+					if (mMap != null) {
+						setDirectionsButtonIcon(true);
+						switch (routeData.getRouteType()) {
+							case DRIVING:
+								List<Polyline> polylines = new ArrayList<Polyline>();
+								for (PolylineOptions polylineOptions : routeData.getRoutePolylineOptionsList()) {
+									polylines.add(mMap.addPolyline(polylineOptions));
+								}
+								client.notifyDrivingResult(polylines);
+								break;
+							case WALKING:
+								List<Circle> circles = new ArrayList<Circle>();
+								for (CircleOptions circleOptions : routeData.getRouteCircleOptionsList()) {
+									circles.add(mMap.addCircle(circleOptions));
+								}
+								client.notifyWalkingResult(circles);
+								break;
+						}
 					}
 				}
 			});
