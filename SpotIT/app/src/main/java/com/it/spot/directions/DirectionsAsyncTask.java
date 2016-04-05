@@ -192,8 +192,8 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 			routeData.setRouteType(RouteType.WALKING);
 			routeData.setRouteCircleOptionsList(circleOptionsList);
 			routeData.setRoutePoints(directions);
-		}else{
-			if(mode.equals(Constants.MODE_DRIVING)){
+		} else {
+			if (mode.equals(Constants.MODE_DRIVING)) {
 				List<PolylineOptions> polylineOptionsList = getDrivingDirections(directions);
 				routeData = new RouteData();
 				routeData.setRouteType(RouteType.DRIVING);
@@ -226,9 +226,10 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 
 		List<CircleOptions> circleOptionsList = new ArrayList<>();
 
-		LatLng pointA, pointB, intermPoint;
+		LatLng pointA, pointB, intermPoint, lastPoint;
 		Location locationA = new Location("");
 		Location locationB = new Location("");
+		Location lastLocation = new Location("");
 		Location intermLocation = new Location("");
 
 		if (points.size() < 2)
@@ -237,14 +238,50 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 		double padding = 0;
 		double scaleFactor = Math.pow(2, Constants.DEFAULT_ZOOM - zoom) * Constants.SCALE_FACTOR_RECTIFIER;
 
+		// Add first point. Just user for calculations, to be removed.
+		circleOptionsList.add(new CircleOptions()
+				.center(Utils.calculateDerivedPosition(points.get(0), points.get(1), -Constants.CIRCLE_DISTANCE * scaleFactor / 2))
+				.fillColor(Constants.DIRECTIONS_LINE_COLOR)
+				.strokeColor(Constants.DIRECTIONS_STROKE_COLOR)
+				.radius(Constants.CIRCLE_SIZE * scaleFactor)
+				.strokeWidth(Constants.CIRCLE_STROKE_WIDTH)
+				.zIndex(Constants.CIRCLE_Z_INDEX));
+
 		for (int i = 1; i < points.size(); i++) {
 			pointA = points.get(i - 1);
 			pointB = points.get(i);
+
+			lastPoint = circleOptionsList.get(circleOptionsList.size() - 1).getCenter();
 
 			locationA.setLatitude(pointA.latitude);
 			locationA.setLongitude(pointA.longitude);
 			locationB.setLatitude(pointB.latitude);
 			locationB.setLongitude(pointB.longitude);
+			lastLocation.setLatitude(lastPoint.latitude);
+			lastLocation.setLongitude(lastPoint.longitude);
+
+			// If point B is too close to the last point, skip the segment.
+			if (lastLocation.distanceTo(locationB) < Constants.CIRCLE_DISTANCE * scaleFactor)
+				continue;
+
+			// Compute padding.
+			if (!lastPoint.equals(pointA)) {
+				double A, B, C, alpha, a, b, c, delta;
+				A = lastLocation.distanceTo(locationA);
+				C = Constants.CIRCLE_DISTANCE * scaleFactor;
+				alpha = Utils.angleFromCoordinates(lastPoint, pointA) - Utils.angleFromCoordinates(pointB, pointA);
+
+				a = 1;
+				b = -2 * A * Math.cos(Math.toRadians(alpha));
+				c = A * A - C * C;
+
+				delta = b * b - 4 * a * c;
+				B = (-b + Math.sqrt(delta)) / (2 * a);
+
+				padding = B;
+			} else {
+				padding = 0;
+			}
 
 			// Compute first intermediate point based on previous padding.
 			intermPoint = Utils.calculateDerivedPosition(
@@ -265,21 +302,24 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 						.fillColor(Constants.DIRECTIONS_LINE_COLOR)
 						.strokeColor(Constants.DIRECTIONS_STROKE_COLOR)
 						.radius(Constants.CIRCLE_SIZE * scaleFactor)
-						.strokeWidth(Constants.CIRCLE_STROKE_WIDTH));
+						.strokeWidth(Constants.CIRCLE_STROKE_WIDTH)
+						.zIndex(Constants.CIRCLE_Z_INDEX));
+
 				// Prepare the next one.
 				chunks++;
 
 				intermPoint = Utils.calculateDerivedPosition(
 						pointA,
 						pointB,
-						(chunks * Constants.CIRCLE_DISTANCE + padding) * scaleFactor);
+						(chunks * Constants.CIRCLE_DISTANCE) * scaleFactor + padding);
 
 				intermLocation.setLatitude(intermPoint.latitude);
 				intermLocation.setLongitude(intermPoint.longitude);
 			}
-			// Prepair padding for the next draw.
-			padding = locationB.distanceTo(intermLocation);
 		}
+
+		// Remove dummy point.
+		circleOptionsList.remove(0);
 
 		return circleOptionsList;
 	}

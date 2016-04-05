@@ -18,7 +18,6 @@ import com.it.spot.directions.DirectionsResultListener;
 import com.it.spot.directions.RecomputeRouteAsyncTask;
 import com.it.spot.directions.RedrawCallback;
 import com.it.spot.directions.RouteData;
-import com.it.spot.directions.RouteData.RouteType;
 import com.it.spot.directions.RouteOptions;
 
 import java.io.BufferedReader;
@@ -295,7 +294,7 @@ public class LocationRouteService {
 			// !!!!!!!!!!!!!!!!!!!!!!!!
 
 			// Change this to walking to force walking route.
-			directions_mode = Constants.MODE_DRIVING;
+			directions_mode = Constants.MODE_WALKING;
 		}
 
 		BasicLocation lastLocation = mLocationManager.getLastLocation();
