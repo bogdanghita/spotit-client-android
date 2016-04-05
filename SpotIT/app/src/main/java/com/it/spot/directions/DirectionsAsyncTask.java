@@ -308,6 +308,20 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 				// Prepare the next one.
 				chunks++;
 
+				double segmentLength = locationA.distanceTo(locationB);
+				double chunksLength = locationA.distanceTo(intermLocation);
+				double remainingLength = segmentLength - chunksLength;
+
+				if (chunks >= Constants.MAX_CIRCLES_PER_SEGMENT && remainingLength >= chunksLength) {
+					double ratio = 1 - chunksLength / segmentLength;
+
+					double newLat = ratio * pointA.latitude + (1 - ratio) * pointB.latitude;
+					double newLng = ratio * pointA.longitude + (1 - ratio) * pointB.longitude;
+
+					points.add(i, new LatLng(newLat, newLng));
+					break;
+				}
+
 				intermPoint = Utils.calculateDerivedPosition(
 						pointA,
 						pointB,
