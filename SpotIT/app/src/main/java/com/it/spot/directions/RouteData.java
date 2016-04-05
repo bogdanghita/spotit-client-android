@@ -14,7 +14,6 @@ import java.util.List;
 public class RouteData {
 	public enum RouteType {DRIVING, WALKING}
 
-	private boolean isDrawn;
 	private RouteType mRouteType;
 
 	private List<LatLng> mRoutePoints;
@@ -33,7 +32,7 @@ public class RouteData {
 	}
 
 	public boolean isDrawn() {
-		return isDrawn;
+		return mRouteCircles != null || mRoutePolylines != null;
 	}
 
 	public void undraw() {
@@ -45,7 +44,6 @@ public class RouteData {
 				this.setRoutePolylines(null);
 				break;
 		}
-		isDrawn = false;
 	}
 
 	public RouteType getRouteType() {
@@ -78,7 +76,6 @@ public class RouteData {
 
 	public void setRoutePolylines(List<Polyline> mRoutePolylines) {
 		this.mRoutePolylines = mRoutePolylines;
-		isDrawn = true;
 	}
 
 	public List<Circle> getRouteCircles() {
@@ -87,6 +84,5 @@ public class RouteData {
 
 	public void setRouteCircles(List<Circle> mRouteCircles) {
 		this.mRouteCircles = mRouteCircles;
-		isDrawn = true;
 	}
 }
