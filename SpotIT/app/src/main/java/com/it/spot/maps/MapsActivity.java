@@ -723,23 +723,22 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void buttonOpenParkingStateOptionsV2(View v) {
 
 		//Normal alert
-		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#ffffff"));
-//		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#f9f9f9"));
-		Dialog alertDialog = new Dialog(this);
-		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		alertDialog.setContentView(R.layout.report_parking_spot_layout2);
-		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
-		alertDialog.show();
-
-		//Fullscreen alert
-//		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
-//		colorDrawable.setAlpha(200);
+//		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#ffffff"));
+////		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#f9f9f9"));
 //		Dialog alertDialog = new Dialog(this);
-//		Dialog alertDialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 //		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 //		alertDialog.setContentView(R.layout.report_parking_spot_layout2);
 //		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
 //		alertDialog.show();
+
+		//Fullscreen alert
+		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
+		colorDrawable.setAlpha(200);
+		Dialog alertDialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		alertDialog.setContentView(R.layout.report_parking_spot_layout);
+		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
+		alertDialog.show();
 	}
 
 	public void buttonReportParkingState(View v) {
