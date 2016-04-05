@@ -62,17 +62,19 @@ import com.it.spot.identity.TokenRequestAsyncTask;
 import com.it.spot.identity.TokenRequestEventListener;
 import com.it.spot.identity.UserInfo;
 import com.it.spot.services.PolygonUI;
+import com.it.spot.threading.Event;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-		LocationListener, TokenRequestEventListener {
+		LocationListener, TokenRequestEventListener, StateMonitorListener {
 
 	private ActionBarDrawerToggle mDrawerToggle;
 
@@ -88,13 +90,15 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	// Bool to track whether the app is already resolving an error
 	private boolean mResolvingError = false;
 
-	private boolean startedPermissionRequestACCESS_FINE_LOCATION = false;
 	private Object permissionLock = new Object();
 
 	private MapUpdateService mapUpdateService;
 	private LocationRouteService locationRouteService;
 
 	private boolean parking_state_button_flag = true;
+
+	private StateMonitorThread stateMonitorThread;
+	private Event onConnectedEvent, onMapReadyEvent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +124,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
 		locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
 
+		initStateMonitor();
+
 		buildGoogleApiClient();
 
 		createLocationRequest();
@@ -139,6 +145,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	@Override
 	public void onStart() {
 		super.onStart();
+
+		stateMonitorThread.start();
 
 		if (mServiceManager.getIdentityManager().getToken() == null) {
 			updateToken();
@@ -228,7 +236,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			}
 		});
 
-		enableLocation();
+		onMapReadyEvent.set();
+
+//		enableLocation();
 
 		locationRouteService.drawMarker();
 	}
@@ -261,18 +271,49 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 	}
 
+	void initStateMonitor() {
+
+		onConnectedEvent = new Event();
+		onMapReadyEvent = new Event();
+		List<Event> eventList = new LinkedList<>();
+		eventList.add(onConnectedEvent);
+		eventList.add(onMapReadyEvent);
+		stateMonitorThread = new StateMonitorThread(this, eventList);
+	}
+
+	@Override
+	public void notifyStateReady() {
+
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+
+				// onConnected
+				if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT_LOCATION)) {
+					return;
+				}
+
+				initLastLocation();
+				startLocationUpdates();
+
+				// onMapReady
+				enableLocation();
+			}
+		});
+	}
+
 	@Override
 	public void onConnected(Bundle bundle) {
 
 		Log.d(Constants.APP + Constants.CONNECTION, "onConnected");
 
-		// TODO: Problem here. FINE_LOCATION is needed in 2 different places. However there is only
-		// one callback on permission granted. Solve this...
-		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT_LOCATION)) {
-			return;
-		}
-		initLastLocation();
-		startLocationUpdates();
+		onConnectedEvent.set();
+
+//		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT_LOCATION)) {
+//			return;
+//		}
+//		initLastLocation();
+//		startLocationUpdates();
 	}
 
 	@Override
@@ -360,6 +401,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private void centerCameraOnLastLocationAction() {
 
 		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		if (lastLocation == null) {
+			return;
+		}
+
 		CameraPosition cameraPosition = new CameraPosition.Builder()
 				.target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
 				.zoom(Constants.DEFAULT_ZOOM)
@@ -809,9 +854,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		String text;
 
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
-			text = "Your destination";
+			text = getResources().getString(R.string.location_info_bar_title_destination);
 		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
-			text = "Your car";
+			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
 		} else {
 			return;
 		}
