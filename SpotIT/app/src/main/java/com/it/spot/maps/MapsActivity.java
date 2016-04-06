@@ -39,6 +39,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -52,7 +53,7 @@ import com.it.spot.address.AddressAsyncTask;
 import com.it.spot.address.AddressResponseListener;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
-import com.it.spot.common.Utils;
+import com.it.spot.directions.RouteData;
 import com.it.spot.identity.IdentityActivity;
 import com.it.spot.identity.IdentityManager;
 import com.it.spot.identity.ImageLoaderAsyncTask;
@@ -188,8 +189,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			locationRouteService.removeDestination();
 			setDirectionsButtonIcon(false);
-		}
-		else {
+		} else {
 			super.onBackPressed();
 		}
 	}
@@ -214,6 +214,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				cameraBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
 
 				Log.d(Constants.APP + Constants.CAMERA_CHANGE, cameraBounds.getCenter() + " - " + cameraBounds.southwest + ", " + cameraBounds.northeast);
+
+				// Updating the zoom and redrawing the route if necessary.
+				locationRouteService.setZoom(mMap.getCameraPosition().zoom);
+				locationRouteService.redrawRouteToMarker();
 
 				// Setting camera position and requesting a map status update
 				mapUpdateService.setCameraPosition(cameraBounds);
@@ -330,18 +334,15 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (mResolvingError) {
 			// Already attempting to resolve an error.
 			return;
-		}
-		else if (connectionResult.hasResolution()) {
+		} else if (connectionResult.hasResolution()) {
 			try {
 				mResolvingError = true;
 				connectionResult.startResolutionForResult(this, Constants.REQUEST_RESOLVE_ERROR);
-			}
-			catch (IntentSender.SendIntentException e) {
+			} catch (IntentSender.SendIntentException e) {
 				// There was an error with the resolution intent. Try again.
 				mMapsGoogleApiClient.connect();
 			}
-		}
-		else {
+		} else {
 			// Show dialog using GoogleApiAvailability.getErrorDialog()
 			showErrorDialog(connectionResult.getErrorCode());
 			mResolvingError = true;
@@ -453,8 +454,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
 			mDrawerLayout.closeDrawer(Gravity.LEFT);
-		}
-		else {
+		} else {
 			mDrawerLayout.openDrawer(Gravity.LEFT);
 		}
 	}
@@ -686,8 +686,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (locationRouteService.isSpotSaved()) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
-		}
-		else {
+		} else {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -713,8 +712,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (parking_state_button_flag) {
 			// Open
 			visibility = View.VISIBLE;
-		}
-		else {
+		} else {
 			// Close
 			visibility = View.GONE;
 		}
@@ -729,23 +727,22 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void buttonOpenParkingStateOptionsV2(View v) {
 
 		//Normal alert
-		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#ffffff"));
-//		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#f9f9f9"));
-		Dialog alertDialog = new Dialog(this);
-		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		alertDialog.setContentView(R.layout.report_parking_spot_layout2);
-		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
-		alertDialog.show();
-
-		//Fullscreen alert
-//		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
-//		colorDrawable.setAlpha(200);
+//		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#ffffff"));
+////		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#f9f9f9"));
 //		Dialog alertDialog = new Dialog(this);
-//		Dialog alertDialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 //		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 //		alertDialog.setContentView(R.layout.report_parking_spot_layout2);
 //		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
 //		alertDialog.show();
+
+		//Fullscreen alert
+		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
+		colorDrawable.setAlpha(200);
+		Dialog alertDialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		alertDialog.setContentView(R.layout.report_parking_spot_layout);
+		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
+		alertDialog.show();
 	}
 
 	public void buttonReportParkingState(View v) {
@@ -806,10 +803,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonDirections(View v) {
 
-		if (!locationRouteService.hasDirectionsPolyline()) {
+		if (!locationRouteService.hasDirections()) {
 			locationRouteService.drawRouteToMarker();
-		}
-		else {
+		} else {
 			locationRouteService.removeRouteToMarker();
 		}
 	}
@@ -844,14 +840,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (iconClosed) {
 			icon_id = R.drawable.ic_close_white_24dp;
-		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			icon_id = R.drawable.ic_directions_car_white_24dp;
-		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			icon_id = R.drawable.ic_directions_walk_white_24dp;
-		}
-		else {
+		} else {
 			return;
 		}
 
@@ -865,11 +858,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			text = getResources().getString(R.string.location_info_bar_title_destination);
-		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
-		}
-		else {
+		} else {
 			return;
 		}
 
@@ -919,99 +910,52 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
 
 		@Override
-		public void drawRoute(final PolylineOptions directionsPolylineOptions, final RouteUpdateResultCallbackClient client) {
+		public void drawRoute(final RouteData routeData, final RouteUpdateResultCallbackClient client) {
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					Polyline result = null;
 					if (mMap != null) {
-						// Directions for driving.
-
-						// TODO: Switch like a sane person would, not with if true/false.
-						if (false) {
-							// Draw stroke.
-							directionsPolylineOptions.width(Constants.DIRECTIONS_STROKE_WIDTH);
-							directionsPolylineOptions.color(Constants.DIRECTIONS_STROKE_COLOR);
-							result = mMap.addPolyline(directionsPolylineOptions);
-							// Draw actual line.
-							directionsPolylineOptions.width(Constants.DIRECTIONS_LINE_WIDTH);
-							directionsPolylineOptions.color(Constants.DIRECTIONS_LINE_COLOR);
-							result = mMap.addPolyline(directionsPolylineOptions);
-						}
-						else {
-							// Draw circles.
-							List<LatLng> points = directionsPolylineOptions.getPoints();
-							LatLng pointA, pointB, intermPoint;
-							Location locationA = new Location("");
-							Location locationB = new Location("");
-							Location intermLocation = new Location("");
-
-							if (points.size() < 2)
-								return;
-
-							double padding = 0;
-							double scaleFactor = Math.pow(2, Constants.DEFAULT_ZOOM - mMap.getCameraPosition().zoom) * Constants.SCALE_FACTOR_RECTIFIER;
-
-							for (int i = 1; i < points.size(); i++) {
-								pointA = points.get(i - 1);
-								pointB = points.get(i);
-
-								locationA.setLatitude(pointA.latitude);
-								locationA.setLongitude(pointA.longitude);
-								locationB.setLatitude(pointB.latitude);
-								locationB.setLongitude(pointB.longitude);
-
-								// Compute first intermediate point based on previous padding.
-								intermPoint = Utils.calculateDerivedPosition(
-										pointA,
-										pointB,
-										padding);
-
-								intermLocation.setLatitude(intermPoint.latitude);
-								intermLocation.setLongitude(intermPoint.longitude);
-
-								int chunks = 0;
-
-								// While intermPoint is still on segment AB.
-								while (locationA.distanceTo(locationB) > locationA.distanceTo(intermLocation)) {
-									// Draw current circle.
-									mMap.addCircle(new CircleOptions()
-											.center(intermPoint)
-											.fillColor(Constants.DIRECTIONS_LINE_COLOR)
-											.strokeColor(Constants.DIRECTIONS_STROKE_COLOR)
-											.radius(Constants.CIRCLE_SIZE * scaleFactor)
-											.strokeWidth(Constants.CIRCLE_STROKE_WIDTH));
-									// Prepare the next one.
-									chunks++;
-
-									intermPoint = Utils.calculateDerivedPosition(
-											pointA,
-											pointB,
-											(chunks * Constants.CIRCLE_DISTANCE + padding) * scaleFactor);
-
-									intermLocation.setLatitude(intermPoint.latitude);
-									intermLocation.setLongitude(intermPoint.longitude);
-								}
-								// Prepair padding for the next draw.
-								padding = locationB.distanceTo(intermLocation);
-							}
-						}
-
 						setDirectionsButtonIcon(true);
+						switch (routeData.getRouteType()) {
+							case DRIVING:
+								List<Polyline> polylines = new ArrayList<Polyline>();
+								for (PolylineOptions polylineOptions : routeData.getRoutePolylineOptionsList()) {
+									polylines.add(mMap.addPolyline(polylineOptions));
+								}
+								client.notifyDrivingResult(polylines);
+								break;
+							case WALKING:
+								List<Circle> circles = new ArrayList<Circle>();
+								for (CircleOptions circleOptions : routeData.getRouteCircleOptionsList()) {
+									circles.add(mMap.addCircle(circleOptions));
+								}
+								client.notifyWalkingResult(circles);
+								break;
+						}
 					}
-					client.notifyPolylineResult(result);
 				}
 			});
 		}
 
 		@Override
-		public void removeRoute(final Polyline directionsPolyline) {
+		public void removeRoute(final RouteData routeData) {
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					directionsPolyline.remove();
+					switch (routeData.getRouteType()) {
+						case DRIVING:
+							for (Polyline polyline : routeData.getRoutePolylines()) {
+								polyline.remove();
+							}
+							break;
+						case WALKING:
+							for (Circle circle : routeData.getRouteCircles()) {
+								circle.remove();
+							}
+							break;
+					}
 					setDirectionsButtonIcon(false);
 				}
 			});
