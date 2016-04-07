@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by Bogdan on 04/04/2016.
  */
 public class Event {
-	
+
 	Lock lock = new ReentrantLock();
 	Condition cond = lock.newCondition();
 	boolean flag;
@@ -26,11 +26,11 @@ public class Event {
 		}
 	}
 
-	public void doWait(float seconds) throws InterruptedException {
+	public void doWait(float milliseconds) throws InterruptedException {
 		lock.lock();
 		try {
 			while (!flag) {
-				cond.await((int) (seconds * 1000), TimeUnit.MILLISECONDS);
+				cond.await((int) (milliseconds), TimeUnit.MILLISECONDS);
 			}
 		}
 		finally {
