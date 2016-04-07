@@ -100,6 +100,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private StateMonitorThread stateMonitorThread;
 	private Event onConnectedEvent, onMapReadyEvent;
 
+	private Dialog mReportParkingStateDialog;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -189,7 +191,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			locationRouteService.removeDestination();
 			setDirectionsButtonIcon(false);
-		} else {
+		}
+		else {
 			super.onBackPressed();
 		}
 	}
@@ -334,15 +337,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (mResolvingError) {
 			// Already attempting to resolve an error.
 			return;
-		} else if (connectionResult.hasResolution()) {
+		}
+		else if (connectionResult.hasResolution()) {
 			try {
 				mResolvingError = true;
 				connectionResult.startResolutionForResult(this, Constants.REQUEST_RESOLVE_ERROR);
-			} catch (IntentSender.SendIntentException e) {
+			}
+			catch (IntentSender.SendIntentException e) {
 				// There was an error with the resolution intent. Try again.
 				mMapsGoogleApiClient.connect();
 			}
-		} else {
+		}
+		else {
 			// Show dialog using GoogleApiAvailability.getErrorDialog()
 			showErrorDialog(connectionResult.getErrorCode());
 			mResolvingError = true;
@@ -454,7 +460,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
 			mDrawerLayout.closeDrawer(Gravity.LEFT);
-		} else {
+		}
+		else {
 			mDrawerLayout.openDrawer(Gravity.LEFT);
 		}
 	}
@@ -686,7 +693,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (locationRouteService.isSpotSaved()) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
-		} else {
+		}
+		else {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -712,7 +720,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (parking_state_button_flag) {
 			// Open
 			visibility = View.VISIBLE;
-		} else {
+		}
+		else {
 			// Close
 			visibility = View.GONE;
 		}
@@ -738,14 +747,19 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		//Fullscreen alert
 		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
 		colorDrawable.setAlpha(200);
-		Dialog alertDialog = new Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		alertDialog.setContentView(R.layout.report_parking_spot_layout);
-		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
-		alertDialog.show();
+		mReportParkingStateDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+		mReportParkingStateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		mReportParkingStateDialog.setContentView(R.layout.report_parking_spot_layout);
+		mReportParkingStateDialog.getWindow().setBackgroundDrawable(colorDrawable);
+		mReportParkingStateDialog.show();
 	}
 
 	public void buttonReportParkingState(View v) {
+
+		int buttonId = v.getId();
+
+		// Dismiss dialog
+		mReportParkingStateDialog.dismiss();
 
 		findViewById(R.id.fab_free_2).setVisibility(View.GONE);
 		findViewById(R.id.fab_moderate_2).setVisibility(View.GONE);
@@ -759,7 +773,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 
 		// TODO: keep the desired set and remove the other one
-		switch (v.getId()) {
+		switch (buttonId) {
 			// First set of buttons
 			case R.id.fab_free_2:
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
@@ -805,7 +819,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (!locationRouteService.hasDirections()) {
 			locationRouteService.drawRouteToMarker();
-		} else {
+		}
+		else {
 			locationRouteService.removeRouteToMarker();
 		}
 	}
@@ -840,11 +855,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (iconClosed) {
 			icon_id = R.drawable.ic_close_white_24dp;
-		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			icon_id = R.drawable.ic_directions_car_white_24dp;
-		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			icon_id = R.drawable.ic_directions_walk_white_24dp;
-		} else {
+		}
+		else {
 			return;
 		}
 
@@ -858,9 +876,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			text = getResources().getString(R.string.location_info_bar_title_destination);
-		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
-		} else {
+		}
+		else {
 			return;
 		}
 

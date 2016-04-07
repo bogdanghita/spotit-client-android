@@ -13,6 +13,8 @@ import java.util.List;
  */
 public class StateMonitorThread extends Thread {
 
+	private final static int WAIT_INTERVAL = 50;
+
 	private StateMonitorListener mListener;
 	private List<Event> mEventList;
 
@@ -24,19 +26,22 @@ public class StateMonitorThread extends Thread {
 	@Override
 	public void run() {
 
-		Iterator<Event> i = mEventList.iterator();
-		while (i.hasNext()) {
-			Event e = i.next();
+		while (!mEventList.isEmpty()) {
 
-			try {
-				e.doWait(10);
-			}
-			catch (InterruptedException e1) {
-				Log.d(Constants.APP + Constants.STATE_MONITOR, e1.toString());
-			}
+			Iterator<Event> i = mEventList.iterator();
+			while (i.hasNext()) {
+				Event e = i.next();
 
-			if (e.isSet()) {
-				i.remove();
+				try {
+					e.doWait(WAIT_INTERVAL);
+				}
+				catch (InterruptedException e1) {
+					Log.d(Constants.APP + Constants.STATE_MONITOR, e1.toString());
+				}
+
+				if (e.isSet()) {
+					i.remove();
+				}
 			}
 		}
 
