@@ -7,4 +7,6 @@
 
 	<string name="location_info_bar_title_destination">Your destination</string>
 	<string name="location_info_bar_title_saved_spot">Your car</string>
+	<string name="color_palette">Color Palette</string>
+	<string name="colors">Colors</string>
 </resources>

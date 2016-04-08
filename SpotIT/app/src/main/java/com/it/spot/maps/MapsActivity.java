@@ -1,6 +1,7 @@
 package com.it.spot.maps;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -74,7 +76,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-		LocationListener, TokenRequestEventListener, StateMonitorListener {
+		LocationListener, TokenRequestEventListener, StateMonitorListener  {
 
 	private ActionBarDrawerToggle mDrawerToggle;
 
@@ -136,7 +138,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		locationRouteService.loadSavedSpot();
 		toggleSaveSpotButton();
+
 	}
+
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -736,22 +740,21 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void buttonOpenParkingStateOptionsV2(View v) {
 
 		//Normal alert
-//		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#ffffff"));
-////		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#f9f9f9"));
-//		Dialog alertDialog = new Dialog(this);
-//		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//		alertDialog.setContentView(R.layout.report_parking_spot_layout2);
-//		alertDialog.getWindow().setBackgroundDrawable(colorDrawable);
-//		alertDialog.show();
+//		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+//		alertDialog.setTitle("Report a spot");
+//		alertDialog.setIcon(R.mipmap.ic_launcher);
+//		alertDialog.setView(R.layout.report_parking_spot_layout3);
+//		mReportParkingStateDialog = alertDialog.create();
+//		mReportParkingStateDialog.show();
 
-		//Fullscreen alert
+//		//Fullscreen alert
 		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
-		colorDrawable.setAlpha(200);
+		colorDrawable.setAlpha(230);
 		mReportParkingStateDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-		mReportParkingStateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		mReportParkingStateDialog.setContentView(R.layout.report_parking_spot_layout);
 		mReportParkingStateDialog.getWindow().setBackgroundDrawable(colorDrawable);
 		mReportParkingStateDialog.show();
+
 	}
 
 	public void buttonReportParkingState(View v) {
