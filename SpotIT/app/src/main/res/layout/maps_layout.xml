@@ -27,6 +27,29 @@
 	<include
 		layout="@layout/location_info_layout"/>
 
+	<com.it.spot.maps.ClipRevealFrame
+		android:id="@+id/menu_layout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="#3b3b58"
+		android:visibility="invisible"
+		>
+
+		<com.ogaclejapan.arclayout.ArcLayout
+			android:id="@+id/arc_layout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			app:arc_axisRadius="20dp"
+			app:arc_origin="center"
+			app:arc_radius="100dp"
+			>
+			<include
+				android:id="@+id/report_parking_spot_layout"
+				layout="@layout/report_parking_spot_layout"/>
+		</com.ogaclejapan.arclayout.ArcLayout>
+
+	</com.it.spot.maps.ClipRevealFrame>
+
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/fab_state_v2"
 		android:layout_width="wrap_content"
