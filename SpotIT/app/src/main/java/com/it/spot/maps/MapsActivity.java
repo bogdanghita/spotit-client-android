@@ -114,10 +114,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	private Dialog mReportParkingStateDialog;
 
-	View rootLayout;
-	ClipRevealFrame menuLayout;
-	ArcLayout arcLayout;
-	View centerItem;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -152,10 +148,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		locationRouteService.loadSavedSpot();
 		toggleSaveSpotButton();
-
-		rootLayout = findViewById(R.id.drawer_layout);
-		menuLayout = (ClipRevealFrame) findViewById(R.id.menu_layout);
-		arcLayout = (ArcLayout) findViewById(R.id.arc_layout);
 
 	}
 
@@ -766,140 +758,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 //		mReportParkingStateDialog.show();
 
 //		//Fullscreen alert
-//		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
-//		colorDrawable.setAlpha(0);
-//		mReportParkingStateDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-//		mReportParkingStateDialog.setContentView(R.layout.report_parking_spot_layout);
-//		mReportParkingStateDialog.getWindow().setBackgroundDrawable(colorDrawable);
-//		mReportParkingStateDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-//			@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-//			@Override
-//			public void onShow(DialogInterface dialog) {
-//				View view = mReportParkingStateDialog.findViewById(android.R.id.content);
-//				int centerX = view.getWidth();
-//				int centerY = view.getHeight();
-//				// TODO Get startRadius from FAB
-//				// TODO Also translate animate FAB to center of screen?
-//				float startRadius = 20;
-//				float endRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
-//				Animator animator = ViewAnimationUtils.createCircularReveal(view, centerX, centerY, startRadius, endRadius);
-//				animator.setDuration(1000);
-//				animator.start();
-//
-//			}
-//		});
-//		mReportParkingStateDialog.show();
-		onFabClick(v);
-
-	}
-	View mView;
-	private void onFabClick(View v) {
-		mView = v;
-		int x = (v.getLeft() + v.getRight()) / 2;
-		int y = (v.getTop() + v.getBottom()) / 2;
-		float radiusOfFab = 1f * v.getWidth() / 2f;
-		float radiusFromFabToRoot = (float) Math.hypot(
-				Math.max(x, rootLayout.getWidth() - x),
-				Math.max(y, rootLayout.getHeight() - y));
-
-		if (v.isSelected()) {
-			hideMenu(x, y, radiusFromFabToRoot, 0);
-		} else {
-			showMenu(x, y, 0, radiusFromFabToRoot);
-		}
-		v.setSelected(!v.isSelected());
-	}
-
-	private void showMenu(int cx, int cy, float startRadius, float endRadius) {
-		menuLayout.setVisibility(View.VISIBLE);
-		FloatingActionButton p = (FloatingActionButton) findViewById(R.id.fab_state_v2);
-		p.setVisibility(View.INVISIBLE);
-		FloatingActionButton c = (FloatingActionButton) findViewById(R.id.my_location);
-		c.setVisibility(View.INVISIBLE);
-
-		List<Animator> animList = new ArrayList<>();
-
-		Animator revealAnim = createCircularReveal(menuLayout, cx, cy, startRadius, endRadius);
-		revealAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-		revealAnim.setDuration(500);
-
-		animList.add(revealAnim);
-
-
-		AnimatorSet animSet = new AnimatorSet();
-		animSet.playSequentially(animList);
-		animSet.start();
-	}
-
-	private void hideMenu(int cx, int cy, float startRadius, float endRadius) {
-		List<Animator> animList = new ArrayList<>();
-
-
-
-		Animator revealAnim = createCircularReveal(menuLayout, cx, cy, startRadius, endRadius);
-		revealAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-		revealAnim.setDuration(200);
-		revealAnim.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				super.onAnimationEnd(animation);
-				menuLayout.setVisibility(View.INVISIBLE);
-				FloatingActionButton p = (FloatingActionButton) findViewById(R.id.fab_state_v2);
-				p.setVisibility(View.VISIBLE);
-				FloatingActionButton c = (FloatingActionButton) findViewById(R.id.my_location);
-				c.setVisibility(View.VISIBLE);
-			}
-		});
-
-		animList.add(revealAnim);
-
-		AnimatorSet animSet = new AnimatorSet();
-		animSet.playSequentially(animList);
-		animSet.start();
+		mReportParkingStateDialog = new DialogReveal(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+		mReportParkingStateDialog.show();
 
 	}
 
 
-	private Animator createCircularReveal(final ClipRevealFrame view, int x, int y, float startRadius,
-										  float endRadius) {
-		final Animator reveal;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			reveal = ViewAnimationUtils.createCircularReveal(view, x, y, startRadius, endRadius);
-		} else {
-			view.setClipOutLines(true);
-			view.setClipCenter(x, y);
-			reveal = ObjectAnimator.ofFloat(view, "ClipRadius", startRadius, endRadius);
-			reveal.addListener(new Animator.AnimatorListener() {
-				@Override
-				public void onAnimationStart(Animator animation) {
-
-				}
-
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					view.setClipOutLines(false);
-				}
-
-				@Override
-				public void onAnimationCancel(Animator animation) {
-
-				}
-
-				@Override
-				public void onAnimationRepeat(Animator animation) {
-
-				}
-			});
-		}
-		return reveal;
-	}
 
 	public void buttonReportParkingState(View v) {
-		onFabClick(mView);
 		int buttonId = v.getId();
 
 		// Dismiss dialog
-		//mReportParkingStateDialog.dismiss();
+		mReportParkingStateDialog.dismiss();
 
 		findViewById(R.id.fab_free_2).setVisibility(View.GONE);
 		findViewById(R.id.fab_moderate_2).setVisibility(View.GONE);
