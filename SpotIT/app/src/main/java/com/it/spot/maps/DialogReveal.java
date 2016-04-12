@@ -38,12 +38,12 @@ public class DialogReveal extends Dialog
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
-        colorDrawable.setAlpha(0);
+//        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
+//        colorDrawable.setAlpha(0);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.report_parking_spot_layout);
-//        getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        getWindow().setBackgroundDrawable(colorDrawable);
+        getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+//        getWindow().setBackgroundDrawable(colorDrawable);
 
         this.setOnShowListener(showListener);
 
