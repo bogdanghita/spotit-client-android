@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent">
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"/>
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:id="@+id/dialog_data"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fontFamily="sans-serif-thin"
+            android:text="Report a spot"
+            android:textSize="30dp"
+            android:textColor="@color/colorLight"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp"
+            android:layout_weight="1"
+            android:gravity="right|bottom"
+            android:paddingRight="@dimen/activity_horizontal_margin"/>
+            <!--/>-->
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center|bottom"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:orientation="horizontal"
+            android:id="@+id/report_buttons_container">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="18dp"
+                android:paddingLeft="18dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    card_view:cardCornerRadius="36dp"
+                    card_view:cardElevation="6dp">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/fab_free_2"
+                        android:onClick="buttonReportParkingState"
+                        android:background="@drawable/round_corner_green2"
+                        android:padding="1dp"
+                        android:alpha="0.8"
+                        android:minWidth="72dp"
+                        android:minHeight="72dp" />
+                </android.support.v7.widget.CardView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:text="Free"
+                    android:paddingTop="5dp"
+                    android:textSize="16dp"
+                    android:textColor="@color/colorLight"
+                    android:gravity="center"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="18dp"
+                android:paddingLeft="18dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    card_view:cardCornerRadius="36dp"
+                    card_view:cardElevation="6dp">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/fab_moderate_2"
+                        android:onClick="buttonReportParkingState"
+                        android:background="@drawable/round_corner_yellow2"
+                        android:padding="1dp"
+                        android:alpha="0.8"
+                        android:minWidth="72dp"
+                        android:minHeight="72dp" />
+
+                </android.support.v7.widget.CardView>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:text="Medium"
+                    android:paddingTop="5dp"
+                    android:textSize="16dp"
+                    android:textColor="@color/colorLight"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="18dp"
+                android:paddingLeft="18dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    card_view:cardCornerRadius="36dp"
+                    card_view:cardElevation="6dp">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/fab_full_2"
+                        android:onClick="buttonReportParkingState"
+                        android:background="@drawable/round_corner_red2"
+                        android:padding="1dp"
+                        android:alpha="0.8"
+                        android:minWidth="72dp"
+                        android:minHeight="72dp" />
+                </android.support.v7.widget.CardView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:text="Full"
+                    android:paddingTop="5dp"
+                    android:textSize="16dp"
+                    android:textColor="@color/colorLight"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
+
+        </LinearLayout>
+        </LinearLayout>
+</LinearLayout>

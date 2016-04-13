@@ -8,15 +8,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Gravity;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.LinearLayout;
 
 import com.it.spot.R;
@@ -41,29 +42,28 @@ public class DialogReveal extends Dialog
 //        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
 //        colorDrawable.setAlpha(0);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.report_parking_spot_layout);
+        setContentView(R.layout.report_parking_spot_layout4);
         getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-//        getWindow().setBackgroundDrawable(colorDrawable);
 
         this.setOnShowListener(showListener);
 
-    }
+        // Round dialog ---->
+        LinearLayout ll = (LinearLayout) findViewById(R.id.dialog_data);
+        Drawable d = new CircleReportSpotDialogDrawable(Color.parseColor("#3b3b58"));
+        //TODO pick between deprecated and api 16
+        if (Build.VERSION.SDK_INT >= 16){
+            ll.setBackground(d);
+        }else{
+            ll.setBackgroundDrawable(d);
+        }
+        // <---- Round dialog
 
+    }
     public OnShowListener showListener = new OnShowListener() {
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onShow(DialogInterface dialog) {
-            View view = findViewById(android.R.id.content);
-            int centerX = view.getWidth();
-            int centerY = view.getHeight();
-            // TODO Get startRadius from FAB
-            // TODO Also translate animate FAB to center of screen?
-            float startRadius = 20;
-            float endRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
-            Animator animator = ViewAnimationUtils.createCircularReveal(view, centerX, centerY, startRadius, endRadius);
-            animator.setDuration(500);
-            animator.start();
-
+            enterReveal();
         }
     };
 
@@ -98,30 +98,31 @@ public class DialogReveal extends Dialog
 
     void enterReveal()
     {
+        final View view = this.findViewById(android.R.id.content);
+        // get the center for the clipping circle
+        int cx = view.getMeasuredWidth();
+        int cy = view.getMeasuredHeight();
+
+        // get the initial radius for the clipping circle
+        float finalRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
+
+        Animator anim;
 
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
-            final View view = this.findViewById(android.R.id.content);
-            // get the center for the clipping circle
-            int cx = view.getMeasuredWidth();
-            int cy = view.getMeasuredHeight();
-
-            // get the final radius for the clipping circle
-            float finalRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
-//            float finalRadius =v.getWidth() / 2;
-
             // create the animator for this view (the start radius is zero)
-            Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
-            anim.setDuration(500);
+            anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+            anim.setDuration(1000);
             anim.start();
             anim.addListener(new AnimatorListenerAdapter()
             {
                 @Override
                 public void onAnimationEnd(Animator animation)
                 {
-
-//                    animateButtonsIn(view, 1);
+                    //Todo Animate buttons on dialog reveal
+//                    LinearLayout ll = (LinearLayout) findViewById(R.id.report_buttons_container);
+//                    animateButtonsIn(ll, 1.2f);
 
 
                     super.onAnimationEnd(animation);
@@ -131,33 +132,39 @@ public class DialogReveal extends Dialog
     }
 
 
-    private void animateButtonsIn(LinearLayout layoutContainerAll, int scale)
+    private void animateButtonsIn(LinearLayout layoutContainerAll, float scale)
     {
         for (int i = 0; i < layoutContainerAll.getChildCount(); i++)
         {
 
             View rowView = layoutContainerAll.getChildAt(i);
-            rowView.animate().setStartDelay(i * 100)
-                    .scaleX(scale).scaleY(scale);
+//            rowView.animate().setStartDelay(i * 200)
+//                    .scaleX(scale).scaleY(scale);
+
+            ScaleAnimation animation = new ScaleAnimation(1, scale, 1, scale, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            animation.setDuration(400);
+            rowView.setAnimation(animation);
+            rowView.animate().setStartDelay(i * 200);
         }
+
     }
 
 
     void exitReveal()
     {
+        View view = this.findViewById(android.R.id.content);
+        // get the center for the clipping circle
+        int cx = view.getMeasuredWidth();
+        int cy = view.getMeasuredHeight();
+
+        // get the initial radius for the clipping circle
+        float initialRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
+
+        Animator anim;
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
-            View view = this.findViewById(android.R.id.content);
-            // get the center for the clipping circle
-            int cx = view.getMeasuredWidth();
-            int cy = view.getMeasuredHeight();
-
-            // get the initial radius for the clipping circle
-            float initialRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
-
             // create the animation (the final radius is zero)
-            Animator anim =
-                    ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
+            anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
             anim.setDuration(400);
             // make the view invisible when the animation is done
             anim.addListener(new AnimatorListenerAdapter()
