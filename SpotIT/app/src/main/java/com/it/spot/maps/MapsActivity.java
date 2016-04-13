@@ -1,23 +1,13 @@
 package com.it.spot.maps;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -28,10 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewAnimationUtils;
-import android.view.Window;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -74,7 +60,6 @@ import com.it.spot.identity.TokenRequestEventListener;
 import com.it.spot.identity.UserInfo;
 import com.it.spot.services.PolygonUI;
 import com.it.spot.threading.Event;
-import com.ogaclejapan.arclayout.ArcLayout;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -112,7 +97,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private StateMonitorThread stateMonitorThread;
 	private Event onConnectedEvent, onMapReadyEvent;
 
-	private Dialog mReportParkingStateDialog;
+	private DialogReveal mReportParkingStateDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
