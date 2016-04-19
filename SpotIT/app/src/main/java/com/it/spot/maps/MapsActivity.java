@@ -234,8 +234,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		onMapReadyEvent.set();
 		Log.d(Constants.APP + Constants.STATE_MONITOR, "onMapReadyEvent.set()");
 
-//		enableLocation();
-
 		locationRouteService.drawMarker();
 	}
 
@@ -927,14 +925,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 						setDirectionsButtonIcon(true);
 						switch (routeData.getRouteType()) {
 							case DRIVING:
-								List<Polyline> polylines = new ArrayList<Polyline>();
+								List<Polyline> polylines = new ArrayList<>();
 								for (PolylineOptions polylineOptions : routeData.getRoutePolylineOptionsList()) {
 									polylines.add(mMap.addPolyline(polylineOptions));
 								}
 								client.notifyDrivingResult(polylines);
 								break;
 							case WALKING:
-								List<Circle> circles = new ArrayList<Circle>();
+								List<Circle> circles = new ArrayList<>();
 								for (CircleOptions circleOptions : routeData.getRouteCircleOptionsList()) {
 									circles.add(mMap.addCircle(circleOptions));
 								}
