@@ -87,14 +87,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	// Bool to track whether the app is already resolving an error
 	private boolean mResolvingError = false;
 
-	private Object permissionLock = new Object();
-
 	private MapUpdateService mapUpdateService;
 	private LocationRouteService locationRouteService;
 
 	private boolean parking_state_button_flag = true;
 
-	private StateMonitorThread stateMonitorThread;
 	private Event onConnectedEvent, onMapReadyEvent;
 
 	private DialogReveal mReportParkingStateDialog;
@@ -123,7 +120,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
 		locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
 
-		initStateMonitor();
+		startStateMonitor();
 
 		buildGoogleApiClient();
 
@@ -133,9 +130,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		locationRouteService.loadSavedSpot();
 		toggleSaveSpotButton();
-
 	}
-
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -146,8 +141,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	@Override
 	public void onStart() {
 		super.onStart();
-
-		stateMonitorThread.start();
 
 		if (mServiceManager.getIdentityManager().getToken() == null) {
 			updateToken();
@@ -274,14 +267,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 	}
 
-	void initStateMonitor() {
+	void startStateMonitor() {
 
 		onConnectedEvent = new Event();
 		onMapReadyEvent = new Event();
 		List<Event> eventList = new LinkedList<>();
 		eventList.add(onConnectedEvent);
 		eventList.add(onMapReadyEvent);
-		stateMonitorThread = new StateMonitorThread(this, eventList);
+		new StateMonitorThread(this, eventList).start();
 	}
 
 	@Override
