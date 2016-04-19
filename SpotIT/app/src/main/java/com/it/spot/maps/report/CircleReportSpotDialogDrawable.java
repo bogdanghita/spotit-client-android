@@ -1,4 +1,4 @@
-package com.it.spot.maps;
+package com.it.spot.maps.report;
 
 import android.graphics.Canvas;
 import android.graphics.Color;

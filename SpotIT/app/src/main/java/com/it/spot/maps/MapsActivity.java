@@ -58,6 +58,7 @@ import com.it.spot.identity.LoginActivity;
 import com.it.spot.identity.TokenRequestAsyncTask;
 import com.it.spot.identity.TokenRequestEventListener;
 import com.it.spot.identity.UserInfo;
+import com.it.spot.maps.report.DialogReveal;
 import com.it.spot.services.PolygonUI;
 import com.it.spot.threading.Event;
 
@@ -89,8 +90,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	private MapUpdateService mapUpdateService;
 	private LocationRouteService locationRouteService;
-
-	private boolean parking_state_button_flag = true;
 
 	private Event onConnectedEvent, onMapReadyEvent;
 
@@ -183,20 +182,12 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			locationRouteService.removeDestination();
 			setDirectionsButtonIcon(false);
-		} else {
+		}
+		else {
 			super.onBackPressed();
 		}
 	}
 
-	/**
-	 * Manipulates the map once available.
-	 * This callback is triggered when the map is ready to be used.
-	 * This is where we can add markers or lines, add listeners or move the camera. In this case,
-	 * we just add a marker near Sydney, Australia.
-	 * If Google Play services is not installed on the device, the user will be prompted to install
-	 * it inside the SupportMapFragment. This method will only be triggered once the user has
-	 * installed Google Play services and returned to the app.
-	 */
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
 
@@ -326,15 +317,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (mResolvingError) {
 			// Already attempting to resolve an error.
 			return;
-		} else if (connectionResult.hasResolution()) {
+		}
+		else if (connectionResult.hasResolution()) {
 			try {
 				mResolvingError = true;
 				connectionResult.startResolutionForResult(this, Constants.REQUEST_RESOLVE_ERROR);
-			} catch (IntentSender.SendIntentException e) {
+			}
+			catch (IntentSender.SendIntentException e) {
 				// There was an error with the resolution intent. Try again.
 				mMapsGoogleApiClient.connect();
 			}
-		} else {
+		}
+		else {
 			// Show dialog using GoogleApiAvailability.getErrorDialog()
 			showErrorDialog(connectionResult.getErrorCode());
 			mResolvingError = true;
@@ -446,7 +440,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
 			mDrawerLayout.closeDrawer(Gravity.LEFT);
-		} else {
+		}
+		else {
 			mDrawerLayout.openDrawer(Gravity.LEFT);
 		}
 	}
@@ -554,8 +549,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // -------------------------------------------------------------------------------------------------
 // MAPS ERROR DIALOG
 // -------------------------------------------------------------------------------------------------
-
-	// The rest of this code is all about building the error dialog
 
 	/* Creates a dialog for an error message */
 	private void showErrorDialog(int errorCode) {
@@ -678,7 +671,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (locationRouteService.isSpotSaved()) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
-		} else {
+		}
+		else {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -690,7 +684,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonHelp(View view) {
 
-
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -699,40 +692,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonOpenParkingStateOptions(View v) {
 
-		int visibility;
-
-		if (parking_state_button_flag) {
-			// Open
-			visibility = View.VISIBLE;
-		} else {
-			// Close
-			visibility = View.GONE;
-		}
-
-		parking_state_button_flag = !parking_state_button_flag;
-
-		findViewById(R.id.fab_free_2).setVisibility(visibility);
-		findViewById(R.id.fab_moderate_2).setVisibility(visibility);
-		findViewById(R.id.fab_full_2).setVisibility(visibility);
-	}
-
-	public void buttonOpenParkingStateOptionsV2(View v) {
-
-		//Normal alert
-//		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-//		alertDialog.setTitle("Report a spot");
-//		alertDialog.setIcon(R.mipmap.ic_launcher);
-//		alertDialog.setView(R.layout.report_parking_spot_layout3);
-//		mReportParkingStateDialog = alertDialog.create();
-//		mReportParkingStateDialog.show();
-
-//		//Fullscreen alert
-		mReportParkingStateDialog = new DialogReveal(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+		mReportParkingStateDialog = new DialogReveal(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 		mReportParkingStateDialog.show();
-
 	}
-
-
 
 	public void buttonReportParkingState(View v) {
 		int buttonId = v.getId();
@@ -740,30 +702,12 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		// Dismiss dialog
 		mReportParkingStateDialog.dismiss();
 
-		findViewById(R.id.fab_free_2).setVisibility(View.GONE);
-		findViewById(R.id.fab_moderate_2).setVisibility(View.GONE);
-		findViewById(R.id.fab_full_2).setVisibility(View.GONE);
-
-		parking_state_button_flag = true;
-
 		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
 		if (lastLocation == null) {
 			return;
 		}
 
-		// TODO: keep the desired set and remove the other one
 		switch (buttonId) {
-			// First set of buttons
-			case R.id.fab_free_2:
-				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
-				break;
-			case R.id.fab_moderate_2:
-				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
-				break;
-			case R.id.fab_full_2:
-				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
-				break;
-			// Second set of buttons
 			case R.id.fab_free:
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
 				break;
@@ -771,16 +715,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
 				break;
 			case R.id.fab_full:
-				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
-				break;
-			// Third set of buttons
-			case R.id.fab_free_3:
-				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_GREEN_TEXT);
-				break;
-			case R.id.fab_moderate_3:
-				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_YELLOW_TEXT);
-				break;
-			case R.id.fab_full_3:
 				mapUpdateService.sendMapStatus(lastLocation, Constants.STATUS_RED_TEXT);
 				break;
 		}
@@ -798,7 +732,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (!locationRouteService.hasDirections()) {
 			locationRouteService.drawRouteToMarker();
-		} else {
+		}
+		else {
 			locationRouteService.removeRouteToMarker();
 		}
 	}
@@ -833,11 +768,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (iconClosed) {
 			icon_id = R.drawable.ic_close_white_24dp;
-		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			icon_id = R.drawable.ic_directions_car_white_24dp;
-		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			icon_id = R.drawable.ic_directions_walk_white_24dp;
-		} else {
+		}
+		else {
 			return;
 		}
 
@@ -851,9 +789,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			text = getResources().getString(R.string.location_info_bar_title_destination);
-		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		}
+		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
-		} else {
+		}
+		else {
 			return;
 		}
 

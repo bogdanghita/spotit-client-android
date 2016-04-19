@@ -12,9 +12,9 @@ import com.it.spot.R;
 /**
  * Created by Bogdan on 03/04/2016.
  */
-public class ParkingStateV2ButtonBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
+public class ParkingStateButtonBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
 
-	public ParkingStateV2ButtonBehavior(Context context, AttributeSet attrs) {
+	public ParkingStateButtonBehavior(Context context, AttributeSet attrs) {
 	}
 
 	@Override
