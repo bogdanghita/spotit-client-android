@@ -1,6 +1,7 @@
 package com.it.spot.services;
 
 import com.it.spot.address.Address;
+import com.it.spot.distance_duration.DistanceDuration;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,12 @@ public interface HttpService {
 	@POST("/api/spot/status")
 	public void postStatus(@Body Message.StatusMessage statusMessage, Callback<Message.StatusMessageID> response);
 
-    @GET("/maps/api/geocode/json")
-    public void getAddress(@Query("latlng") String latlng, Callback<Address> response);
+	@GET("/maps/api/geocode/json")
+	public void getAddress(@Query("latlng") String latlng, Callback<Address> response);
+
+	@GET("/maps/api/distancematrix/json")
+	public void getDistanceDuration(@Query("origins") String origin,
+									@Query("destinations") String destination,
+									@Query("mode") String mode,
+									Callback<DistanceDuration> response);
 }

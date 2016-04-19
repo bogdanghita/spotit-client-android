@@ -22,6 +22,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.InputStream;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,8 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 	private DirectionsResultListener mDirectionsResultListener;
 
 	public DirectionsAsyncTask(DirectionsResultListener directionsResultListener) {
+		if(directionsResultListener == null)
+			throw new InvalidParameterException();
 
 		this.mDirectionsResultListener = directionsResultListener;
 	}
@@ -43,6 +46,11 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 	@Override
 	protected Void doInBackground(RouteOptions... params) {
 
+		if (params == null || params.length != 1)
+		{
+			Log.d(Constants.DIRECTIONS, "Incorrect parameters");
+			return null;
+		}
 		RouteOptions routeOptions = params[0];
 		RouteData routeData = getDirections(routeOptions.source, routeOptions.destination, routeOptions.mode, routeOptions.zoom);
 

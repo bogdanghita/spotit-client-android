@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 /**
@@ -16,6 +17,9 @@ public class RecomputeRouteAsyncTask extends AsyncTask<List<LatLng>, Void, Void>
 	private RedrawCallback mRedrawCallback;
 
 	public RecomputeRouteAsyncTask(RedrawCallback redrawCallback, float zoom) {
+		if(redrawCallback == null)
+			throw new InvalidParameterException();
+
 		mRedrawCallback = redrawCallback;
 		mZoom = zoom;
 	}
