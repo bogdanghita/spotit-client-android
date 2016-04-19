@@ -22,7 +22,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
-import com.it.spot.maps.MapsActivity;
+import com.it.spot.maps.main.MapsActivity;
 
 import java.util.ArrayList;
 import java.util.List;

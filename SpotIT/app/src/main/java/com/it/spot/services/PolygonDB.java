@@ -3,7 +3,6 @@ package com.it.spot.services;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.annotations.Expose;
 import com.it.spot.common.Constants;
-import com.it.spot.maps.MapPoint;
 
 import java.util.ArrayList;
 import java.util.List;

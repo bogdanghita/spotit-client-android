@@ -1,7 +1,7 @@
 package com.it.spot.services;
 
-import com.it.spot.address.Address;
-import com.it.spot.distance_duration.DistanceDuration;
+import com.it.spot.maps.address.Address;
+import com.it.spot.maps.distance_duration.DistanceDuration;
 
 import java.util.List;
 import java.util.Map;
