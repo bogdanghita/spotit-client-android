@@ -5,7 +5,7 @@ package com.it.spot.events;
  */
 public class RemoveRouteEvent extends BaseEvent {
 
-	public RemoveRouteEvent(EventManager.EventType type) {
-		super(type);
+	public RemoveRouteEvent() {
+		super(EventManager.EventType.MAP_LISTENER);
 	}
 }

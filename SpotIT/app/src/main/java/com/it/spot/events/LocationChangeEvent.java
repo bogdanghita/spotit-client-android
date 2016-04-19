@@ -5,7 +5,7 @@ package com.it.spot.events;
  */
 public class LocationChangeEvent extends BaseEvent {
 
-	public LocationChangeEvent(EventManager.EventType type) {
-		super(type);
+	public LocationChangeEvent() {
+		super(EventManager.EventType.MAP_LISTENER);
 	}
 }

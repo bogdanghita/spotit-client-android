@@ -46,9 +46,9 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.it.spot.R;
-import com.it.spot.events.BaseEvent;
 import com.it.spot.events.CameraChangeEvent;
 import com.it.spot.events.DrawRouteEvent;
+import com.it.spot.events.EventManager;
 import com.it.spot.events.LocationChangeEvent;
 import com.it.spot.events.MapEventListener;
 import com.it.spot.events.RemoveMarkerEvent;
@@ -68,6 +68,7 @@ import com.it.spot.identity.TokenRequestAsyncTask;
 import com.it.spot.identity.TokenRequestEventListener;
 import com.it.spot.identity.UserInfo;
 import com.it.spot.maps.location.BasicLocation;
+import com.it.spot.maps.location.LocationManager;
 import com.it.spot.maps.report.DialogReveal;
 import com.it.spot.services.PolygonUI;
 import com.it.spot.threading.Event;
@@ -131,6 +132,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
 		locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
 
+		// Subscribe map event listener
+		ServiceManager.getInstance().getEventManager().subscribe(mapEventListener);
+
 		startStateMonitor();
 
 		buildGoogleApiClient();
@@ -192,8 +196,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	@Override
 	public void onBackPressed() {
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+
+//			locationRouteService.removeDestination();
+//
+//			setDirectionsButtonIcon(false);
+
 			locationRouteService.removeDestination();
-			setDirectionsButtonIcon(false);
+
+			// TODO
 		}
 		else {
 			super.onBackPressed();
@@ -223,13 +233,21 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		});
 
 		mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+//			@Override
+//			public void onMapClick(final LatLng latLng) {
+//
+//				locationRouteService.setDestination(latLng);
+//
+//				setDirectionsButtonIcon(false);
+//				setLocationInfoBarTitle();
+//			}
+
 			@Override
 			public void onMapClick(final LatLng latLng) {
 
 				locationRouteService.setDestination(latLng);
 
-				setDirectionsButtonIcon(false);
-				setLocationInfoBarTitle();
+				// TODO
 			}
 		});
 
@@ -651,28 +669,48 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // SIDEBAR OPTIONS
 // -------------------------------------------------------------------------------------------------
 
+//	public void buttonSaveSpot(View view) {
+//
+//		locationRouteService.saveSpot();
+//
+//		toggleSaveSpotButton();
+//
+//		toggleNavigationDrawer();
+//
+//		setDirectionsButtonIcon(false);
+//		setLocationInfoBarTitle();
+//	}
+
 	public void buttonSaveSpot(View view) {
 
-		locationRouteService.saveSpot();
+		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
+		if (lastLocation == null) {
+			return;
+		}
 
-		toggleSaveSpotButton();
+		mServiceManager.getEventManager().triggerEvent(new SetMarkerEvent(lastLocation,
+				LocationRouteService.MarkerType.SAVED_SPOT));
 
-		toggleNavigationDrawer();
-
-		setDirectionsButtonIcon(false);
-		setLocationInfoBarTitle();
+		// TODO
 	}
+
+//	public void buttonLeaveSpot(View view) {
+//
+//		locationRouteService.leaveSpot();
+//
+//		toggleSaveSpotButton();
+//
+//		toggleNavigationDrawer();
+//
+//		setDirectionsButtonIcon(false);
+//		setLocationInfoBarTitle();
+//	}
 
 	public void buttonLeaveSpot(View view) {
 
-		locationRouteService.leaveSpot();
+		mServiceManager.getEventManager().triggerEvent(new RemoveMarkerEvent());
 
-		toggleSaveSpotButton();
-
-		toggleNavigationDrawer();
-
-		setDirectionsButtonIcon(false);
-		setLocationInfoBarTitle();
+		// TODO
 	}
 
 	void toggleSaveSpotButton() {
@@ -957,11 +995,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // MAP EVENT LISTENER
 // -------------------------------------------------------------------------------------------------
 
-	MapEventListener mapEventListener = new MapEventListener() {
-		@Override
-		public void notify(BaseEvent event) {
-			super.notify(event);
-		}
+	private MapEventListener mapEventListener = new MapEventListener() {
 
 		@Override
 		public void notifySetMarker(SetMarkerEvent event) {

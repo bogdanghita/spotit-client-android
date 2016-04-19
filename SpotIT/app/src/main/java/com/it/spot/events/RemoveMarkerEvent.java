@@ -5,7 +5,7 @@ package com.it.spot.events;
  */
 public class RemoveMarkerEvent extends  BaseEvent {
 
-	public RemoveMarkerEvent(EventManager.EventType type) {
-		super(type);
+	public RemoveMarkerEvent() {
+		super(EventManager.EventType.MAP_LISTENER);
 	}
 }
