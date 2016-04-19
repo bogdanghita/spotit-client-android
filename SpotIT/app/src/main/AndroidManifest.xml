@@ -37,7 +37,7 @@
 			android:value="@string/google_maps_key"/>
 
 		<activity
-			android:name=".maps.MapsActivity"
+			android:name=".maps.main.MapsActivity"
 			android:label="@string/title_activity_maps"
 			android:screenOrientation="portrait"
 			android:theme="@style/AppTheme">

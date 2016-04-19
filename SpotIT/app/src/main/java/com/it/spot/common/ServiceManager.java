@@ -1,7 +1,7 @@
 package com.it.spot.common;
 
 import com.it.spot.identity.IdentityManager;
-import com.it.spot.maps.LocationManager;
+import com.it.spot.maps.location.LocationManager;
 
 /**
  * Created by Bogdan on 19/03/2016.
