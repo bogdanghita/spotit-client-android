@@ -1,17 +1,13 @@
 package com.it.spot.maps;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -22,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -102,7 +97,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private StateMonitorThread stateMonitorThread;
 	private Event onConnectedEvent, onMapReadyEvent;
 
-	private Dialog mReportParkingStateDialog;
+	private DialogReveal mReportParkingStateDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -748,17 +743,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 //		mReportParkingStateDialog.show();
 
 //		//Fullscreen alert
-		ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
-		colorDrawable.setAlpha(230);
-		mReportParkingStateDialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-		mReportParkingStateDialog.setContentView(R.layout.report_parking_spot_layout);
-		mReportParkingStateDialog.getWindow().setBackgroundDrawable(colorDrawable);
+		mReportParkingStateDialog = new DialogReveal(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 		mReportParkingStateDialog.show();
 
 	}
 
-	public void buttonReportParkingState(View v) {
 
+
+	public void buttonReportParkingState(View v) {
 		int buttonId = v.getId();
 
 		// Dismiss dialog
