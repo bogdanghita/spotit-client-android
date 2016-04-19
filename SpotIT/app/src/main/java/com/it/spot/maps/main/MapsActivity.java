@@ -46,6 +46,15 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.it.spot.R;
+import com.it.spot.events.BaseEvent;
+import com.it.spot.events.CameraChangeEvent;
+import com.it.spot.events.DrawRouteEvent;
+import com.it.spot.events.LocationChangeEvent;
+import com.it.spot.events.MapEventListener;
+import com.it.spot.events.RemoveMarkerEvent;
+import com.it.spot.events.RemoveRouteEvent;
+import com.it.spot.events.SetMarkerEvent;
+import com.it.spot.events.SpotsMapEvent;
 import com.it.spot.maps.address.AddressAsyncTask;
 import com.it.spot.maps.address.AddressResponseListener;
 import com.it.spot.common.Constants;
@@ -940,6 +949,53 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 					locationAddress.setText(address);
 				}
 			});
+		}
+	};
+
+
+// -------------------------------------------------------------------------------------------------
+// MAP EVENT LISTENER
+// -------------------------------------------------------------------------------------------------
+
+	MapEventListener mapEventListener = new MapEventListener() {
+		@Override
+		public void notify(BaseEvent event) {
+			super.notify(event);
+		}
+
+		@Override
+		public void notifySetMarker(SetMarkerEvent event) {
+
+		}
+
+		@Override
+		public void notifyRemoveMarker(RemoveMarkerEvent event) {
+
+		}
+
+		@Override
+		public void notifyDrawRoute(DrawRouteEvent event) {
+
+		}
+
+		@Override
+		public void notifyRemoveRoute(RemoveRouteEvent event) {
+
+		}
+
+		@Override
+		public void notifySpotsMap(SpotsMapEvent event) {
+
+		}
+
+		@Override
+		public void notifyLocationChange(LocationChangeEvent event) {
+
+		}
+
+		@Override
+		public void notifyCameraChange(CameraChangeEvent event) {
+
 		}
 	};
 }
