@@ -26,6 +26,7 @@ public class Constants {
 	public final static String ADDRESS = "ADDR-";
 	public final static String DISTANCE_DURATION = "DIS_DUR-";
 	public final static String STATE_MONITOR = "STATE_M-";
+	public final static String EVENT = "EVENT-";
 
 	public final static int RC_SIGN_IN = 9001;
 	public final static int USER_RECOVERABLE_AUTH_EXCEPTION = 7001;
