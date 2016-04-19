@@ -1,4 +1,4 @@
-package com.it.spot.maps;
+package com.it.spot.maps.report;
 
 /**
  * Created by teo on 09.04.2016.
