@@ -5,7 +5,7 @@ package com.it.spot.events;
  */
 public class DrawRouteEvent extends BaseEvent {
 
-	public DrawRouteEvent(EventManager.EventType type) {
-		super(type);
+	public DrawRouteEvent() {
+		super(EventManager.EventType.MAP_LISTENER);
 	}
 }

@@ -12,6 +12,9 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.gson.Gson;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
+import com.it.spot.events.EventManager;
+import com.it.spot.events.RemoveMarkerEvent;
+import com.it.spot.events.SetMarkerEvent;
 import com.it.spot.maps.directions.DirectionsAsyncTask;
 import com.it.spot.maps.directions.DirectionsResultListener;
 import com.it.spot.maps.directions.RecomputeRouteAsyncTask;
@@ -38,6 +41,8 @@ import java.util.List;
  */
 public class LocationRouteService {
 
+	private EventManager mEventManager;
+
 	public enum MarkerType {SAVED_SPOT, DESTINATION, NONE}
 
 	private MarkerType markerType;
@@ -60,6 +65,8 @@ public class LocationRouteService {
 
 		this.mContext = context;
 		this.mRouteUpdateClient = routeUpdateClient;
+
+		mEventManager = ServiceManager.getInstance().getEventManager();
 
 		mLocationManager = ServiceManager.getInstance().getLocationManager();
 		markerType = MarkerType.NONE;
@@ -153,32 +160,55 @@ public class LocationRouteService {
 		mZoom = zoom;
 	}
 
+//	public void setDestination(LatLng latLng) {
+//
+//		if (markerType == MarkerType.SAVED_SPOT) {
+//			return;
+//		}
+//
+//		markerType = MarkerType.DESTINATION;
+//		mMarkerLocation = new BasicLocation(latLng.latitude, latLng.longitude);
+//
+//		hasDirections = false;
+//		clearDirections();
+//
+//		updateMarkerMapState();
+//	}
+
 	public void setDestination(LatLng latLng) {
 
 		if (markerType == MarkerType.SAVED_SPOT) {
 			return;
 		}
 
-		markerType = MarkerType.DESTINATION;
-		mMarkerLocation = new BasicLocation(latLng.latitude, latLng.longitude);
+		mEventManager.triggerEvent(new SetMarkerEvent(
+				new BasicLocation(latLng.latitude, latLng.longitude), MarkerType.DESTINATION));
 
-		hasDirections = false;
-		clearDirections();
-
-		updateMarkerMapState();
+		// TODO
 	}
 
+//	public void removeDestination() {
+//		if (markerType != MarkerType.DESTINATION) {
+//			return;
+//		}
+//
+//		markerType = MarkerType.NONE;
+//
+//		hasDirections = false;
+//		clearDirections();
+//
+//		updateMarkerMapState();
+//	}
+
 	public void removeDestination() {
+
 		if (markerType != MarkerType.DESTINATION) {
 			return;
 		}
 
-		markerType = MarkerType.NONE;
+		mEventManager.triggerEvent(new RemoveMarkerEvent());
 
-		hasDirections = false;
-		clearDirections();
-
-		updateMarkerMapState();
+		// TODO
 	}
 
 	public boolean isSpotSaved() {
@@ -186,16 +216,27 @@ public class LocationRouteService {
 		return markerType == MarkerType.SAVED_SPOT;
 	}
 
+//	public void loadSavedSpot() {
+//
+//		SavedSpot savedSpot = readSavedSpotFile(Constants.SAVED_SPOT_FILE);
+//
+//		if (savedSpot != null && savedSpot.hasSavedSpot) {
+//			markerType = MarkerType.SAVED_SPOT;
+//			mMarkerLocation = savedSpot.location;
+//		}
+//
+//		updateMarkerMapState();
+//	}
+
 	public void loadSavedSpot() {
 
 		SavedSpot savedSpot = readSavedSpotFile(Constants.SAVED_SPOT_FILE);
 
 		if (savedSpot != null && savedSpot.hasSavedSpot) {
-			markerType = MarkerType.SAVED_SPOT;
-			mMarkerLocation = savedSpot.location;
+			mEventManager.triggerEvent(new SetMarkerEvent(savedSpot.location, MarkerType.SAVED_SPOT));
 		}
 
-		updateMarkerMapState();
+		// TODO
 	}
 
 	private void writeSavedSpotFile(SavedSpot spot, String filename) {
@@ -209,9 +250,11 @@ public class LocationRouteService {
 			fos.write(jsonString.getBytes());
 
 			fos.close();
-		} catch (FileNotFoundException e) {
+		}
+		catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error writing saved spot to file: " + filename);
 		}
@@ -230,7 +273,8 @@ public class LocationRouteService {
 
 			reader.close();
 			fis.close();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error reading saved spot from file: " + filename);
 		}
@@ -283,7 +327,8 @@ public class LocationRouteService {
 		}
 		if (markerType == MarkerType.SAVED_SPOT) {
 			directions_mode = Constants.MODE_WALKING;
-		} else {
+		}
+		else {
 			// If anyone but Claudiu, ignore this.
 
 			// !!!!!!!!!!!!!!!!!!!!!!!!!

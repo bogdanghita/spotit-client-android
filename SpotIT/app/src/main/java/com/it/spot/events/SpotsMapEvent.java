@@ -5,7 +5,7 @@ package com.it.spot.events;
  */
 public class SpotsMapEvent extends BaseEvent {
 
-	public SpotsMapEvent(EventManager.EventType type) {
-		super(type);
+	public SpotsMapEvent() {
+		super(EventManager.EventType.MAP_LISTENER);
 	}
 }
