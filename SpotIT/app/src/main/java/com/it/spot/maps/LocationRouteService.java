@@ -19,6 +19,10 @@ import com.it.spot.directions.RecomputeRouteAsyncTask;
 import com.it.spot.directions.RedrawCallback;
 import com.it.spot.directions.RouteData;
 import com.it.spot.directions.RouteOptions;
+import com.it.spot.distance_duration.DistanceDurationAsyncTask;
+import com.it.spot.distance_duration.DistanceDurationData;
+import com.it.spot.distance_duration.DistanceDurationOptions;
+import com.it.spot.distance_duration.DistanceDurationResponseListener;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -281,17 +285,17 @@ public class LocationRouteService {
 		} else {
 			// If anyone but Claudiu, ignore this.
 
-			// !!!!!!!!!!!!!!!!!!!!!!!!
-			// !!!!!    DRIVING   !!!!!
-			// !!!!!!!!!!!!!!!!!!!!!!!!
+			// !!!!!!!!!!!!!!!!!!!!!!!!!
+			// !!!!!    DRIVING    !!!!!
+			// !!!!!!!!!!!!!!!!!!!!!!!!!
 
-			// !!!!!!!!!!!!!!!!!!!!!!!!
-			// !!!!!    DRIVING   !!!!!
-			// !!!!!!!!!!!!!!!!!!!!!!!!
+			// !!!!!!!!!!!!!!!!!!!!!!!!!
+			// !!!!!    DRIVING    !!!!!
+			// !!!!!!!!!!!!!!!!!!!!!!!!!
 
-			// !!!!!!!!!!!!!!!!!!!!!!!!
-			// !!!!!    DRIVING   !!!!!
-			// !!!!!!!!!!!!!!!!!!!!!!!!
+			// !!!!!!!!!!!!!!!!!!!!!!!!!
+			// !!!!!    DRIVING    !!!!!
+			// !!!!!!!!!!!!!!!!!!!!!!!!!
 
 			// Change this to walking to force walking route.
 			directions_mode = Constants.MODE_DRIVING;
@@ -315,6 +319,13 @@ public class LocationRouteService {
 		LatLng destination = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
 		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsResultListener);
 		directions.execute(new RouteOptions(source, destination, directions_mode, mZoom));
+
+		// DEBUG / EXAMPLE
+		// TODO: REMOVE!
+		// Get distance and duration
+		DistanceDurationOptions distanceDurationOptions = new DistanceDurationOptions(source, destination, directions_mode);
+		DistanceDurationAsyncTask distanceDurationAsyncTask = new DistanceDurationAsyncTask(distanceDurationResponseListener);
+		distanceDurationAsyncTask.execute(distanceDurationOptions);
 	}
 
 	public void removeRouteToMarker() {
@@ -392,6 +403,17 @@ public class LocationRouteService {
 			mRouteData = backup;
 			mRouteData.setRouteCircleOptionsList(circleOptionsList);
 			drawDirections();
+		}
+	};
+
+	// DEBUG / EXAMPLE
+	// TODO: REMOVE!
+	private DistanceDurationResponseListener distanceDurationResponseListener = new DistanceDurationResponseListener() {
+		@Override
+		public void notifyAddressResponse(DistanceDurationData distanceDurationData) {
+			String duration = distanceDurationData.getDuration();
+
+			// Do stuff with "duration" variable.
 		}
 	};
 }

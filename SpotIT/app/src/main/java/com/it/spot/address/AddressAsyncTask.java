@@ -8,6 +8,7 @@ import com.it.spot.common.Constants;
 import com.it.spot.maps.BasicLocation;
 import com.it.spot.services.HttpService;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import retrofit.Callback;
@@ -24,6 +25,9 @@ public class AddressAsyncTask extends AsyncTask<BasicLocation, Void, Void> {
 	private HttpService mHttpService;
 
 	public AddressAsyncTask(AddressResponseListener addressListener) {
+		if (addressListener == null)
+			throw new InvalidParameterException();
+
 		mAddressResponseListener = addressListener;
 
 		RestAdapter retrofit = new RestAdapter.Builder()
@@ -36,7 +40,7 @@ public class AddressAsyncTask extends AsyncTask<BasicLocation, Void, Void> {
 	@Override
 	protected Void doInBackground(BasicLocation... params) {
 
-		if (params == null || params.length == 0) {
+		if (params == null || params.length != 1) {
 			return null;
 		}
 

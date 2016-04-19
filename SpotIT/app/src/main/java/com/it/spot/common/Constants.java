@@ -24,6 +24,7 @@ public class Constants {
 	public final static String URL = "URL-";
 	public final static String DIRECTION_TYPE = "DIR_TYPE-";
 	public final static String ADDRESS = "ADDR-";
+	public final static String DISTANCE_DURATION = "DIS_DUR-";
 	public final static String STATE_MONITOR = "STATE_M-";
 
 	public final static int RC_SIGN_IN = 9001;

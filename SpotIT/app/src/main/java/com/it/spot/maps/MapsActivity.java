@@ -71,7 +71,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-		LocationListener, TokenRequestEventListener, StateMonitorListener  {
+		LocationListener, TokenRequestEventListener, StateMonitorListener {
 
 	private ActionBarDrawerToggle mDrawerToggle;
 
@@ -183,8 +183,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			locationRouteService.removeDestination();
 			setDirectionsButtonIcon(false);
-		}
-		else {
+		} else {
 			super.onBackPressed();
 		}
 	}
@@ -327,18 +326,15 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (mResolvingError) {
 			// Already attempting to resolve an error.
 			return;
-		}
-		else if (connectionResult.hasResolution()) {
+		} else if (connectionResult.hasResolution()) {
 			try {
 				mResolvingError = true;
 				connectionResult.startResolutionForResult(this, Constants.REQUEST_RESOLVE_ERROR);
-			}
-			catch (IntentSender.SendIntentException e) {
+			} catch (IntentSender.SendIntentException e) {
 				// There was an error with the resolution intent. Try again.
 				mMapsGoogleApiClient.connect();
 			}
-		}
-		else {
+		} else {
 			// Show dialog using GoogleApiAvailability.getErrorDialog()
 			showErrorDialog(connectionResult.getErrorCode());
 			mResolvingError = true;
@@ -450,8 +446,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
 			mDrawerLayout.closeDrawer(Gravity.LEFT);
-		}
-		else {
+		} else {
 			mDrawerLayout.openDrawer(Gravity.LEFT);
 		}
 	}
@@ -683,8 +678,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (locationRouteService.isSpotSaved()) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
-		}
-		else {
+		} else {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -710,8 +704,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (parking_state_button_flag) {
 			// Open
 			visibility = View.VISIBLE;
-		}
-		else {
+		} else {
 			// Close
 			visibility = View.GONE;
 		}
@@ -805,8 +798,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (!locationRouteService.hasDirections()) {
 			locationRouteService.drawRouteToMarker();
-		}
-		else {
+		} else {
 			locationRouteService.removeRouteToMarker();
 		}
 	}
@@ -841,14 +833,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (iconClosed) {
 			icon_id = R.drawable.ic_close_white_24dp;
-		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			icon_id = R.drawable.ic_directions_car_white_24dp;
-		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			icon_id = R.drawable.ic_directions_walk_white_24dp;
-		}
-		else {
+		} else {
 			return;
 		}
 
@@ -862,11 +851,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			text = getResources().getString(R.string.location_info_bar_title_destination);
-		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		} else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
-		}
-		else {
+		} else {
 			return;
 		}
 
@@ -1012,5 +999,4 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			});
 		}
 	};
-
 }
