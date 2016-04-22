@@ -1,7 +1,6 @@
 package com.it.spot.maps.main;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -9,12 +8,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
-import com.google.gson.Gson;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.events.EventManager;
 import com.it.spot.events.RemoveMarkerEvent;
 import com.it.spot.events.SetMarkerEvent;
+import com.it.spot.maps.FileService;
+import com.it.spot.maps.MarkerData;
 import com.it.spot.maps.directions.DirectionsAsyncTask;
 import com.it.spot.maps.directions.DirectionsResultListener;
 import com.it.spot.maps.directions.RecomputeRouteAsyncTask;
@@ -28,12 +28,6 @@ import com.it.spot.maps.distance_duration.DistanceDurationResponseListener;
 import com.it.spot.maps.location.BasicLocation;
 import com.it.spot.maps.location.LocationManager;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 
 /**
@@ -45,11 +39,10 @@ public class LocationRouteService {
 
 	public enum MarkerType {SAVED_SPOT, DESTINATION, NONE}
 
-	private MarkerType markerType;
+	private MarkerData mMarkerData = null;
+
 	private boolean hasDirections;
 
-	private BasicLocation mMarkerLocation = null;
-	private Marker mMarker = null;
 	private RouteData mRouteData = null;
 	private float mOldZoom = Constants.DEFAULT_ZOOM;
 	private float mZoom = Constants.DEFAULT_ZOOM;
@@ -69,7 +62,7 @@ public class LocationRouteService {
 		mEventManager = ServiceManager.getInstance().getEventManager();
 
 		mLocationManager = ServiceManager.getInstance().getLocationManager();
-		markerType = MarkerType.NONE;
+		mMarkerData = new MarkerData();
 		hasDirections = false;
 	}
 
@@ -82,15 +75,15 @@ public class LocationRouteService {
 	}
 
 	public MarkerType getMarkerType() {
-		return markerType;
+		return mMarkerData.markerType;
 	}
 
 	private void updateMarkerMapState() {
 
-		switch (markerType) {
+		switch (mMarkerData.markerType) {
 			case NONE:
 
-				mMarkerLocation = null;
+				mMarkerData.mMarkerLocation = null;
 				mRouteData = null;
 				clearMapItems();
 
@@ -112,9 +105,9 @@ public class LocationRouteService {
 
 	private void clearMapItems() {
 
-		if (mMarker != null) {
-			mRouteUpdateClient.removeMarker(mMarker);
-			mMarker = null;
+		if (mMarkerData.mMarker != null) {
+			mRouteUpdateClient.removeMarker(mMarkerData.mMarker);
+			mMarkerData.mMarker = null;
 		}
 	}
 
@@ -125,11 +118,11 @@ public class LocationRouteService {
 			return;
 		}
 
-		markerType = MarkerType.SAVED_SPOT;
-		mMarkerLocation = lastLocation;
+		mMarkerData.markerType = MarkerType.SAVED_SPOT;
+		mMarkerData.mMarkerLocation = lastLocation;
 
 		SavedSpot spot = new SavedSpot(true, lastLocation);
-		writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
+		new FileService(mContext).writeSavedSpotFile(spot, Constants.SAVED_SPOT_FILE);
 
 		hasDirections = false;
 		clearDirections();
@@ -141,7 +134,7 @@ public class LocationRouteService {
 
 		clearSavedSpotFile();
 
-		markerType = MarkerType.NONE;
+		mMarkerData.markerType = MarkerType.NONE;
 
 		hasDirections = false;
 		clearDirections();
@@ -151,7 +144,7 @@ public class LocationRouteService {
 
 	public void clearSavedSpotFile() {
 
-		writeSavedSpotFile(new SavedSpot(false, null), Constants.SAVED_SPOT_FILE);
+		new FileService(mContext).writeSavedSpotFile(new SavedSpot(false, null), Constants.SAVED_SPOT_FILE);
 	}
 
 	// Always keep the last 2 values of the zoom in case the user just moves around the map without zooming.
@@ -160,31 +153,19 @@ public class LocationRouteService {
 		mZoom = zoom;
 	}
 
-//	public void setDestination(LatLng latLng) {
-//
-//		if (markerType == MarkerType.SAVED_SPOT) {
-//			return;
-//		}
-//
-//		markerType = MarkerType.DESTINATION;
-//		mMarkerLocation = new BasicLocation(latLng.latitude, latLng.longitude);
-//
-//		hasDirections = false;
-//		clearDirections();
-//
-//		updateMarkerMapState();
-//	}
-
 	public void setDestination(LatLng latLng) {
 
-		if (markerType == MarkerType.SAVED_SPOT) {
+		if (mMarkerData.markerType == MarkerType.SAVED_SPOT) {
 			return;
 		}
 
-		mEventManager.triggerEvent(new SetMarkerEvent(
-				new BasicLocation(latLng.latitude, latLng.longitude), MarkerType.DESTINATION));
+		mMarkerData.markerType = MarkerType.DESTINATION;
+		mMarkerData.mMarkerLocation = new BasicLocation(latLng.latitude, latLng.longitude);
 
-		// TODO
+		hasDirections = false;
+		clearDirections();
+
+		updateMarkerMapState();
 	}
 
 //	public void removeDestination() {
@@ -197,12 +178,12 @@ public class LocationRouteService {
 //		hasDirections = false;
 //		clearDirections();
 //
-//		updateMarkerMapState();
+//		notifySetMarker();
 //	}
 
 	public void removeDestination() {
 
-		if (markerType != MarkerType.DESTINATION) {
+		if (mMarkerData.markerType != MarkerType.DESTINATION) {
 			return;
 		}
 
@@ -213,7 +194,7 @@ public class LocationRouteService {
 
 	public boolean isSpotSaved() {
 
-		return markerType == MarkerType.SAVED_SPOT;
+		return mMarkerData.markerType == MarkerType.SAVED_SPOT;
 	}
 
 //	public void loadSavedSpot() {
@@ -230,7 +211,7 @@ public class LocationRouteService {
 
 	public void loadSavedSpot() {
 
-		SavedSpot savedSpot = readSavedSpotFile(Constants.SAVED_SPOT_FILE);
+		SavedSpot savedSpot = new FileService(mContext).readSavedSpotFile(Constants.SAVED_SPOT_FILE);
 
 		if (savedSpot != null && savedSpot.hasSavedSpot) {
 			mEventManager.triggerEvent(new SetMarkerEvent(savedSpot.location, MarkerType.SAVED_SPOT));
@@ -239,58 +220,15 @@ public class LocationRouteService {
 		// TODO
 	}
 
-	private void writeSavedSpotFile(SavedSpot spot, String filename) {
-
-		try {
-			FileOutputStream fos = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
-
-			Gson gson = new Gson();
-			String jsonString = gson.toJson(spot);
-
-			fos.write(jsonString.getBytes());
-
-			fos.close();
-		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error writing saved spot to file: " + filename);
-		}
-	}
-
-	private SavedSpot readSavedSpotFile(String filename) {
-
-		SavedSpot result = null;
-
-		try {
-			FileInputStream fis = mContext.openFileInput(filename);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-
-			Gson gson = new Gson();
-			result = gson.fromJson(reader, SavedSpot.class);
-
-			reader.close();
-			fis.close();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error reading saved spot from file: " + filename);
-		}
-
-		return result;
-	}
-
 // -------------------------------------------------------------------------------------------------
 // MAP ITEMS ACTIONS
 // -------------------------------------------------------------------------------------------------
 
 	public void notifyMapCleared() {
 
-		mMarker = null;
+		mMarkerData.mMarker = null;
 		if (mRouteData != null)
-			mRouteData.undraw();
+			mRouteData.clearRoute();
 
 		updateMarkerMapState();
 		drawDirections();
@@ -298,15 +236,15 @@ public class LocationRouteService {
 
 	public void drawMarker() {
 
-		if (mMarker != null) {
-			mRouteUpdateClient.removeMarker(mMarker);
+		if (mMarkerData.mMarker != null) {
+			mRouteUpdateClient.removeMarker(mMarkerData.mMarker);
 		}
 
-		if (mMarkerLocation == null) {
+		if (mMarkerData.mMarkerLocation == null) {
 			return;
 		}
 
-		LatLng point = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
+		LatLng point = new LatLng(mMarkerData.mMarkerLocation.getLatitude(), mMarkerData.mMarkerLocation.getLongitude());
 
 		MarkerOptions markerOptions = new MarkerOptions().position(point);
 		mRouteUpdateClient.drawMarker(markerOptions, locationRouteUpdateClient);
@@ -322,10 +260,10 @@ public class LocationRouteService {
 	public void drawRouteToMarker() {
 
 		String directions_mode;
-		if (markerType == MarkerType.NONE || mMarkerLocation == null) {
+		if (mMarkerData.markerType == MarkerType.NONE || mMarkerData.mMarkerLocation == null) {
 			return;
 		}
-		if (markerType == MarkerType.SAVED_SPOT) {
+		if (mMarkerData.markerType == MarkerType.SAVED_SPOT) {
 			directions_mode = Constants.MODE_WALKING;
 		}
 		else {
@@ -353,16 +291,16 @@ public class LocationRouteService {
 		}
 
 		// Not drawing the same route again
-		if (hasDirections && checkSameRoute(lastLocation, mMarkerLocation)) {
+		if (hasDirections && checkSameRoute(lastLocation, mMarkerData.mMarkerLocation)) {
 			return;
 		}
 		lastDirectionsSource = lastLocation.clone();
-		lastDirectionsDestination = mMarkerLocation.clone();
+		lastDirectionsDestination = mMarkerData.mMarkerLocation.clone();
 
 		// Get route
 		hasDirections = true;
 		LatLng source = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-		LatLng destination = new LatLng(mMarkerLocation.getLatitude(), mMarkerLocation.getLongitude());
+		LatLng destination = new LatLng(mMarkerData.mMarkerLocation.getLatitude(), mMarkerData.mMarkerLocation.getLongitude());
 		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsResultListener);
 		directions.execute(new RouteOptions(source, destination, directions_mode, mZoom));
 
@@ -408,7 +346,7 @@ public class LocationRouteService {
 		}
 
 		if (mRouteData != null)
-			mRouteData.undraw();
+			mRouteData.clearRoute();
 		mRouteData = null;
 	}
 
@@ -437,8 +375,8 @@ public class LocationRouteService {
 
 		@Override
 		public void notifyMarkerResult(Marker marker) {
-			mMarker = marker;
-		}
+			mMarkerData.mMarker = marker;
+	}
 	};
 
 	private RedrawCallback mRedrawCallback = new RedrawCallback() {

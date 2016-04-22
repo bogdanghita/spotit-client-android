@@ -2,6 +2,7 @@ package com.it.spot.common;
 
 import com.it.spot.events.EventManager;
 import com.it.spot.identity.IdentityManager;
+import com.it.spot.maps.MapItemsManager;
 import com.it.spot.maps.location.LocationManager;
 
 /**
@@ -17,10 +18,13 @@ public class ServiceManager {
 
 	private EventManager eventManager;
 
+	private MapItemsManager mapItemsManager;
+
 	private ServiceManager() {
 		identityManager = new IdentityManager();
 		locationManager = new LocationManager();
 		eventManager = new EventManager();
+		mapItemsManager = new MapItemsManager();
 	}
 
 	public synchronized static ServiceManager getInstance() {
@@ -40,6 +44,10 @@ public class ServiceManager {
 
 	public EventManager getEventManager() {
 		return eventManager;
+	}
+
+	public MapItemsManager getMapItemsManager() {
+		return mapItemsManager;
 	}
 
 	public void clear() {

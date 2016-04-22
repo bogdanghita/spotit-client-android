@@ -18,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -36,30 +35,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.it.spot.R;
-import com.it.spot.events.CameraChangeEvent;
-import com.it.spot.events.DrawRouteEvent;
-import com.it.spot.events.EventManager;
-import com.it.spot.events.LocationChangeEvent;
-import com.it.spot.events.MapEventListener;
+import com.it.spot.events.MapItemsProvider;
 import com.it.spot.events.RemoveMarkerEvent;
-import com.it.spot.events.RemoveRouteEvent;
 import com.it.spot.events.SetMarkerEvent;
-import com.it.spot.events.SpotsMapEvent;
-import com.it.spot.maps.address.AddressAsyncTask;
+import com.it.spot.maps.FileService;
+import com.it.spot.maps.MapItemsService;
+import com.it.spot.maps.MarkerData;
+import com.it.spot.maps.UiController;
 import com.it.spot.maps.address.AddressResponseListener;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
-import com.it.spot.maps.directions.RouteData;
 import com.it.spot.identity.IdentityActivity;
 import com.it.spot.identity.IdentityManager;
 import com.it.spot.identity.ImageLoaderAsyncTask;
@@ -68,7 +57,6 @@ import com.it.spot.identity.TokenRequestAsyncTask;
 import com.it.spot.identity.TokenRequestEventListener;
 import com.it.spot.identity.UserInfo;
 import com.it.spot.maps.location.BasicLocation;
-import com.it.spot.maps.location.LocationManager;
 import com.it.spot.maps.report.DialogReveal;
 import com.it.spot.services.PolygonUI;
 import com.it.spot.threading.Event;
@@ -85,7 +73,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends IdentityActivity implements OnMapReadyCallback,
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-		LocationListener, TokenRequestEventListener, StateMonitorListener {
+		LocationListener, TokenRequestEventListener, StateMonitorListener, MapItemsProvider, UiController {
 
 	private ActionBarDrawerToggle mDrawerToggle;
 
@@ -102,7 +90,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private boolean mResolvingError = false;
 
 	private MapUpdateService mapUpdateService;
-	private LocationRouteService locationRouteService;
+//	private LocationRouteService locationRouteService;
 
 	private Event onConnectedEvent, onMapReadyEvent;
 
@@ -130,10 +118,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mResolvingError = savedInstanceState != null && savedInstanceState.getBoolean(Constants.STATE_RESOLVING_ERROR, false);
 
 		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
-		locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
+//		locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
 
 		// Subscribe map event listener
-		ServiceManager.getInstance().getEventManager().subscribe(mapEventListener);
+		ServiceManager.getInstance().getEventManager().subscribe(new MapItemsService(this, this, this));
 
 		startStateMonitor();
 
@@ -143,8 +131,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		createUserProfile();
 
-		locationRouteService.loadSavedSpot();
-		toggleSaveSpotButton();
+		loadSavedSpot();
 	}
 
 	@Override
@@ -195,19 +182,23 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	@Override
 	public void onBackPressed() {
-		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 
-//			locationRouteService.removeDestination();
-//
-//			setDirectionsButtonIcon(false);
+		MarkerData markerData = mServiceManager.getMapItemsManager().getMarkerData();
 
-			locationRouteService.removeDestination();
+		if (markerData == null || markerData.markerType != LocationRouteService.MarkerType.DESTINATION) {
 
-			// TODO
-		}
-		else {
 			super.onBackPressed();
 		}
+		else {
+
+			mServiceManager.getEventManager().triggerEvent(new RemoveMarkerEvent());
+
+			// TODO: DONE
+
+			setDirectionsButtonIcon(false);
+		}
+
+
 	}
 
 	@Override
@@ -222,9 +213,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 				Log.d(Constants.APP + Constants.CAMERA_CHANGE, cameraBounds.getCenter() + " - " + cameraBounds.southwest + ", " + cameraBounds.northeast);
 
+				// TODO
 				// Updating the zoom and redrawing the route if necessary.
-				locationRouteService.setZoom(mMap.getCameraPosition().zoom);
-				locationRouteService.redrawRouteToMarker();
+//				locationRouteService.setZoom(mMap.getCameraPosition().zoom);
+//				locationRouteService.redrawRouteToMarker();
 
 				// Setting camera position and requesting a map status update
 				mapUpdateService.setCameraPosition(cameraBounds);
@@ -245,16 +237,26 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			@Override
 			public void onMapClick(final LatLng latLng) {
 
-				locationRouteService.setDestination(latLng);
+				MarkerData markerData = mServiceManager.getMapItemsManager().getMarkerData();
+				if (markerData != null && markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
+					return;
+				}
 
-				// TODO
+				mServiceManager.getEventManager().triggerEvent(new SetMarkerEvent(
+						new BasicLocation(latLng.latitude, latLng.longitude), LocationRouteService.MarkerType.DESTINATION));
+
+				// TODO: DONE
+
+				setDirectionsButtonIcon(false);
+				setLocationInfoBarTitle();
 			}
 		});
 
 		onMapReadyEvent.set();
 		Log.d(Constants.APP + Constants.STATE_MONITOR, "onMapReadyEvent.set()");
 
-		locationRouteService.drawMarker();
+		// TODO
+//		locationRouteService.drawMarker();
 	}
 
 	private void enableLocation() {
@@ -525,7 +527,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		Log.d(Constants.APP + Constants.MENU, "Button Sign out");
 
 		// Clear saved spot
-		locationRouteService.clearSavedSpotFile();
+		new FileService(this).writeSavedSpotFile(new SavedSpot(false, null), Constants.SAVED_SPOT_FILE);
 
 		// Signing out from Google
 		Auth.GoogleSignInApi.signOut(mIdentityGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
@@ -691,7 +693,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mServiceManager.getEventManager().triggerEvent(new SetMarkerEvent(lastLocation,
 				LocationRouteService.MarkerType.SAVED_SPOT));
 
-		// TODO
+		// TODO: DONE
+
+		toggleSaveSpotButton();
+		toggleNavigationDrawer();
+
+		setDirectionsButtonIcon(false);
+		setLocationInfoBarTitle();
 	}
 
 //	public void buttonLeaveSpot(View view) {
@@ -710,7 +718,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		mServiceManager.getEventManager().triggerEvent(new RemoveMarkerEvent());
 
-		// TODO
+		// TODO: DONE
+
+		toggleSaveSpotButton();
+		toggleNavigationDrawer();
+
+		setDirectionsButtonIcon(false);
+		setLocationInfoBarTitle();
 	}
 
 	void toggleSaveSpotButton() {
@@ -718,7 +732,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
 		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
 
-		if (locationRouteService.isSpotSaved()) {
+		if (mServiceManager.getMapItemsManager().hasSavedSpot()) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
 		}
@@ -780,49 +794,31 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonDirections(View v) {
 
-		if (!locationRouteService.hasDirections()) {
-			locationRouteService.drawRouteToMarker();
-		}
-		else {
-			locationRouteService.removeRouteToMarker();
-		}
-	}
-
-	private void openLocationInfoBar(BasicLocation location) {
-
-		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
-		View directions_fab = findViewById(R.id.directions_fab);
-
-		bottom_layout.setTranslationY(0);
-		directions_fab.setVisibility(View.VISIBLE);
-
-		AddressAsyncTask addressAsyncTask = new AddressAsyncTask(addressResponseListener);
-		addressAsyncTask.execute(location);
-	}
-
-	private void closeLocationInfoBar() {
-
-		LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.location_info_bar);
-		View directions_fab = findViewById(R.id.directions_fab);
-
-		bottom_layout.setTranslationY(bottom_layout.getHeight());
-		directions_fab.setVisibility(View.INVISIBLE);
-
-		TextView locationAddress = (TextView) findViewById(R.id.location_address);
-		locationAddress.setText("");
+		// TODO
+//		if (!locationRouteService.hasDirections()) {
+//			locationRouteService.drawRouteToMarker();
+//		}
+//		else {
+//			locationRouteService.removeRouteToMarker();
+//		}
 	}
 
 	private void setDirectionsButtonIcon(boolean iconClosed) {
 
 		int icon_id;
 
+		MarkerData markerData = mServiceManager.getMapItemsManager().getMarkerData();
+
 		if (iconClosed) {
 			icon_id = R.drawable.ic_close_white_24dp;
 		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+		else if (markerData == null) {
+			return;
+		}
+		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			icon_id = R.drawable.ic_directions_car_white_24dp;
 		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			icon_id = R.drawable.ic_directions_walk_white_24dp;
 		}
 		else {
@@ -837,10 +833,15 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		String text;
 
-		if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+		MarkerData markerData = mServiceManager.getMapItemsManager().getMarkerData();
+		if (markerData == null) {
+			return;
+		}
+
+		if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
 			text = getResources().getString(R.string.location_info_bar_title_destination);
 		}
-		else if (locationRouteService.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
 			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
 		}
 		else {
@@ -872,8 +873,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 					// Clearing polygons
 					mMap.clear();
 
+					// TODO
 					// Notify route service
-					locationRouteService.notifyMapCleared();
+//					locationRouteService.notifyMapCleared();
 
 					// Drawing all polygons
 					for (PolygonUI polygon : polygons) {
@@ -890,146 +892,124 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 	};
 
-	private RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
-
-		@Override
-		public void drawRoute(final RouteData routeData, final RouteUpdateResultCallbackClient client) {
-
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					if (mMap != null) {
-						setDirectionsButtonIcon(true);
-						switch (routeData.getRouteType()) {
-							case DRIVING:
-								List<Polyline> polylines = new ArrayList<>();
-								for (PolylineOptions polylineOptions : routeData.getRoutePolylineOptionsList()) {
-									polylines.add(mMap.addPolyline(polylineOptions));
-								}
-								client.notifyDrivingResult(polylines);
-								break;
-							case WALKING:
-								List<Circle> circles = new ArrayList<>();
-								for (CircleOptions circleOptions : routeData.getRouteCircleOptionsList()) {
-									circles.add(mMap.addCircle(circleOptions));
-								}
-								client.notifyWalkingResult(circles);
-								break;
-						}
-					}
-				}
-			});
-		}
-
-		@Override
-		public void removeRoute(final RouteData routeData) {
-
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					switch (routeData.getRouteType()) {
-						case DRIVING:
-							for (Polyline polyline : routeData.getRoutePolylines()) {
-								polyline.remove();
-							}
-							break;
-						case WALKING:
-							for (Circle circle : routeData.getRouteCircles()) {
-								circle.remove();
-							}
-							break;
-					}
-					setDirectionsButtonIcon(false);
-				}
-			});
-		}
-
-		@Override
-		public void drawMarker(final MarkerOptions markerOptions, final RouteUpdateResultCallbackClient client) {
-
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					Marker result = null;
-					if (mMap != null) {
-						result = mMap.addMarker(markerOptions);
-					}
-					client.notifyMarkerResult(result);
-
-					LatLng position = markerOptions.getPosition();
-					openLocationInfoBar(new BasicLocation(position.latitude, position.longitude));
-				}
-			});
-		}
-
-		@Override
-		public void removeMarker(final Marker marker) {
-
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					marker.remove();
-
-					closeLocationInfoBar();
-				}
-			});
-		}
-	};
-
-	private AddressResponseListener addressResponseListener = new AddressResponseListener() {
-		@Override
-		public void notifyAddressResponse(final String address) {
-
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					TextView locationAddress = (TextView) findViewById(R.id.location_address);
-					locationAddress.setText(address);
-				}
-			});
-		}
-	};
-
+//	private RouteUpdateCallbackClient routeUpdateCallbackClient = new RouteUpdateCallbackClient() {
+//
+//		@Override
+//		public void drawRoute(final RouteData routeData, final RouteUpdateResultCallbackClient client) {
+//
+//			runOnUiThread(new Runnable() {
+//				@Override
+//				public void run() {
+//					if (mMap != null) {
+//						setDirectionsButtonIcon(true);
+//						switch (routeData.getRouteType()) {
+//							case DRIVING:
+//								List<Polyline> polylines = new ArrayList<>();
+//								for (PolylineOptions polylineOptions : routeData.getRoutePolylineOptionsList()) {
+//									polylines.add(mMap.addPolyline(polylineOptions));
+//								}
+//								client.notifyDrivingResult(polylines);
+//								break;
+//							case WALKING:
+//								List<Circle> circles = new ArrayList<>();
+//								for (CircleOptions circleOptions : routeData.getRouteCircleOptionsList()) {
+//									circles.add(mMap.addCircle(circleOptions));
+//								}
+//								client.notifyWalkingResult(circles);
+//								break;
+//						}
+//					}
+//				}
+//			});
+//		}
+//
+//		@Override
+//		public void removeRoute(final RouteData routeData) {
+//
+//			runOnUiThread(new Runnable() {
+//				@Override
+//				public void run() {
+//					switch (routeData.getRouteType()) {
+//						case DRIVING:
+//							for (Polyline polyline : routeData.getRoutePolylines()) {
+//								polyline.remove();
+//							}
+//							break;
+//						case WALKING:
+//							for (Circle circle : routeData.getRouteCircles()) {
+//								circle.remove();
+//							}
+//							break;
+//					}
+//					setDirectionsButtonIcon(false);
+//				}
+//			});
+//		}
+//
+//		@Override
+//		public void drawMarker(final MarkerOptions markerOptions, final RouteUpdateResultCallbackClient client) {
+//
+//			runOnUiThread(new Runnable() {
+//				@Override
+//				public void run() {
+//					Marker result = null;
+//					if (mMap != null) {
+//						result = mMap.addMarker(markerOptions);
+//					}
+//					client.notifyMarkerResult(result);
+//
+//					LatLng position = markerOptions.getPosition();
+//					openLocationInfoBar(new BasicLocation(position.latitude, position.longitude));
+//				}
+//			});
+//		}
+//
+//		@Override
+//		public void removeMarker(final Marker marker) {
+//
+//			runOnUiThread(new Runnable() {
+//				@Override
+//				public void run() {
+//					marker.remove();
+//
+//					closeLocationInfoBar();
+//				}
+//			});
+//		}
+//	};
 
 // -------------------------------------------------------------------------------------------------
-// MAP EVENT LISTENER
+// NEW
 // -------------------------------------------------------------------------------------------------
 
-	private MapEventListener mapEventListener = new MapEventListener() {
+	private void loadSavedSpot() {
 
-		@Override
-		public void notifySetMarker(SetMarkerEvent event) {
+//		locationRouteService.loadSavedSpot();
+//		toggleSaveSpotButton();
 
+		SavedSpot savedSpot = new FileService(this).readSavedSpotFile(Constants.SAVED_SPOT_FILE);
+
+		if (savedSpot != null && savedSpot.hasSavedSpot) {
+			mServiceManager.getEventManager().triggerEvent(new SetMarkerEvent(savedSpot.location, LocationRouteService.MarkerType.SAVED_SPOT));
 		}
 
-		@Override
-		public void notifyRemoveMarker(RemoveMarkerEvent event) {
+		// TODO: DONE
 
-		}
+		toggleSaveSpotButton();
+	}
 
-		@Override
-		public void notifyDrawRoute(DrawRouteEvent event) {
+	@Override
+	public GoogleMap getMap() {
+		return mMap;
+	}
 
-		}
+	@Override
+	public View getView(int id) {
+		return findViewById(id);
+	}
 
-		@Override
-		public void notifyRemoveRoute(RemoveRouteEvent event) {
-
-		}
-
-		@Override
-		public void notifySpotsMap(SpotsMapEvent event) {
-
-		}
-
-		@Override
-		public void notifyLocationChange(LocationChangeEvent event) {
-
-		}
-
-		@Override
-		public void notifyCameraChange(CameraChangeEvent event) {
-
-		}
-	};
+	@Override
+	public void doRunOnUiThread(Runnable runnable) {
+		runOnUiThread(runnable);
+	}
 }

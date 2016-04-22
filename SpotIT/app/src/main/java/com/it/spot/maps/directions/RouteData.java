@@ -35,7 +35,7 @@ public class RouteData {
 		return mRouteCircles != null || mRoutePolylines != null;
 	}
 
-	public void undraw() {
+	public void clearRoute() {
 		switch (mRouteType) {
 			case DRIVING:
 				this.setRouteCircles(null);
