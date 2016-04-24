@@ -8,7 +8,6 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -132,8 +131,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		createLocationRequest();
 
 		createUserProfile();
-
-		loadSavedSpot();
 	}
 
 	@Override
@@ -261,8 +258,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		onMapReadyEvent.set();
 		Log.d(Constants.APP + Constants.STATE_MONITOR, "onMapReadyEvent.set()");
 
-		// TODO
+		// TODO: DONE
 //		locationRouteService.drawMarker();
+		// See state ready callback
 	}
 
 	private void enableLocation() {
@@ -308,9 +306,14 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		Log.d(Constants.APP + Constants.STATE_MONITOR, "notifyStateReady()");
 
+		// Perform location related actions
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+
+				// Load saved spot
+				// NOTE: it is done here so that the map is ready when the marker will be drawn
+				loadSavedSpot();
 
 				// onConnected
 				if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT_LOCATION)) {
@@ -891,8 +894,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 						return;
 					}
 
+					// TODO
 					// Clearing polygons
-					mMap.clear();
+//					mMap.clear();
 
 					// TODO
 					// Notify route service
