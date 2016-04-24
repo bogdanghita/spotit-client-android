@@ -24,10 +24,10 @@ public abstract class MapEventListener implements EventListener {
 			notifyRemoveMarker((RemoveMarkerEvent) event);
 		}
 		else if (event instanceof DrawRouteEvent) {
-			notifyDrawRoute((DrawRouteEvent) event);
+			notifyDisplayRoute((DrawRouteEvent) event);
 		}
 		else if (event instanceof RemoveRouteEvent) {
-			notifyRemoveRoute((RemoveRouteEvent) event);
+			notifyHideRoute((RemoveRouteEvent) event);
 		}
 		else if (event instanceof SpotsMapEvent) {
 			notifySpotsMap((SpotsMapEvent) event);
@@ -44,9 +44,9 @@ public abstract class MapEventListener implements EventListener {
 
 	public abstract void notifyRemoveMarker(RemoveMarkerEvent event);
 
-	public abstract void notifyDrawRoute(DrawRouteEvent event);
+	public abstract void notifyDisplayRoute(DrawRouteEvent event);
 
-	public abstract void notifyRemoveRoute(RemoveRouteEvent event);
+	public abstract void notifyHideRoute(RemoveRouteEvent event);
 
 	public abstract void notifySpotsMap(SpotsMapEvent event);
 
