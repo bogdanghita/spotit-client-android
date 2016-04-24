@@ -201,8 +201,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 			setDirectionsButtonIcon(false);
 		}
-
-
 	}
 
 	@Override
