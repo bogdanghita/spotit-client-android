@@ -20,6 +20,7 @@ public class RouteData {
 
 	private List<PolylineOptions> mRoutePolylineOptionsList;
 	private List<Polyline> mRoutePolylines = null;
+
 	private List<CircleOptions> mRouteCircleOptionsList;
 	private List<Circle> mRouteCircles = null;
 

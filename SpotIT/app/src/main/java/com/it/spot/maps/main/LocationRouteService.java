@@ -362,6 +362,17 @@ public class LocationRouteService {
 		}
 	};
 
+	private RedrawCallback mRedrawCallback = new RedrawCallback() {
+		@Override
+		public void notifyRedraw(List<CircleOptions> circleOptionsList) {
+			RouteData backup = mRouteData;
+			clearDirections();
+			mRouteData = backup;
+			mRouteData.setRouteCircleOptionsList(circleOptionsList);
+			drawDirections();
+		}
+	};
+
 	private RouteUpdateResultCallbackClient locationRouteUpdateClient = new RouteUpdateResultCallbackClient() {
 		@Override
 		public void notifyDrivingResult(List<Polyline> polylineList) {
@@ -377,17 +388,6 @@ public class LocationRouteService {
 		public void notifyMarkerResult(Marker marker) {
 			mMarkerData.mMarker = marker;
 	}
-	};
-
-	private RedrawCallback mRedrawCallback = new RedrawCallback() {
-		@Override
-		public void notifyRedraw(List<CircleOptions> circleOptionsList) {
-			RouteData backup = mRouteData;
-			clearDirections();
-			mRouteData = backup;
-			mRouteData.setRouteCircleOptionsList(circleOptionsList);
-			drawDirections();
-		}
 	};
 
 	// DEBUG / EXAMPLE

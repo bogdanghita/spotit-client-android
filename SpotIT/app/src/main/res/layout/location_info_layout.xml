@@ -31,15 +31,13 @@
 			android:id="@+id/location_address"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:layout_weight="95"
-			android:text="dsdsad"/>
+			android:layout_weight="95"/>
 
 		<TextView
 			android:id="@+id/destination_time"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="5"
-			android:text="21 min"
 			android:textColor="@color/colorPrimary"
 			android:textSize="15sp"
 			android:textStyle="bold"/>

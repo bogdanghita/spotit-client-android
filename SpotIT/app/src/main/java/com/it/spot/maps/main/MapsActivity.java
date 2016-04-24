@@ -219,6 +219,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				// Updating the zoom and redrawing the route if necessary.
 //				locationRouteService.setZoom(mMap.getCameraPosition().zoom);
 //				locationRouteService.redrawRouteToMarker();
+				mServiceManager.getMapItemsManager().setZoom(mMap.getCameraPosition().zoom);
 
 				// Setting camera position and requesting a map status update
 				mapUpdateService.setCameraPosition(cameraBounds);
@@ -250,7 +251,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				// TODO: DONE
 
 				setDirectionsButtonIcon(false);
-				setLocationInfoBarTitle();
+				// TODO: here
+//				setLocationInfoBarTitle();
 			}
 		});
 
@@ -701,7 +703,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleNavigationDrawer();
 
 		setDirectionsButtonIcon(false);
-		setLocationInfoBarTitle();
+		// TODO: here
+//		setLocationInfoBarTitle();
 	}
 
 //	public void buttonLeaveSpot(View view) {
@@ -726,7 +729,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleNavigationDrawer();
 
 		setDirectionsButtonIcon(false);
-		setLocationInfoBarTitle();
+		// TODO: here
+//		setLocationInfoBarTitle();
 	}
 
 	void toggleSaveSpotButton() {
@@ -831,28 +835,28 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		fab.setImageDrawable(getResources().getDrawable(icon_id));
 	}
 
-	private void setLocationInfoBarTitle() {
-
-		String text;
-
-		MarkerData markerData = mServiceManager.getMapItemsManager().getMarkerData();
-		if (markerData == null) {
-			return;
-		}
-
-		if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
-			text = getResources().getString(R.string.location_info_bar_title_destination);
-		}
-		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
-			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
-		}
-		else {
-			return;
-		}
-
-		TextView tv = (TextView) findViewById(R.id.location_title);
-		tv.setText(text);
-	}
+//	private void setLocationInfoBarTitle() {
+//
+//		String text;
+//
+//		MarkerData markerData = mServiceManager.getMapItemsManager().getMarkerData();
+//		if (markerData == null) {
+//			return;
+//		}
+//
+//		if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+//			text = getResources().getString(R.string.location_info_bar_title_destination);
+//		}
+//		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+//			text = getResources().getString(R.string.location_info_bar_title_saved_spot);
+//		}
+//		else {
+//			text = "";
+//		}
+//
+//		TextView tv = (TextView) findViewById(R.id.location_title);
+//		tv.setText(text);
+//	}
 
 // -------------------------------------------------------------------------------------------------
 // UPDATE CALLBACK CLIENT
@@ -998,6 +1002,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		// TODO: DONE
 
 		toggleSaveSpotButton();
+		// TODO: here
+//		setLocationInfoBarTitle();
 	}
 
 	@Override
