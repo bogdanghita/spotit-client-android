@@ -19,6 +19,7 @@ public class MapItemsManager {
 
 	private BasicLocation lastDirectionsSource, lastDirectionsDestination;
 
+	private float oldZoom = Constants.DEFAULT_ZOOM;
 	private float zoom = Constants.DEFAULT_ZOOM;
 
 	public MapItemsManager() {
@@ -63,12 +64,17 @@ public class MapItemsManager {
 		this.lastDirectionsSource = lastDirectionsSource;
 	}
 
+	public void updateZoom(float zoom) {
+		oldZoom = this.zoom;
+		this.zoom = zoom;
+	}
+
 	public float getZoom() {
 		return zoom;
 	}
 
-	public void setZoom(float zoom) {
-		this.zoom = zoom;
+	public float getOldZoom() {
+		return oldZoom;
 	}
 
 	public BasicLocation getLastDirectionsDestination() {

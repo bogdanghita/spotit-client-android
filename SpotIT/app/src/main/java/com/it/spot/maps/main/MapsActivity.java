@@ -39,6 +39,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.it.spot.R;
 import com.it.spot.events.BaseEvent;
+import com.it.spot.events.CameraChangeEvent;
 import com.it.spot.events.DrawRouteEvent;
 import com.it.spot.events.MapItemsProvider;
 import com.it.spot.events.RemoveMarkerEvent;
@@ -213,13 +214,16 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 				Log.d(Constants.APP + Constants.CAMERA_CHANGE, cameraBounds.getCenter() + " - " + cameraBounds.southwest + ", " + cameraBounds.northeast);
 
-				// TODO
+				// TODO: DONE
 				// Updating the zoom and redrawing the route if necessary.
-//				locationRouteService.setZoom(mMap.getCameraPosition().zoom);
+//				locationRouteService.updateZoom(mMap.getCameraPosition().zoom);
 //				locationRouteService.redrawRouteToMarker();
-				mServiceManager.getMapItemsManager().setZoom(mMap.getCameraPosition().zoom);
 
-				// Setting camera position and requesting a map status update
+				// Trigger event
+				CameraChangeEvent event = new CameraChangeEvent(mMap.getCameraPosition().zoom);
+				mServiceManager.getEventManager().triggerEvent(event);
+
+				// Set camera position and request a map status update
 				mapUpdateService.setCameraPosition(cameraBounds);
 				mapUpdateService.requestMapStatusUpdate();
 			}
