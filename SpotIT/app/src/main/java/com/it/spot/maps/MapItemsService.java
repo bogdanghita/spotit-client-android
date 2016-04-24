@@ -236,38 +236,50 @@ public class MapItemsService extends MapEventListener {
 // MAIN
 // ------------------------------------------------------------------------------------------------
 
-	private void openLocationInfoBar(BasicLocation location) {
+	private void openLocationInfoBar(final BasicLocation location) {
 
-		// Clear items first (useful when location info bar was not closed)
-		clearLocationInfoBarItems();
+		mUiController.doRunOnUiThread(new Runnable() {
+			@Override
+			public void run() {
 
-		LinearLayout bottom_layout = (LinearLayout) mMapItemsProvider.getView(R.id.location_info_bar);
-		View directions_fab = mMapItemsProvider.getView(R.id.directions_fab);
+				// Clear items first (useful when location info bar was not closed)
+				clearLocationInfoBarItems();
 
-		bottom_layout.setTranslationY(0);
-		directions_fab.setVisibility(View.VISIBLE);
+				LinearLayout bottom_layout = (LinearLayout) mMapItemsProvider.getView(R.id.location_info_bar);
+				View directions_fab = mMapItemsProvider.getView(R.id.directions_fab);
 
-		AddressAsyncTask addressAsyncTask = new AddressAsyncTask(addressResponseListener);
-		addressAsyncTask.execute(location);
+				bottom_layout.setTranslationY(0);
+				directions_fab.setVisibility(View.VISIBLE);
 
-		// Set appropriate title
-		setLocationInfoBarTitle();
+				AddressAsyncTask addressAsyncTask = new AddressAsyncTask(addressResponseListener);
+				addressAsyncTask.execute(location);
+
+				// Set appropriate title
+				setLocationInfoBarTitle();
+			}
+		});
 	}
 
 	private void closeLocationInfoBar() {
 
-		LinearLayout bottom_layout = (LinearLayout) mMapItemsProvider.getView(R.id.location_info_bar);
-		View directions_fab = mMapItemsProvider.getView(R.id.directions_fab);
+		mUiController.doRunOnUiThread(new Runnable() {
+			@Override
+			public void run() {
 
-		bottom_layout.setTranslationY(bottom_layout.getHeight());
-		directions_fab.setVisibility(View.INVISIBLE);
+				LinearLayout bottom_layout = (LinearLayout) mMapItemsProvider.getView(R.id.location_info_bar);
+				View directions_fab = mMapItemsProvider.getView(R.id.directions_fab);
 
-		clearLocationInfoBarItems();
+				bottom_layout.setTranslationY(bottom_layout.getHeight());
+				directions_fab.setVisibility(View.INVISIBLE);
+
+				clearLocationInfoBarItems();
+			}
+		});
 	}
 
 	private void setLocationInfoBarTitle() {
 
-		String text;
+		final String text;
 
 		MarkerData markerData = mMapItemsManager.getMarkerData();
 		if (markerData == null) {
@@ -284,25 +296,36 @@ public class MapItemsService extends MapEventListener {
 			text = "";
 		}
 
-		TextView tv = (TextView) mMapItemsProvider.getView(R.id.location_title);
-		tv.setText(text);
+		mUiController.doRunOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				TextView tv = (TextView) mMapItemsProvider.getView(R.id.location_title);
+				tv.setText(text);
+			}
+		});
 	}
 
 	private void clearLocationInfoBarItems() {
 
-		TextView locationTitle = (TextView) mMapItemsProvider.getView(R.id.location_title);
-		locationTitle.setText("");
+		mUiController.doRunOnUiThread(new Runnable() {
+			@Override
+			public void run() {
 
-		TextView locationAddress = (TextView) mMapItemsProvider.getView(R.id.location_address);
-		locationAddress.setText("");
+				TextView locationTitle = (TextView) mMapItemsProvider.getView(R.id.location_title);
+				locationTitle.setText("");
 
-		TextView destinationTime = (TextView) mMapItemsProvider.getView(R.id.destination_time);
-		destinationTime.setText("");
+				TextView locationAddress = (TextView) mMapItemsProvider.getView(R.id.location_address);
+				locationAddress.setText("");
+
+				TextView destinationTime = (TextView) mMapItemsProvider.getView(R.id.destination_time);
+				destinationTime.setText("");
+			}
+		});
 	}
 
 	private void setDirectionsButtonIcon(boolean iconClosed) {
 
-		int icon_id;
+		final int icon_id;
 
 		MarkerData markerData = mMapItemsManager.getMarkerData();
 
@@ -322,8 +345,13 @@ public class MapItemsService extends MapEventListener {
 			return;
 		}
 
-		FloatingActionButton fab = (FloatingActionButton) mMapItemsProvider.getView(R.id.directions_fab);
-		fab.setImageDrawable(mContext.getResources().getDrawable(icon_id));
+		mUiController.doRunOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				FloatingActionButton fab = (FloatingActionButton) mMapItemsProvider.getView(R.id.directions_fab);
+				fab.setImageDrawable(mContext.getResources().getDrawable(icon_id));
+			}
+		});
 	}
 
 // ------------------------------------------------------------------------------------------------
@@ -411,7 +439,8 @@ public class MapItemsService extends MapEventListener {
 		if (lastLocation == null) {
 			return;
 		}
-		// Not drawing the same route again
+
+		// Checking if this is the same route as the last one
 		if (mMapItemsManager.isRouteDisplayed() && checkSameRoute(lastLocation, markerData.mMarkerLocation)) {
 			return;
 		}
