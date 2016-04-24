@@ -38,7 +38,9 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.common.collect.HashMultimap;
 import com.it.spot.R;
+import com.it.spot.events.EventListener;
 import com.it.spot.events.MapItemsProvider;
 import com.it.spot.events.RemoveMarkerEvent;
 import com.it.spot.events.SetMarkerEvent;
@@ -63,6 +65,8 @@ import com.it.spot.threading.Event;
 import com.it.spot.threading.StateMonitorListener;
 import com.it.spot.threading.StateMonitorThread;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
