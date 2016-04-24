@@ -175,7 +175,7 @@ public class LocationRouteService {
 //
 //		markerType = MarkerType.NONE;
 //
-//		hasDirections = false;
+//		isRouteDisplayed = false;
 //		clearDirections();
 //
 //		notifySetMarker();

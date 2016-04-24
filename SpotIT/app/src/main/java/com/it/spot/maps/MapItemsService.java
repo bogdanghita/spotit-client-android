@@ -40,7 +40,6 @@ import com.it.spot.maps.distance_duration.DistanceDurationResponseListener;
 import com.it.spot.maps.location.BasicLocation;
 import com.it.spot.maps.location.LocationManager;
 import com.it.spot.maps.main.LocationRouteService;
-import com.it.spot.maps.main.RouteUpdateResultCallbackClient;
 import com.it.spot.maps.main.SavedSpot;
 import com.it.spot.threading.Event;
 
@@ -71,8 +70,6 @@ public class MapItemsService extends MapEventListener {
 		mFileService = new FileService(context);
 		mMapItemsManager = ServiceManager.getInstance().getMapItemsManager();
 		mLocationManager = ServiceManager.getInstance().getLocationManager();
-
-		mMapItemsManager.setHasDirections(false);
 
 		mUiController = uiController;
 	}
@@ -109,12 +106,15 @@ public class MapItemsService extends MapEventListener {
 				return;
 		}
 
-		mMapItemsManager.setHasDirections(false);
+		// Mark that the route is no displayed & set corresponding icon
+		mMapItemsManager.setRouteDisplayed(false);
+		setDirectionsButtonIcon(false);
+
 		clearDirections();
 
 		drawMarker();
 
-		// TODO: depending on whether this is blocking or not, decide where to call it
+		// Perform call to get directions. When result is ready, directions will be populated
 		populateDirections();
 	}
 
@@ -125,6 +125,9 @@ public class MapItemsService extends MapEventListener {
 
 		// Close location info bar first
 		closeLocationInfoBar();
+
+		// Mark that the route is not displayed
+		mMapItemsManager.setRouteDisplayed(false);
 
 		MarkerData markerData = mMapItemsManager.getMarkerData();
 		if (markerData == null) {
@@ -138,7 +141,6 @@ public class MapItemsService extends MapEventListener {
 
 		markerData.markerType = LocationRouteService.MarkerType.NONE;
 
-		mMapItemsManager.setHasDirections(false);
 		clearDirections();
 
 		markerData.mMarkerLocation = null;
@@ -150,12 +152,34 @@ public class MapItemsService extends MapEventListener {
 	public void notifyDisplayRoute(DrawRouteEvent event) {
 
 		Log.d(Constants.EVENT + Constants.ITEMS, "notifyDisplayRoute()");
+
+		// Mark that we have displayed the route & set corresponding icon
+		mMapItemsManager.setRouteDisplayed(true);
+		setDirectionsButtonIcon(true);
+
+		RouteData routeData = mMapItemsManager.getRouteData();
+		if (routeData != null) {
+			drawRoute(routeData);
+		}
 	}
 
 	@Override
 	public void notifyHideRoute(RemoveRouteEvent event) {
 
 		Log.d(Constants.EVENT + Constants.ITEMS, "notifyHideRoute()");
+
+		// Mark that the route is not displayed & set corresponding icon
+		mMapItemsManager.setRouteDisplayed(false);
+		setDirectionsButtonIcon(false);
+
+		RouteData routeData = mMapItemsManager.getRouteData();
+		if (routeData == null) {
+			return;
+		}
+
+		if (routeData.isDrawn()) {
+			removeRoute(routeData);
+		}
 	}
 
 	@Override
@@ -189,9 +213,9 @@ public class MapItemsService extends MapEventListener {
 
 		if (routeData.isDrawn()) {
 			removeRoute(routeData);
-			routeData.clearRoute();
 		}
 
+		routeData.clearRoute();
 		mMapItemsManager.setRouteData(null);
 	}
 
@@ -276,6 +300,32 @@ public class MapItemsService extends MapEventListener {
 		destinationTime.setText("");
 	}
 
+	private void setDirectionsButtonIcon(boolean iconClosed) {
+
+		int icon_id;
+
+		MarkerData markerData = mMapItemsManager.getMarkerData();
+
+		if (iconClosed) {
+			icon_id = R.drawable.ic_close_white_24dp;
+		}
+		else if (markerData == null) {
+			return;
+		}
+		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+			icon_id = R.drawable.ic_directions_car_white_24dp;
+		}
+		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+			icon_id = R.drawable.ic_directions_walk_white_24dp;
+		}
+		else {
+			return;
+		}
+
+		FloatingActionButton fab = (FloatingActionButton) mMapItemsProvider.getView(R.id.directions_fab);
+		fab.setImageDrawable(mContext.getResources().getDrawable(icon_id));
+	}
+
 // ------------------------------------------------------------------------------------------------
 // MARKER
 // ------------------------------------------------------------------------------------------------
@@ -329,7 +379,7 @@ public class MapItemsService extends MapEventListener {
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
-			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marked to be added.");
+			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be added.");
 		}
 
 		return marker[0];
@@ -362,7 +412,7 @@ public class MapItemsService extends MapEventListener {
 			return;
 		}
 		// Not drawing the same route again
-		if (mMapItemsManager.hasDirections() && checkSameRoute(lastLocation, markerData.mMarkerLocation)) {
+		if (mMapItemsManager.isRouteDisplayed() && checkSameRoute(lastLocation, markerData.mMarkerLocation)) {
 			return;
 		}
 
@@ -396,10 +446,6 @@ public class MapItemsService extends MapEventListener {
 		// Get distance and duration
 		DistanceDurationAsyncTask distanceDurationAsyncTask = new DistanceDurationAsyncTask(distanceDurationResponseListener);
 		distanceDurationAsyncTask.execute(new DistanceDurationOptions(source, destination, directions_mode));
-
-		// TODO: this might not be used in the same way with the new directions logic
-		// Mark that we have directions
-		mMapItemsManager.setHasDirections(true);
 	}
 
 	private boolean checkSameRoute(BasicLocation source, BasicLocation destination) {
@@ -415,9 +461,13 @@ public class MapItemsService extends MapEventListener {
 	}
 	// </THIS>
 
-	private void drawRoute(final RouteData routeData, final RouteUpdateResultCallbackClient client) {
+	private void drawRoute(RouteData routeData) {
 
-		final GoogleMap map = mMapItemsProvider.getMap();
+		if (routeData == null) {
+			return;
+		}
+
+		GoogleMap map = mMapItemsProvider.getMap();
 		if (map == null) {
 			return;
 		}
@@ -460,7 +510,7 @@ public class MapItemsService extends MapEventListener {
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
-			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marked to be added.");
+			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be added.");
 		}
 
 		return polylines;
@@ -488,7 +538,7 @@ public class MapItemsService extends MapEventListener {
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
-			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marked to be added.");
+			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be added.");
 		}
 
 		return circles;
@@ -538,6 +588,11 @@ public class MapItemsService extends MapEventListener {
 		public void notifyDirectionsResponse(RouteData routeData) {
 			// Set route data
 			mMapItemsManager.setRouteData(routeData);
+
+			// Draw route if the user already clicked on the directions button
+			if (mMapItemsManager.isRouteDisplayed()) {
+				drawRoute(routeData);
+			}
 		}
 	};
 
