@@ -32,6 +32,7 @@ import com.it.spot.maps.address.AddressAsyncTask;
 import com.it.spot.maps.address.AddressResponseListener;
 import com.it.spot.maps.directions.DirectionsAsyncTask;
 import com.it.spot.maps.directions.DirectionsResultListener;
+import com.it.spot.maps.directions.RecomputeRouteAsyncTask;
 import com.it.spot.maps.directions.RouteData;
 import com.it.spot.maps.directions.RouteOptions;
 import com.it.spot.maps.distance_duration.DistanceDurationAsyncTask;
@@ -203,6 +204,26 @@ public class MapItemsService extends MapEventListener {
 	public void notifyCameraChange(CameraChangeEvent event) {
 
 		Log.d(Constants.EVENT + Constants.ITEMS, "notifyCameraChange()");
+
+		// Update zoom
+		mMapItemsManager.updateZoom(event.getZoom());
+
+		// TODO
+		redrawRouteToMarker();
+	}
+
+	// TODO: move this from here
+	public void redrawRouteToMarker() {
+
+		float zoom = mMapItemsManager.getZoom();
+		float oldZoom = mMapItemsManager.getOldZoom();
+
+		// Only redraw if the zoom has changed.
+		if (mRouteData == null || oldZoom == zoom) {
+			return;
+		}
+
+		new RecomputeRouteAsyncTask(mRedrawCallback, zoom).execute(mRouteData.getRoutePoints());
 	}
 
 // ------------------------------------------------------------------------------------------------
@@ -528,7 +549,7 @@ public class MapItemsService extends MapEventListener {
 			// !!!!!!!!!!!!!!!!!!!!!!!!!
 
 			// NOTE: DEBUG - Change this to walking to force walking route.
-			directions_mode = Constants.MODE_DRIVING;
+			directions_mode = Constants.MODE_WALKING;
 		}
 
 		// Perform call to get directions
