@@ -15,17 +15,18 @@ public class MapItemsManager {
 	private RouteData routeData;
 	private MarkerData markerData;
 
-	private boolean hasDirections;
+	private boolean routeDisplayed;
 
 	private BasicLocation lastDirectionsSource, lastDirectionsDestination;
 
 	private float zoom = Constants.DEFAULT_ZOOM;
 
 	public MapItemsManager() {
+		routeDisplayed = false;
 	}
 
-	public boolean hasDirections() {
-		return hasDirections;
+	public boolean isRouteDisplayed() {
+		return routeDisplayed;
 	}
 
 	public boolean hasSavedSpot() {
@@ -34,8 +35,8 @@ public class MapItemsManager {
 				markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT;
 	}
 
-	public void setHasDirections(boolean hasDirections) {
-		this.hasDirections = hasDirections;
+	public void setRouteDisplayed(boolean routeDisplayed) {
+		this.routeDisplayed = routeDisplayed;
 	}
 
 	public RouteData getRouteData() {

@@ -38,17 +38,17 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.common.collect.HashMultimap;
 import com.it.spot.R;
-import com.it.spot.events.EventListener;
+import com.it.spot.events.BaseEvent;
+import com.it.spot.events.DrawRouteEvent;
 import com.it.spot.events.MapItemsProvider;
 import com.it.spot.events.RemoveMarkerEvent;
+import com.it.spot.events.RemoveRouteEvent;
 import com.it.spot.events.SetMarkerEvent;
 import com.it.spot.maps.FileService;
 import com.it.spot.maps.MapItemsService;
 import com.it.spot.maps.MarkerData;
 import com.it.spot.maps.UiController;
-import com.it.spot.maps.address.AddressResponseListener;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.identity.IdentityActivity;
@@ -65,8 +65,6 @@ import com.it.spot.threading.Event;
 import com.it.spot.threading.StateMonitorListener;
 import com.it.spot.threading.StateMonitorThread;
 
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -199,7 +197,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 			// TODO: DONE
 
-			setDirectionsButtonIcon(false);
+			// TODO AAA
+//			setDirectionsButtonIcon(false);
+//			mServiceManager.getMapItemsManager().setRouteDisplayed(false);
 		}
 	}
 
@@ -250,7 +250,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 				// TODO: DONE
 
-				setDirectionsButtonIcon(false);
+				// TODO AAA
+//				setDirectionsButtonIcon(false);
+//				mServiceManager.getMapItemsManager().setRouteDisplayed(false);
 				// TODO: here
 //				setLocationInfoBarTitle();
 			}
@@ -702,7 +704,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleSaveSpotButton();
 		toggleNavigationDrawer();
 
-		setDirectionsButtonIcon(false);
+		// TODO AAA
+//		setDirectionsButtonIcon(false);
+//		mServiceManager.getMapItemsManager().setRouteDisplayed(false);
 		// TODO: here
 //		setLocationInfoBarTitle();
 	}
@@ -728,7 +732,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		toggleSaveSpotButton();
 		toggleNavigationDrawer();
 
-		setDirectionsButtonIcon(false);
+		// TODO AAA
+//		setDirectionsButtonIcon(false);
+//		mServiceManager.getMapItemsManager().setRouteDisplayed(false);
 		// TODO: here
 //		setLocationInfoBarTitle();
 	}
@@ -800,40 +806,49 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonDirections(View v) {
 
-		// TODO
-//		if (!locationRouteService.hasDirections()) {
+		// TODO: DONE
+//		if (!locationRouteService.isRouteDisplayed()) {
 //			locationRouteService.drawRouteToMarker();
 //		}
 //		else {
 //			locationRouteService.removeRouteToMarker();
 //		}
-	}
 
-	private void setDirectionsButtonIcon(boolean iconClosed) {
-
-		int icon_id;
-
-		MarkerData markerData = mServiceManager.getMapItemsManager().getMarkerData();
-
-		if (iconClosed) {
-			icon_id = R.drawable.ic_close_white_24dp;
-		}
-		else if (markerData == null) {
-			return;
-		}
-		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
-			icon_id = R.drawable.ic_directions_car_white_24dp;
-		}
-		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
-			icon_id = R.drawable.ic_directions_walk_white_24dp;
+		BaseEvent event;
+		if (!mServiceManager.getMapItemsManager().isRouteDisplayed()) {
+			event = new DrawRouteEvent();
 		}
 		else {
-			return;
+			event = new RemoveRouteEvent();
 		}
-
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.directions_fab);
-		fab.setImageDrawable(getResources().getDrawable(icon_id));
+		mServiceManager.getEventManager().triggerEvent(event);
 	}
+
+//	private void setDirectionsButtonIcon(boolean iconClosed) {
+//
+//		int icon_id;
+//
+//		MarkerData markerData = mServiceManager.getMapItemsManager().getMarkerData();
+//
+//		if (iconClosed) {
+//			icon_id = R.drawable.ic_close_white_24dp;
+//		}
+//		else if (markerData == null) {
+//			return;
+//		}
+//		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+//			icon_id = R.drawable.ic_directions_car_white_24dp;
+//		}
+//		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+//			icon_id = R.drawable.ic_directions_walk_white_24dp;
+//		}
+//		else {
+//			return;
+//		}
+//
+//		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.directions_fab);
+//		fab.setImageDrawable(getResources().getDrawable(icon_id));
+//	}
 
 //	private void setLocationInfoBarTitle() {
 //
