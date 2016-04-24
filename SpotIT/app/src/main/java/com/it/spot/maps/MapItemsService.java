@@ -255,7 +255,7 @@ public class MapItemsService extends MapEventListener {
 		});
 
 		try {
-			eventHandler.wait();
+			eventHandler.doWait();
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
@@ -318,7 +318,7 @@ public class MapItemsService extends MapEventListener {
 		});
 
 		try {
-			eventHandler.wait();
+			eventHandler.doWait();
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
@@ -346,7 +346,7 @@ public class MapItemsService extends MapEventListener {
 		});
 
 		try {
-			eventHandler.wait();
+			eventHandler.doWait();
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
