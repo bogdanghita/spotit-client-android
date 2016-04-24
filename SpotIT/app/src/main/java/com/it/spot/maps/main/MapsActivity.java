@@ -44,6 +44,7 @@ import com.it.spot.events.MapItemsProvider;
 import com.it.spot.events.RemoveMarkerEvent;
 import com.it.spot.events.RemoveRouteEvent;
 import com.it.spot.events.SetMarkerEvent;
+import com.it.spot.events.SpotsMapEvent;
 import com.it.spot.maps.FileService;
 import com.it.spot.maps.MapItemsService;
 import com.it.spot.maps.MarkerData;
@@ -506,26 +507,27 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		}
 	}
 
+	// TODO: remove this
 	private void updateUI() {
 		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
 		Log.d(Constants.APP + Constants.LOCATION, mLastUpdateTime + ": " + lastLocation.getLatitude() +
 				", " + lastLocation.getLongitude());
 	}
 
-	private void drawPolygon(Iterable<LatLng> points, int color) {
-
-		String text = "";
-		for (LatLng point : points) {
-			text += point.toString() + ", ";
-		}
-		Log.d(Constants.APP + Constants.DRAW, text);
-
-		mMap.addPolygon(new PolygonOptions()
-				.addAll(points)
-				.strokeColor(color)
-				.strokeWidth(0)
-				.fillColor(color));
-	}
+//	private void drawPolygon(Iterable<LatLng> points, int color) {
+//
+//		String text = "";
+//		for (LatLng point : points) {
+//			text += point.toString() + ", ";
+//		}
+//		Log.d(Constants.APP + Constants.DRAW, text);
+//
+//		mMap.addPolygon(new PolygonOptions()
+//				.addAll(points)
+//				.strokeColor(color)
+//				.strokeWidth(0)
+//				.fillColor(color));
+//	}
 
 // -------------------------------------------------------------------------------------------------
 // LOGIN
@@ -890,23 +892,27 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				@Override
 				public void run() {
 
-					if (mMap == null) {
-						return;
-					}
+//					if (mMap == null) {
+//						return;
+//					}
 
-					// TODO
+					// TODO: DONE
 					// Clearing polygons
 //					mMap.clear();
 
-					// TODO
+					// TODO: DONE
 					// Notify route service
 //					locationRouteService.notifyMapCleared();
 
+					// TODO: DONE
 					// Drawing all polygons
-					for (PolygonUI polygon : polygons) {
+//					for (PolygonUI polygon : polygons) {
+//
+//						drawPolygon(polygon.getPoints(), polygon.getColor());
+//					}
 
-						drawPolygon(polygon.getPoints(), polygon.getColor());
-					}
+					SpotsMapEvent event = new SpotsMapEvent(polygons);
+					mServiceManager.getEventManager().triggerEvent(event);
 				}
 			});
 		}

@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.it.spot.R;
@@ -41,6 +42,7 @@ import com.it.spot.maps.location.BasicLocation;
 import com.it.spot.maps.location.LocationManager;
 import com.it.spot.maps.main.LocationRouteService;
 import com.it.spot.maps.main.SavedSpot;
+import com.it.spot.services.PolygonUI;
 import com.it.spot.threading.Event;
 
 import java.util.ArrayList;
@@ -143,7 +145,6 @@ public class MapItemsService extends MapEventListener {
 
 		clearDirections();
 
-		markerData.mMarkerLocation = null;
 		mMapItemsManager.setRouteData(null);
 		clearMarker();
 	}
@@ -186,6 +187,10 @@ public class MapItemsService extends MapEventListener {
 	public void notifySpotsMap(SpotsMapEvent event) {
 
 		Log.d(Constants.EVENT + Constants.ITEMS, "notifySpotsMap()");
+
+		clearSpots();
+
+		drawSpots(event.getPolygons());
 	}
 
 	@Override
@@ -228,12 +233,15 @@ public class MapItemsService extends MapEventListener {
 
 		if (markerData.mMarker != null) {
 			removeMarker(markerData.mMarker);
-			markerData.mMarker = null;
 		}
+
+		markerData.mMarker = null;
+		markerData.mMarkerLocation = null;
+		markerData.mMarkerOptions = null;
 	}
 
 // ------------------------------------------------------------------------------------------------
-// MAIN
+// GUI ITEMS
 // ------------------------------------------------------------------------------------------------
 
 	private void openLocationInfoBar(final BasicLocation location) {
@@ -286,10 +294,10 @@ public class MapItemsService extends MapEventListener {
 			return;
 		}
 
-		if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+		if (markerData.markerType == LocationRouteService.MarkerType.DESTINATION) {
 			text = mContext.getResources().getString(R.string.location_info_bar_title_destination);
 		}
-		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		else if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
 			text = mContext.getString(R.string.location_info_bar_title_saved_spot);
 		}
 		else {
@@ -335,10 +343,10 @@ public class MapItemsService extends MapEventListener {
 		else if (markerData == null) {
 			return;
 		}
-		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.DESTINATION) {
+		else if (markerData.markerType == LocationRouteService.MarkerType.DESTINATION) {
 			icon_id = R.drawable.ic_directions_car_white_24dp;
 		}
-		else if (markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT) {
+		else if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
 			icon_id = R.drawable.ic_directions_walk_white_24dp;
 		}
 		else {
@@ -352,6 +360,60 @@ public class MapItemsService extends MapEventListener {
 				fab.setImageDrawable(mContext.getResources().getDrawable(icon_id));
 			}
 		});
+	}
+
+// ------------------------------------------------------------------------------------------------
+// SPOT ITEMS
+// ------------------------------------------------------------------------------------------------
+
+	private void clearSpots() {
+
+		GoogleMap map = mMapItemsProvider.getMap();
+		if (map == null) {
+			return;
+		}
+
+		// Clear all map items
+		map.clear();
+
+		// Redraw marker
+		MarkerData markerData = mMapItemsManager.getMarkerData();
+		if (markerData != null && markerData.mMarkerOptions != null) {
+			markerData.mMarker = addMarker(markerData.mMarkerOptions);
+		}
+
+		// Redraw route
+		RouteData routeData = mMapItemsManager.getRouteData();
+		if (routeData != null && routeData.isDrawn()) {
+			drawRoute(routeData);
+		}
+	}
+
+	private void drawSpots(List<PolygonUI> polygons) {
+
+		GoogleMap map = mMapItemsProvider.getMap();
+		if (map == null) {
+			return;
+		}
+
+		for (PolygonUI polygon : polygons) {
+			drawPolygon(map, polygon.getPoints(), polygon.getColor());
+		}
+	}
+
+	private void drawPolygon(GoogleMap map, Iterable<LatLng> points, int color) {
+
+		String text = "";
+		for (LatLng point : points) {
+			text += point.toString() + ", ";
+		}
+		Log.d(Constants.APP + Constants.DRAW, text);
+
+		map.addPolygon(new PolygonOptions()
+				.addAll(points)
+				.strokeColor(color)
+				.strokeWidth(0)
+				.fillColor(color));
 	}
 
 // ------------------------------------------------------------------------------------------------
@@ -378,15 +440,16 @@ public class MapItemsService extends MapEventListener {
 		// Open location info bar only if marker data is OK
 		openLocationInfoBar(new BasicLocation(point.latitude, point.longitude));
 
-		// Perform call to get location info
+		// Draw marker
 		MarkerOptions markerOptions = new MarkerOptions().position(point);
+		markerData.mMarkerOptions = markerOptions;
 		markerData.mMarker = addMarker(markerOptions);
 	}
 
 	private Marker addMarker(final MarkerOptions markerOptions) {
 
 		final GoogleMap map = mMapItemsProvider.getMap();
-		if (map == null) {
+		if (map == null || markerOptions == null) {
 			return null;
 		}
 
@@ -504,14 +567,20 @@ public class MapItemsService extends MapEventListener {
 		switch (routeData.getRouteType()) {
 			case DRIVING:
 
-				List<Polyline> polylines = addPolylines(map, routeData.getRoutePolylineOptionsList());
-				mMapItemsManager.getRouteData().setRoutePolylines(polylines);
+				List<PolylineOptions> polylineOptions = routeData.getRoutePolylineOptionsList();
+				if (polylineOptions != null) {
+					List<Polyline> polylines = addPolylines(map, polylineOptions);
+					mMapItemsManager.getRouteData().setRoutePolylines(polylines);
+				}
 
 				break;
 			case WALKING:
 
-				List<Circle> circles = addCircles(map, routeData.getRouteCircleOptionsList());
-				mMapItemsManager.getRouteData().setRouteCircles(circles);
+				List<CircleOptions> circleOptions = routeData.getRouteCircleOptionsList();
+				if (circleOptions != null) {
+					List<Circle> circles = addCircles(map, circleOptions);
+					mMapItemsManager.getRouteData().setRouteCircles(circles);
+				}
 
 				break;
 		}

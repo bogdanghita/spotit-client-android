@@ -32,7 +32,7 @@ public class MapItemsManager {
 	public boolean hasSavedSpot() {
 
 		return markerData != null &&
-				markerData.getMarkerType() == LocationRouteService.MarkerType.SAVED_SPOT;
+				markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT;
 	}
 
 	public void setRouteDisplayed(boolean routeDisplayed) {
