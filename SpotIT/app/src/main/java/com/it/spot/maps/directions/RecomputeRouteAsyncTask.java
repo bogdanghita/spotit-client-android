@@ -11,13 +11,13 @@ import java.util.List;
 /**
  * Created by Claudiu on 04-Apr-16.
  */
-public class RecomputeRouteAsyncTask extends AsyncTask<List<LatLng>, Void, Void> {
+public class RecomputeRouteAsyncTask extends AsyncTask<List, Void, Void> {
 
 	private float mZoom;
 	private RedrawCallback mRedrawCallback;
 
 	public RecomputeRouteAsyncTask(RedrawCallback redrawCallback, float zoom) {
-		if(redrawCallback == null)
+		if (redrawCallback == null)
 			throw new InvalidParameterException();
 
 		mRedrawCallback = redrawCallback;
@@ -25,8 +25,18 @@ public class RecomputeRouteAsyncTask extends AsyncTask<List<LatLng>, Void, Void>
 	}
 
 	@Override
-	protected Void doInBackground(List<LatLng>... params) {
-		List<CircleOptions> result = DirectionsAsyncTask.getWalkingDirections(params[0], mZoom);
+	protected Void doInBackground(List... params) {
+
+		List<CircleOptions> result;
+
+		try {
+			result = (List<CircleOptions>) DirectionsAsyncTask.getWalkingDirections(params[0], mZoom);
+		}
+		catch (ClassCastException e) {
+			e.printStackTrace();
+			return null;
+		}
+
 		mRedrawCallback.notifyRedraw(result);
 		return null;
 	}
