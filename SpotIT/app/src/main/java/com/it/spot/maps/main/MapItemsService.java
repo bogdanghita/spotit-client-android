@@ -1,4 +1,4 @@
-package com.it.spot.maps;
+package com.it.spot.maps.main;
 
 import android.content.Context;
 import android.util.Log;
@@ -17,6 +17,7 @@ import com.it.spot.events.RemoveMarkerEvent;
 import com.it.spot.events.RemoveRouteEvent;
 import com.it.spot.events.SetMarkerEvent;
 import com.it.spot.events.SpotsMapEvent;
+import com.it.spot.services.FileService;
 import com.it.spot.maps.directions.RouteData;
 import com.it.spot.services.PolygonUI;
 

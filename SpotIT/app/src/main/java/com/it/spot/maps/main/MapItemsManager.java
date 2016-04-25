@@ -1,4 +1,4 @@
-package com.it.spot.maps;
+package com.it.spot.maps.main;
 
 import com.it.spot.common.Constants;
 import com.it.spot.maps.directions.RouteData;

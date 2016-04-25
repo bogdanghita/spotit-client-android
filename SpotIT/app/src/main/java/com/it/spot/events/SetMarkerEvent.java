@@ -1,6 +1,6 @@
 package com.it.spot.events;
 
-import com.it.spot.maps.MapItemsService;
+import com.it.spot.maps.main.MapItemsService;
 import com.it.spot.maps.location.BasicLocation;
 
 /**

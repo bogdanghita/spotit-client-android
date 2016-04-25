@@ -1,4 +1,4 @@
-package com.it.spot.maps;
+package com.it.spot.maps.main;
 
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
@@ -9,9 +9,6 @@ import android.widget.TextView;
 import com.it.spot.R;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.events.MapItemsProvider;
-import com.it.spot.maps.MapItemsManager;
-import com.it.spot.maps.MarkerData;
-import com.it.spot.maps.UiController;
 import com.it.spot.maps.address.AddressAsyncTask;
 import com.it.spot.maps.address.AddressResponseListener;
 import com.it.spot.maps.location.BasicLocation;

@@ -2,7 +2,7 @@ package com.it.spot.common;
 
 import com.it.spot.events.EventManager;
 import com.it.spot.identity.IdentityManager;
-import com.it.spot.maps.MapItemsManager;
+import com.it.spot.maps.main.MapItemsManager;
 import com.it.spot.maps.location.LocationManager;
 
 /**
