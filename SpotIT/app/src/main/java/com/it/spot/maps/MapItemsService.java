@@ -33,6 +33,7 @@ import com.it.spot.maps.address.AddressResponseListener;
 import com.it.spot.maps.directions.DirectionsAsyncTask;
 import com.it.spot.maps.directions.DirectionsResultListener;
 import com.it.spot.maps.directions.RecomputeRouteAsyncTask;
+import com.it.spot.maps.directions.RedrawCallback;
 import com.it.spot.maps.directions.RouteData;
 import com.it.spot.maps.directions.RouteOptions;
 import com.it.spot.maps.distance_duration.DistanceDurationAsyncTask;
@@ -205,25 +206,61 @@ public class MapItemsService extends MapEventListener {
 
 		Log.d(Constants.EVENT + Constants.ITEMS, "notifyCameraChange()");
 
-		// Update zoom
-		mMapItemsManager.updateZoom(event.getZoom());
-
-		// TODO
-		redrawRouteToMarker();
-	}
-
-	// TODO: move this from here
-	public void redrawRouteToMarker() {
-
-		float zoom = mMapItemsManager.getZoom();
-		float oldZoom = mMapItemsManager.getOldZoom();
-
-		// Only redraw if the zoom has changed.
-		if (mRouteData == null || oldZoom == zoom) {
+		if (!mMapItemsManager.isRouteDisplayed()) {
 			return;
 		}
 
-		new RecomputeRouteAsyncTask(mRedrawCallback, zoom).execute(mRouteData.getRoutePoints());
+		// Nothing to do for driving directions
+		RouteData routeData = mMapItemsManager.getRouteData();
+		if (routeData == null || routeData.getRouteType() == RouteData.RouteType.DRIVING) {
+			return;
+		}
+
+		float zoom = event.getZoom();
+		float oldZoom = mMapItemsManager.getZoom();
+
+		// Only redraw if the zoom has changed.
+		if (oldZoom == zoom) {
+			return;
+		}
+
+		// Update zoom
+		mMapItemsManager.setZoom(zoom);
+
+		// Recompute and redraw circles
+		redrawRouteToMarker(zoom);
+	}
+
+	// TODO: move this from here
+	public void redrawRouteToMarker(float zoom) {
+
+		final RouteData routeData = mMapItemsManager.getRouteData();
+		if (routeData == null || routeData.getRoutePoints() == null) {
+			return;
+		}
+
+		RecomputeRouteAsyncTask computeTask = new RecomputeRouteAsyncTask(new RedrawCallback() {
+			@Override
+			public void notifyRedraw(List<CircleOptions> circleOptionsList) {
+
+				GoogleMap map = mMapItemsProvider.getMap();
+				if (map == null) {
+					return;
+				}
+
+				// Remove current circles
+				removeRoute(routeData);
+
+				// Set new circle options
+				routeData.setRouteCircleOptionsList(circleOptionsList);
+
+				// Add new circles
+				List<Circle> circles = addCircles(map, circleOptionsList);
+				mMapItemsManager.getRouteData().setRouteCircles(circles);
+			}
+		}, zoom);
+
+		computeTask.execute(routeData.getRoutePoints());
 	}
 
 // ------------------------------------------------------------------------------------------------
@@ -403,6 +440,11 @@ public class MapItemsService extends MapEventListener {
 			markerData.mMarker = addMarker(markerData.mMarkerOptions);
 		}
 
+		// Draw route only if it is displayed
+		if (!mMapItemsManager.isRouteDisplayed()) {
+			return;
+		}
+
 		// Redraw route
 		RouteData routeData = mMapItemsManager.getRouteData();
 		if (routeData != null && routeData.isDrawn()) {
@@ -548,7 +590,7 @@ public class MapItemsService extends MapEventListener {
 			// !!!!!    DRIVING    !!!!!
 			// !!!!!!!!!!!!!!!!!!!!!!!!!
 
-			// NOTE: DEBUG - Change this to walking to force walking route.
+			// TODO NOTE: DEBUG - Change this to walking to force walking route.
 			directions_mode = Constants.MODE_WALKING;
 		}
 

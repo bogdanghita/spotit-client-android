@@ -216,15 +216,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 				// TODO: DONE
 				// Updating the zoom and redrawing the route if necessary.
-//				locationRouteService.updateZoom(mMap.getCameraPosition().zoom);
+//				locationRouteService.setZoom(mMap.getCameraPosition().zoom);
 //				locationRouteService.redrawRouteToMarker();
 
 				// Trigger event
+				// TODO: the circles are also recomputed when requestMapStatusUpdate() (see below)
+				// TODO: i.e. se face de doua ori...
 				CameraChangeEvent event = new CameraChangeEvent(mMap.getCameraPosition().zoom);
 				mServiceManager.getEventManager().triggerEvent(event);
 
 				// Set camera position and request a map status update
 				mapUpdateService.setCameraPosition(cameraBounds);
+				// TODO: optimize this. request update only if needed (not for every tiny movement of the camera)
 				mapUpdateService.requestMapStatusUpdate();
 			}
 		});
