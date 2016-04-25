@@ -1,4 +1,4 @@
-package com.it.spot.maps.report;
+package com.it.spot.maps;
 
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;

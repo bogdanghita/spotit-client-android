@@ -36,7 +36,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.it.spot.R;
 import com.it.spot.events.BaseEvent;
 import com.it.spot.events.CameraChangeEvent;
@@ -93,7 +92,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private boolean mResolvingError = false;
 
 	private MapUpdateService mapUpdateService;
-//	private LocationRouteService locationRouteService;
+	private MapItemsService mapItemsService;
 
 	private Event onConnectedEvent, onMapReadyEvent;
 
@@ -120,19 +119,16 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		mResolvingError = savedInstanceState != null && savedInstanceState.getBoolean(Constants.STATE_RESOLVING_ERROR, false);
 
-		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
-//		locationRouteService = new LocationRouteService(this, routeUpdateCallbackClient);
+		createUserProfile();
 
-		// Subscribe map event listener
-		ServiceManager.getInstance().getEventManager().subscribe(new MapItemsService(this, this, this));
+		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
+		mapItemsService = new MapItemsService(this, this, this);
 
 		startStateMonitor();
 
 		buildGoogleApiClient();
 
 		createLocationRequest();
-
-		createUserProfile();
 	}
 
 	@Override
@@ -152,6 +148,12 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (!mResolvingError) {
 			mMapsGoogleApiClient.connect();
 		}
+
+		// Start executor service
+		mServiceManager.getEventManager().startExecutorService();
+
+		// Subscribe map event listener
+		ServiceManager.getInstance().getEventManager().subscribe(mapItemsService);
 	}
 
 	@Override
@@ -173,12 +175,19 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		super.onStop();
 
 		mMapsGoogleApiClient.disconnect();
+
+		// Unsubscribe map event listener
+		mServiceManager.getEventManager().unsubscribe(mapItemsService);
+
+		// Stop executor service
+		mServiceManager.getEventManager().stopExecutorService();
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 
+		mServiceManager.getEventManager().clear();
 	}
 
 	@Override
@@ -708,13 +717,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			return;
 		}
 
-		mServiceManager.getEventManager().triggerEvent(new SetMarkerEvent(lastLocation,
-				LocationRouteService.MarkerType.SAVED_SPOT));
-
 		// TODO: DONE
 
 		toggleSaveSpotButton();
 		toggleNavigationDrawer();
+
+		mServiceManager.getEventManager().triggerEvent(new SetMarkerEvent(lastLocation,
+				LocationRouteService.MarkerType.SAVED_SPOT));
 
 		// TODO AAA
 //		setDirectionsButtonIcon(false);
@@ -737,33 +746,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonLeaveSpot(View view) {
 
-		mServiceManager.getEventManager().triggerEvent(new RemoveMarkerEvent());
-
 		// TODO: DONE
 
 		toggleSaveSpotButton();
 		toggleNavigationDrawer();
+
+		mServiceManager.getEventManager().triggerEvent(new RemoveMarkerEvent());
 
 		// TODO AAA
 //		setDirectionsButtonIcon(false);
 //		mServiceManager.getMapItemsManager().setRouteDisplayed(false);
 		// TODO: here
 //		setLocationInfoBarTitle();
-	}
-
-	void toggleSaveSpotButton() {
-
-		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
-		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
-
-		if (mServiceManager.getMapItemsManager().hasSavedSpot()) {
-			buttonLeaveSpot.setVisibility(View.VISIBLE);
-			buttonSaveSpot.setVisibility(View.GONE);
-		}
-		else {
-			buttonLeaveSpot.setVisibility(View.GONE);
-			buttonSaveSpot.setVisibility(View.VISIBLE);
-		}
 	}
 
 	public void buttonHistory(View view) {
@@ -1027,15 +1021,46 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		SavedSpot savedSpot = new FileService(this).readSavedSpotFile(Constants.SAVED_SPOT_FILE);
 
-		if (savedSpot != null && savedSpot.hasSavedSpot) {
-			mServiceManager.getEventManager().triggerEvent(new SetMarkerEvent(savedSpot.location, LocationRouteService.MarkerType.SAVED_SPOT));
-		}
-
 		// TODO: DONE
+		setSaveSpotButton(savedSpot.hasSavedSpot);
 
-		toggleSaveSpotButton();
+//		toggleSaveSpotButton();
 		// TODO: here
 //		setLocationInfoBarTitle();
+
+		if (savedSpot.hasSavedSpot) {
+			mServiceManager.getEventManager().triggerEvent(new SetMarkerEvent(savedSpot.location, LocationRouteService.MarkerType.SAVED_SPOT));
+		}
+	}
+
+	private void setSaveSpotButton(boolean hasSavedSpot) {
+
+		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
+		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
+		if (hasSavedSpot) {
+			buttonLeaveSpot.setVisibility(View.VISIBLE);
+			buttonSaveSpot.setVisibility(View.GONE);
+		}
+		else {
+			buttonLeaveSpot.setVisibility(View.GONE);
+			buttonSaveSpot.setVisibility(View.VISIBLE);
+		}
+	}
+
+	void toggleSaveSpotButton() {
+
+		RelativeLayout buttonSaveSpot = (RelativeLayout) findViewById(R.id.item_save_spot);
+		RelativeLayout buttonLeaveSpot = (RelativeLayout) findViewById(R.id.item_leave_spot);
+
+//		if (mServiceManager.getMapItemsManager().hasSavedSpot()) {
+		if (buttonLeaveSpot.getVisibility() == View.GONE) {
+			buttonLeaveSpot.setVisibility(View.VISIBLE);
+			buttonSaveSpot.setVisibility(View.GONE);
+		}
+		else {
+			buttonLeaveSpot.setVisibility(View.GONE);
+			buttonSaveSpot.setVisibility(View.VISIBLE);
+		}
 	}
 
 	@Override

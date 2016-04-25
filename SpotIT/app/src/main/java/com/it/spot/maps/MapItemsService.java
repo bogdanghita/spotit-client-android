@@ -4,8 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.it.spot.common.Constants;
@@ -19,13 +17,9 @@ import com.it.spot.events.RemoveMarkerEvent;
 import com.it.spot.events.RemoveRouteEvent;
 import com.it.spot.events.SetMarkerEvent;
 import com.it.spot.events.SpotsMapEvent;
-import com.it.spot.maps.directions.RecomputeRouteAsyncTask;
-import com.it.spot.maps.directions.RedrawCallback;
 import com.it.spot.maps.directions.RouteData;
 import com.it.spot.maps.main.LocationRouteService;
 import com.it.spot.maps.main.SavedSpot;
-import com.it.spot.maps.report.MarkerLogic;
-import com.it.spot.maps.report.UiItemsController;
 import com.it.spot.services.PolygonUI;
 
 import java.util.List;
@@ -196,66 +190,8 @@ public class MapItemsService extends MapEventListener {
 		mMapItemsManager.setZoom(zoom);
 
 		// Update route to marker
-		updateRouteToMarker(zoom, oldZoom);
+		mRouteLogic.updateRouteToMarker(zoom, oldZoom);
 	}
-
-	// TODO: move this from here
-	private void updateRouteToMarker(float zoom, float oldZoom) {
-
-		// Nothing to do for driving directions
-		RouteData routeData = mMapItemsManager.getRouteData();
-		if (routeData == null || routeData.getRouteType() == RouteData.RouteType.DRIVING) {
-			return;
-		}
-
-		// Only redraw if the zoom has changed.
-		if (oldZoom == zoom) {
-			return;
-		}
-
-		// Recompute and redraw circles
-		redrawRouteToMarker(zoom);
-	}
-
-	// TODO: move this from here
-	private void redrawRouteToMarker(float zoom) {
-
-		final RouteData routeData = mMapItemsManager.getRouteData();
-		if (routeData == null || routeData.getRoutePoints() == null) {
-			return;
-		}
-
-		// Compute the new circles
-		RecomputeRouteAsyncTask computeTask = new RecomputeRouteAsyncTask(new RedrawCallback() {
-			@Override
-			public void notifyRedraw(List<CircleOptions> circleOptionsList) {
-
-				// Remove current circles
-				mRouteLogic.removeRoute(routeData);
-
-				// Set new circle options
-				routeData.setRouteCircleOptionsList(circleOptionsList);
-
-				// Draw the new circles only if the route is displayed
-				if (!mMapItemsManager.isRouteDisplayed()) {
-					return;
-				}
-
-				// Add new circles
-				GoogleMap map = mMapItemsProvider.getMap();
-				if (map != null) {
-					List<Circle> circles = mRouteLogic.addCircles(map, circleOptionsList);
-					mMapItemsManager.getRouteData().setRouteCircles(circles);
-				}
-			}
-		}, zoom);
-
-		computeTask.execute(routeData.getRoutePoints());
-	}
-
-// ------------------------------------------------------------------------------------------------
-// L R SERVICE
-// ------------------------------------------------------------------------------------------------
 
 	private void clearDirections() {
 
@@ -287,10 +223,6 @@ public class MapItemsService extends MapEventListener {
 		markerData.mMarkerLocation = null;
 		markerData.mMarkerOptions = null;
 	}
-
-// ------------------------------------------------------------------------------------------------
-// SPOT ITEMS
-// ------------------------------------------------------------------------------------------------
 
 	private void clearSpots() {
 
