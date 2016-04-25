@@ -3,7 +3,6 @@ package com.it.spot.maps;
 import com.it.spot.common.Constants;
 import com.it.spot.maps.directions.RouteData;
 import com.it.spot.maps.location.BasicLocation;
-import com.it.spot.maps.main.LocationRouteService;
 
 /**
  * Created by Bogdan on 22/04/2016.
@@ -32,7 +31,7 @@ public class MapItemsManager {
 	public boolean hasSavedSpot() {
 
 		return markerData != null &&
-				markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT;
+				markerData.markerType == MapItemsService.MarkerType.SAVED_SPOT;
 	}
 
 	public void setRouteDisplayed(boolean routeDisplayed) {

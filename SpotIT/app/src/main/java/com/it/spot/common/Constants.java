@@ -66,7 +66,7 @@ public class Constants {
 	public static final int COLOR_ERROR = Color.argb(255, 0, 0, 0);
 
 	public static final String SERVER_ADDRESS = "http://spot-it-app.com";
-	public static final int MAP_UPDATE_INTERVAL = 20 * 1000;
+	public static final int MAP_UPDATE_INTERVAL = 10 * 1000;
 	public static final int HTTP_UNAUTHORIZED = 401;
 
 	public static final String SAVED_SPOT_FILE = "saved_spot.json";

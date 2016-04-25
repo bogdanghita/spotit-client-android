@@ -15,7 +15,6 @@ import com.it.spot.maps.UiController;
 import com.it.spot.maps.address.AddressAsyncTask;
 import com.it.spot.maps.address.AddressResponseListener;
 import com.it.spot.maps.location.BasicLocation;
-import com.it.spot.maps.main.LocationRouteService;
 
 /**
  * Created by Bogdan on 25/04/2016.
@@ -86,10 +85,10 @@ public class UiItemsController {
 		else if (markerData == null) {
 			return;
 		}
-		else if (markerData.markerType == LocationRouteService.MarkerType.DESTINATION) {
+		else if (markerData.markerType == MapItemsService.MarkerType.DESTINATION) {
 			icon_id = R.drawable.ic_directions_car_white_24dp;
 		}
-		else if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
+		else if (markerData.markerType == MapItemsService.MarkerType.SAVED_SPOT) {
 			icon_id = R.drawable.ic_directions_walk_white_24dp;
 		}
 		else {
@@ -138,10 +137,10 @@ public class UiItemsController {
 			return;
 		}
 
-		if (markerData.markerType == LocationRouteService.MarkerType.DESTINATION) {
+		if (markerData.markerType == MapItemsService.MarkerType.DESTINATION) {
 			text = mContext.getResources().getString(R.string.location_info_bar_title_destination);
 		}
-		else if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
+		else if (markerData.markerType == MapItemsService.MarkerType.SAVED_SPOT) {
 			text = mContext.getString(R.string.location_info_bar_title_saved_spot);
 		}
 		else {

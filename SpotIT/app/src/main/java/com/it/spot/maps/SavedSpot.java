@@ -1,4 +1,4 @@
-package com.it.spot.maps.main;
+package com.it.spot.maps;
 
 import com.it.spot.maps.location.BasicLocation;
 

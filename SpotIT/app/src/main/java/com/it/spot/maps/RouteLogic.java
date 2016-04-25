@@ -25,7 +25,6 @@ import com.it.spot.maps.distance_duration.DistanceDurationOptions;
 import com.it.spot.maps.distance_duration.DistanceDurationResponseListener;
 import com.it.spot.maps.location.BasicLocation;
 import com.it.spot.maps.location.LocationManager;
-import com.it.spot.maps.main.LocationRouteService;
 import com.it.spot.threading.Event;
 
 import java.util.ArrayList;
@@ -54,7 +53,7 @@ public class RouteLogic {
 	public void populateDirections() {
 
 		MarkerData markerData = mMapItemsManager.getMarkerData();
-		if (markerData.markerType == LocationRouteService.MarkerType.NONE || markerData.mMarkerLocation == null) {
+		if (markerData.markerType == MapItemsService.MarkerType.NONE || markerData.mMarkerLocation == null) {
 			return;
 		}
 
@@ -78,7 +77,7 @@ public class RouteLogic {
 		float zoom = mMapItemsManager.getZoom();
 
 		String directions_mode;
-		if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
+		if (markerData.markerType == MapItemsService.MarkerType.SAVED_SPOT) {
 			directions_mode = Constants.MODE_WALKING;
 		}
 		else {
@@ -88,7 +87,7 @@ public class RouteLogic {
 			// !!!!!!!!!!!!!!!!!!!!!!!!!
 
 			// TODO NOTE: DEBUG - Change this to walking to force walking route.
-			directions_mode = Constants.MODE_WALKING;
+			directions_mode = Constants.MODE_DRIVING;
 		}
 
 		// Perform call to get directions
