@@ -1,22 +1,13 @@
 package com.it.spot.maps;
 
 import android.content.Context;
-import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.events.CameraChangeEvent;
@@ -28,26 +19,15 @@ import com.it.spot.events.RemoveMarkerEvent;
 import com.it.spot.events.RemoveRouteEvent;
 import com.it.spot.events.SetMarkerEvent;
 import com.it.spot.events.SpotsMapEvent;
-import com.it.spot.maps.address.AddressAsyncTask;
-import com.it.spot.maps.address.AddressResponseListener;
-import com.it.spot.maps.directions.DirectionsAsyncTask;
-import com.it.spot.maps.directions.DirectionsResultListener;
 import com.it.spot.maps.directions.RecomputeRouteAsyncTask;
 import com.it.spot.maps.directions.RedrawCallback;
 import com.it.spot.maps.directions.RouteData;
-import com.it.spot.maps.directions.RouteOptions;
-import com.it.spot.maps.distance_duration.DistanceDurationAsyncTask;
-import com.it.spot.maps.distance_duration.DistanceDurationData;
-import com.it.spot.maps.distance_duration.DistanceDurationOptions;
-import com.it.spot.maps.distance_duration.DistanceDurationResponseListener;
-import com.it.spot.maps.location.BasicLocation;
-import com.it.spot.maps.location.LocationManager;
 import com.it.spot.maps.main.LocationRouteService;
 import com.it.spot.maps.main.SavedSpot;
+import com.it.spot.maps.report.MarkerLogic;
+import com.it.spot.maps.report.UiItemsController;
 import com.it.spot.services.PolygonUI;
-import com.it.spot.threading.Event;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,27 +35,30 @@ import java.util.List;
  */
 public class MapItemsService extends MapEventListener {
 
-	private Context mContext;
-
 	private MapItemsManager mMapItemsManager;
-
 	private FileService mFileService;
 
 	private MapItemsProvider mMapItemsProvider;
-
 	private UiController mUiController;
 
-	private LocationManager mLocationManager;
+	private UiItemsController mUiItemsController;
+
+	private RouteLogic mRouteLogic;
+	private MarkerLogic mMarkerLogic;
 
 	public MapItemsService(Context context, MapItemsProvider mapItemsProvider, UiController uiController) {
-		this.mContext = context;
+
 		mMapItemsProvider = mapItemsProvider;
 
 		mFileService = new FileService(context);
 		mMapItemsManager = ServiceManager.getInstance().getMapItemsManager();
-		mLocationManager = ServiceManager.getInstance().getLocationManager();
 
 		mUiController = uiController;
+
+		mUiItemsController = new UiItemsController(context, mapItemsProvider, uiController);
+
+		mRouteLogic = new RouteLogic(mapItemsProvider, uiController);
+		mMarkerLogic = new MarkerLogic(mapItemsProvider, uiController, mUiItemsController);
 	}
 
 	@Override
@@ -112,14 +95,14 @@ public class MapItemsService extends MapEventListener {
 
 		// Mark that the route is no displayed & set corresponding icon
 		mMapItemsManager.setRouteDisplayed(false);
-		setDirectionsButtonIcon(false);
+		mUiItemsController.setDirectionsButtonIcon(false);
 
 		clearDirections();
 
-		drawMarker();
+		mMarkerLogic.drawMarker();
 
 		// Perform call to get directions. When result is ready, directions will be populated
-		populateDirections();
+		mRouteLogic.populateDirections();
 	}
 
 	@Override
@@ -128,7 +111,7 @@ public class MapItemsService extends MapEventListener {
 		Log.d(Constants.EVENT + Constants.ITEMS, "notifyRemoveMarker()");
 
 		// Close location info bar first
-		closeLocationInfoBar();
+		mUiItemsController.closeLocationInfoBar();
 
 		// Mark that the route is not displayed
 		mMapItemsManager.setRouteDisplayed(false);
@@ -158,11 +141,11 @@ public class MapItemsService extends MapEventListener {
 
 		// Mark that we have displayed the route & set corresponding icon
 		mMapItemsManager.setRouteDisplayed(true);
-		setDirectionsButtonIcon(true);
+		mUiItemsController.setDirectionsButtonIcon(true);
 
 		RouteData routeData = mMapItemsManager.getRouteData();
 		if (routeData != null) {
-			drawRoute(routeData);
+			mRouteLogic.drawRoute(routeData);
 		}
 	}
 
@@ -173,7 +156,7 @@ public class MapItemsService extends MapEventListener {
 
 		// Mark that the route is not displayed & set corresponding icon
 		mMapItemsManager.setRouteDisplayed(false);
-		setDirectionsButtonIcon(false);
+		mUiItemsController.setDirectionsButtonIcon(false);
 
 		RouteData routeData = mMapItemsManager.getRouteData();
 		if (routeData == null) {
@@ -181,7 +164,7 @@ public class MapItemsService extends MapEventListener {
 		}
 
 		if (routeData.isDrawn()) {
-			removeRoute(routeData);
+			mRouteLogic.removeRoute(routeData);
 		}
 	}
 
@@ -248,7 +231,7 @@ public class MapItemsService extends MapEventListener {
 			public void notifyRedraw(List<CircleOptions> circleOptionsList) {
 
 				// Remove current circles
-				removeRoute(routeData);
+				mRouteLogic.removeRoute(routeData);
 
 				// Set new circle options
 				routeData.setRouteCircleOptionsList(circleOptionsList);
@@ -261,7 +244,7 @@ public class MapItemsService extends MapEventListener {
 				// Add new circles
 				GoogleMap map = mMapItemsProvider.getMap();
 				if (map != null) {
-					List<Circle> circles = addCircles(map, circleOptionsList);
+					List<Circle> circles = mRouteLogic.addCircles(map, circleOptionsList);
 					mMapItemsManager.getRouteData().setRouteCircles(circles);
 				}
 			}
@@ -282,7 +265,7 @@ public class MapItemsService extends MapEventListener {
 		}
 
 		if (routeData.isDrawn()) {
-			removeRoute(routeData);
+			mRouteLogic.removeRoute(routeData);
 		}
 
 		routeData.clearRoute();
@@ -297,134 +280,12 @@ public class MapItemsService extends MapEventListener {
 		}
 
 		if (markerData.mMarker != null) {
-			removeMarker(markerData.mMarker);
+			mMarkerLogic.removeMarker(markerData.mMarker);
 		}
 
 		markerData.mMarker = null;
 		markerData.mMarkerLocation = null;
 		markerData.mMarkerOptions = null;
-	}
-
-// ------------------------------------------------------------------------------------------------
-// GUI ITEMS
-// ------------------------------------------------------------------------------------------------
-
-	private void openLocationInfoBar(final BasicLocation location) {
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-
-				// Clear items first (useful when location info bar was not closed)
-				clearLocationInfoBarItems();
-
-				LinearLayout bottom_layout = (LinearLayout) mMapItemsProvider.getView(R.id.location_info_bar);
-				View directions_fab = mMapItemsProvider.getView(R.id.directions_fab);
-
-				bottom_layout.setTranslationY(0);
-				directions_fab.setVisibility(View.VISIBLE);
-
-				AddressAsyncTask addressAsyncTask = new AddressAsyncTask(addressResponseListener);
-				addressAsyncTask.execute(location);
-
-				// Set appropriate title
-				setLocationInfoBarTitle();
-			}
-		});
-	}
-
-	private void closeLocationInfoBar() {
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-
-				LinearLayout bottom_layout = (LinearLayout) mMapItemsProvider.getView(R.id.location_info_bar);
-				View directions_fab = mMapItemsProvider.getView(R.id.directions_fab);
-
-				bottom_layout.setTranslationY(bottom_layout.getHeight());
-				directions_fab.setVisibility(View.INVISIBLE);
-
-				clearLocationInfoBarItems();
-			}
-		});
-	}
-
-	private void setLocationInfoBarTitle() {
-
-		final String text;
-
-		MarkerData markerData = mMapItemsManager.getMarkerData();
-		if (markerData == null) {
-			return;
-		}
-
-		if (markerData.markerType == LocationRouteService.MarkerType.DESTINATION) {
-			text = mContext.getResources().getString(R.string.location_info_bar_title_destination);
-		}
-		else if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
-			text = mContext.getString(R.string.location_info_bar_title_saved_spot);
-		}
-		else {
-			text = "";
-		}
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				TextView tv = (TextView) mMapItemsProvider.getView(R.id.location_title);
-				tv.setText(text);
-			}
-		});
-	}
-
-	private void clearLocationInfoBarItems() {
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-
-				TextView locationTitle = (TextView) mMapItemsProvider.getView(R.id.location_title);
-				locationTitle.setText("");
-
-				TextView locationAddress = (TextView) mMapItemsProvider.getView(R.id.location_address);
-				locationAddress.setText("");
-
-				TextView destinationTime = (TextView) mMapItemsProvider.getView(R.id.destination_time);
-				destinationTime.setText("");
-			}
-		});
-	}
-
-	private void setDirectionsButtonIcon(boolean iconClosed) {
-
-		final int icon_id;
-
-		MarkerData markerData = mMapItemsManager.getMarkerData();
-
-		if (iconClosed) {
-			icon_id = R.drawable.ic_close_white_24dp;
-		}
-		else if (markerData == null) {
-			return;
-		}
-		else if (markerData.markerType == LocationRouteService.MarkerType.DESTINATION) {
-			icon_id = R.drawable.ic_directions_car_white_24dp;
-		}
-		else if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
-			icon_id = R.drawable.ic_directions_walk_white_24dp;
-		}
-		else {
-			return;
-		}
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				FloatingActionButton fab = (FloatingActionButton) mMapItemsProvider.getView(R.id.directions_fab);
-				fab.setImageDrawable(mContext.getResources().getDrawable(icon_id));
-			}
-		});
 	}
 
 // ------------------------------------------------------------------------------------------------
@@ -449,7 +310,7 @@ public class MapItemsService extends MapEventListener {
 		// Redraw marker
 		MarkerData markerData = mMapItemsManager.getMarkerData();
 		if (markerData != null && markerData.mMarkerOptions != null) {
-			markerData.mMarker = addMarker(markerData.mMarkerOptions);
+			markerData.mMarker = mMarkerLogic.addMarker(markerData.mMarkerOptions);
 		}
 
 		// Draw route only if it is displayed
@@ -460,7 +321,7 @@ public class MapItemsService extends MapEventListener {
 		// Redraw route
 		RouteData routeData = mMapItemsManager.getRouteData();
 		if (routeData != null && routeData.isDrawn()) {
-			drawRoute(routeData);
+			mRouteLogic.drawRoute(routeData);
 		}
 	}
 
@@ -490,296 +351,4 @@ public class MapItemsService extends MapEventListener {
 				.strokeWidth(0)
 				.fillColor(color));
 	}
-
-// ------------------------------------------------------------------------------------------------
-// MARKER
-// ------------------------------------------------------------------------------------------------
-
-	private void drawMarker() {
-
-		MarkerData markerData = mMapItemsManager.getMarkerData();
-		if (markerData == null) {
-			return;
-		}
-
-		if (markerData.mMarker != null) {
-			removeMarker(markerData.mMarker);
-		}
-
-		if (markerData.mMarkerLocation == null) {
-			return;
-		}
-
-		LatLng point = new LatLng(markerData.mMarkerLocation.getLatitude(), markerData.mMarkerLocation.getLongitude());
-
-		// Open location info bar only if marker data is OK
-		openLocationInfoBar(new BasicLocation(point.latitude, point.longitude));
-
-		// Draw marker
-		MarkerOptions markerOptions = new MarkerOptions().position(point);
-		markerData.mMarkerOptions = markerOptions;
-		markerData.mMarker = addMarker(markerOptions);
-	}
-
-	private Marker addMarker(final MarkerOptions markerOptions) {
-
-		final GoogleMap map = mMapItemsProvider.getMap();
-		if (map == null || markerOptions == null) {
-			return null;
-		}
-
-		final Marker[] marker = new Marker[1];
-		final Event eventHandler = new Event();
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-
-				marker[0] = map.addMarker(markerOptions);
-				eventHandler.set();
-			}
-		});
-
-		try {
-			eventHandler.doWait();
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be added.");
-		}
-
-		return marker[0];
-	}
-
-	private void removeMarker(final Marker marker) {
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				marker.remove();
-			}
-		});
-	}
-
-// ------------------------------------------------------------------------------------------------
-// ROUTE
-// ------------------------------------------------------------------------------------------------
-
-	// <THIS>
-	private void populateDirections() {
-
-		MarkerData markerData = mMapItemsManager.getMarkerData();
-		if (markerData.markerType == LocationRouteService.MarkerType.NONE || markerData.mMarkerLocation == null) {
-			return;
-		}
-
-		BasicLocation lastLocation = mLocationManager.getLastLocation();
-		if (lastLocation == null) {
-			return;
-		}
-
-		// Checking if this is the same route as the last one
-		if (mMapItemsManager.isRouteDisplayed() && checkSameRoute(lastLocation, markerData.mMarkerLocation)) {
-			return;
-		}
-
-		// Set last directions source and destination
-		mMapItemsManager.setLastDirectionsSource(lastLocation.clone());
-		mMapItemsManager.setLastDirectionsDestination(markerData.mMarkerLocation.clone());
-
-		// Get route params
-		LatLng source = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-		LatLng destination = new LatLng(markerData.mMarkerLocation.getLatitude(), markerData.mMarkerLocation.getLongitude());
-		float zoom = mMapItemsManager.getZoom();
-
-		String directions_mode;
-		if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
-			directions_mode = Constants.MODE_WALKING;
-		}
-		else {
-			// If anyone but Claudiu, ignore this.
-			// !!!!!!!!!!!!!!!!!!!!!!!!!
-			// !!!!!    DRIVING    !!!!!
-			// !!!!!!!!!!!!!!!!!!!!!!!!!
-
-			// TODO NOTE: DEBUG - Change this to walking to force walking route.
-			directions_mode = Constants.MODE_WALKING;
-		}
-
-		// Perform call to get directions
-		DirectionsAsyncTask directions = new DirectionsAsyncTask(directionsListener);
-		directions.execute(new RouteOptions(source, destination, directions_mode, zoom));
-
-		// Get distance and duration
-		DistanceDurationAsyncTask distanceDurationAsyncTask = new DistanceDurationAsyncTask(distanceDurationResponseListener);
-		distanceDurationAsyncTask.execute(new DistanceDurationOptions(source, destination, directions_mode));
-	}
-
-	private boolean checkSameRoute(BasicLocation source, BasicLocation destination) {
-
-		BasicLocation lastDirectionsSource = mMapItemsManager.getLastDirectionsSource();
-		BasicLocation lastDirectionsDestination = mMapItemsManager.getLastDirectionsDestination();
-
-		if (lastDirectionsSource == null || lastDirectionsDestination == null) {
-			return false;
-		}
-
-		return !(source.equals(lastDirectionsSource) && destination.equals(lastDirectionsDestination));
-	}
-	// </THIS>
-
-	private void drawRoute(RouteData routeData) {
-
-		if (routeData == null) {
-			return;
-		}
-
-		GoogleMap map = mMapItemsProvider.getMap();
-		if (map == null) {
-			return;
-		}
-
-		switch (routeData.getRouteType()) {
-			case DRIVING:
-
-				List<PolylineOptions> polylineOptions = routeData.getRoutePolylineOptionsList();
-				if (polylineOptions != null) {
-					List<Polyline> polylines = addPolylines(map, polylineOptions);
-					mMapItemsManager.getRouteData().setRoutePolylines(polylines);
-				}
-
-				break;
-			case WALKING:
-
-				List<CircleOptions> circleOptions = routeData.getRouteCircleOptionsList();
-				if (circleOptions != null) {
-					List<Circle> circles = addCircles(map, circleOptions);
-					mMapItemsManager.getRouteData().setRouteCircles(circles);
-				}
-
-				break;
-		}
-	}
-
-	private List<Polyline> addPolylines(final GoogleMap map, final List<PolylineOptions> polylineOptionsList) {
-
-		final List<Polyline> polylines = new ArrayList<>();
-
-		final Event eventHandler = new Event();
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-
-				for (PolylineOptions polylineOptions : polylineOptionsList) {
-					polylines.add(map.addPolyline(polylineOptions));
-				}
-				eventHandler.set();
-			}
-		});
-
-		try {
-			eventHandler.doWait();
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be added.");
-		}
-
-		return polylines;
-	}
-
-	private List<Circle> addCircles(final GoogleMap map, final List<CircleOptions> circleOptionsList) {
-
-		final List<Circle> circles = new ArrayList<>();
-
-		final Event eventHandler = new Event();
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-
-				for (CircleOptions circleOptions : circleOptionsList) {
-					circles.add(map.addCircle(circleOptions));
-				}
-				eventHandler.set();
-			}
-		});
-
-		try {
-			eventHandler.doWait();
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be added.");
-		}
-
-		return circles;
-	}
-
-	private void removeRoute(final RouteData routeData) {
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				switch (routeData.getRouteType()) {
-					case DRIVING:
-						for (Polyline polyline : routeData.getRoutePolylines()) {
-							polyline.remove();
-						}
-						break;
-					case WALKING:
-						for (Circle circle : routeData.getRouteCircles()) {
-							circle.remove();
-						}
-						break;
-				}
-			}
-		});
-	}
-
-// ------------------------------------------------------------------------------------------------
-// GOOGLE CALLBACK LISTENERS
-// ------------------------------------------------------------------------------------------------
-
-	private AddressResponseListener addressResponseListener = new AddressResponseListener() {
-		@Override
-		public void notifyAddressResponse(final String address) {
-
-			mUiController.doRunOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					TextView locationAddress = (TextView) mMapItemsProvider.getView(R.id.location_address);
-					locationAddress.setText(address);
-				}
-			});
-		}
-	};
-
-	private DirectionsResultListener directionsListener = new DirectionsResultListener() {
-		@Override
-		public void notifyDirectionsResponse(RouteData routeData) {
-			// Set route data
-			mMapItemsManager.setRouteData(routeData);
-
-			// Draw route if the user already clicked on the directions button
-			if (mMapItemsManager.isRouteDisplayed()) {
-				drawRoute(routeData);
-			}
-		}
-	};
-
-	private DistanceDurationResponseListener distanceDurationResponseListener = new DistanceDurationResponseListener() {
-		@Override
-		public void notifyAddressResponse(final DistanceDurationData distanceDurationData) {
-
-			mUiController.doRunOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					TextView destinationTime = (TextView) mMapItemsProvider.getView(R.id.destination_time);
-					destinationTime.setText(distanceDurationData.getDuration());
-				}
-			});
-		}
-	};
 }
