@@ -206,9 +206,18 @@ public class MapItemsService extends MapEventListener {
 
 		Log.d(Constants.EVENT + Constants.ITEMS, "notifyCameraChange()");
 
-		if (!mMapItemsManager.isRouteDisplayed()) {
-			return;
-		}
+		float zoom = event.getZoom();
+		float oldZoom = mMapItemsManager.getZoom();
+
+		// Update zoom
+		mMapItemsManager.setZoom(zoom);
+
+		// Update route to marker
+		updateRouteToMarker(zoom, oldZoom);
+	}
+
+	// TODO: move this from here
+	private void updateRouteToMarker(float zoom, float oldZoom) {
 
 		// Nothing to do for driving directions
 		RouteData routeData = mMapItemsManager.getRouteData();
@@ -216,37 +225,27 @@ public class MapItemsService extends MapEventListener {
 			return;
 		}
 
-		float zoom = event.getZoom();
-		float oldZoom = mMapItemsManager.getZoom();
-
 		// Only redraw if the zoom has changed.
 		if (oldZoom == zoom) {
 			return;
 		}
-
-		// Update zoom
-		mMapItemsManager.setZoom(zoom);
 
 		// Recompute and redraw circles
 		redrawRouteToMarker(zoom);
 	}
 
 	// TODO: move this from here
-	public void redrawRouteToMarker(float zoom) {
+	private void redrawRouteToMarker(float zoom) {
 
 		final RouteData routeData = mMapItemsManager.getRouteData();
 		if (routeData == null || routeData.getRoutePoints() == null) {
 			return;
 		}
 
+		// Compute the new circles
 		RecomputeRouteAsyncTask computeTask = new RecomputeRouteAsyncTask(new RedrawCallback() {
 			@Override
 			public void notifyRedraw(List<CircleOptions> circleOptionsList) {
-
-				GoogleMap map = mMapItemsProvider.getMap();
-				if (map == null) {
-					return;
-				}
 
 				// Remove current circles
 				removeRoute(routeData);
@@ -254,9 +253,17 @@ public class MapItemsService extends MapEventListener {
 				// Set new circle options
 				routeData.setRouteCircleOptionsList(circleOptionsList);
 
+				// Draw the new circles only if the route is displayed
+				if (!mMapItemsManager.isRouteDisplayed()) {
+					return;
+				}
+
 				// Add new circles
-				List<Circle> circles = addCircles(map, circleOptionsList);
-				mMapItemsManager.getRouteData().setRouteCircles(circles);
+				GoogleMap map = mMapItemsProvider.getMap();
+				if (map != null) {
+					List<Circle> circles = addCircles(map, circleOptionsList);
+					mMapItemsManager.getRouteData().setRouteCircles(circles);
+				}
 			}
 		}, zoom);
 
@@ -426,13 +433,18 @@ public class MapItemsService extends MapEventListener {
 
 	private void clearSpots() {
 
-		GoogleMap map = mMapItemsProvider.getMap();
+		final GoogleMap map = mMapItemsProvider.getMap();
 		if (map == null) {
 			return;
 		}
 
 		// Clear all map items
-		map.clear();
+		mUiController.doRunOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				map.clear();
+			}
+		});
 
 		// Redraw marker
 		MarkerData markerData = mMapItemsManager.getMarkerData();
