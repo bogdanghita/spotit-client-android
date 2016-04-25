@@ -258,16 +258,21 @@ public class MapItemsService extends MapEventListener {
 		}
 	}
 
-	private void drawSpots(List<PolygonUI> polygons) {
+	private void drawSpots(final List<PolygonUI> polygons) {
 
-		GoogleMap map = mMapItemsProvider.getMap();
+		final GoogleMap map = mMapItemsProvider.getMap();
 		if (map == null) {
 			return;
 		}
 
-		for (PolygonUI polygon : polygons) {
-			drawPolygon(map, polygon.getPoints(), polygon.getColor());
-		}
+		mUiController.doRunOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				for (PolygonUI polygon : polygons) {
+					drawPolygon(map, polygon.getPoints(), polygon.getColor());
+				}
+			}
+		});
 	}
 
 	private void drawPolygon(GoogleMap map, Iterable<LatLng> points, int color) {
