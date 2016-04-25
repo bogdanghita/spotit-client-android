@@ -1,10 +1,11 @@
-package com.it.spot.maps;
+package com.it.spot.services;
 
 import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.it.spot.common.Constants;
+import com.it.spot.maps.main.SavedSpot;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

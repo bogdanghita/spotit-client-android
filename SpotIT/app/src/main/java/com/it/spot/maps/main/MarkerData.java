@@ -1,4 +1,4 @@
-package com.it.spot.maps;
+package com.it.spot.maps.main;
 
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
