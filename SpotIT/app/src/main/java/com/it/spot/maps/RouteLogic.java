@@ -15,6 +15,8 @@ import com.it.spot.common.ServiceManager;
 import com.it.spot.events.MapItemsProvider;
 import com.it.spot.maps.directions.DirectionsAsyncTask;
 import com.it.spot.maps.directions.DirectionsResultListener;
+import com.it.spot.maps.directions.RecomputeRouteAsyncTask;
+import com.it.spot.maps.directions.RedrawCallback;
 import com.it.spot.maps.directions.RouteData;
 import com.it.spot.maps.directions.RouteOptions;
 import com.it.spot.maps.distance_duration.DistanceDurationAsyncTask;
@@ -49,7 +51,6 @@ public class RouteLogic {
 		mLocationManager = ServiceManager.getInstance().getLocationManager();
 	}
 
-	// <THIS>
 	public void populateDirections() {
 
 		MarkerData markerData = mMapItemsManager.getMarkerData();
@@ -110,7 +111,62 @@ public class RouteLogic {
 
 		return !(source.equals(lastDirectionsSource) && destination.equals(lastDirectionsDestination));
 	}
-	// </THIS>
+
+	public void updateRouteToMarker(float zoom, float oldZoom) {
+
+		// Nothing to do for driving directions
+		RouteData routeData = mMapItemsManager.getRouteData();
+		if (routeData == null || routeData.getRouteType() == RouteData.RouteType.DRIVING) {
+			return;
+		}
+
+		// Only redraw if the zoom has changed.
+		if (oldZoom == zoom) {
+			return;
+		}
+
+		// Recompute and redraw circles
+		redrawRouteToMarker(zoom);
+	}
+
+	private void redrawRouteToMarker(float zoom) {
+
+		final RouteData routeData = mMapItemsManager.getRouteData();
+		if (routeData == null || routeData.getRoutePoints() == null) {
+			return;
+		}
+
+		// Compute the new circles
+		RecomputeRouteAsyncTask computeTask = new RecomputeRouteAsyncTask(new RedrawCallback() {
+			@Override
+			public void notifyRedraw(List<CircleOptions> circleOptionsList) {
+
+				// Remove current circles
+				removeRoute(routeData);
+
+				// Set new circle options
+				routeData.setRouteCircleOptionsList(circleOptionsList);
+
+				// Draw the new circles only if the route is displayed
+				if (!mMapItemsManager.isRouteDisplayed()) {
+					return;
+				}
+
+				// Add new circles
+				GoogleMap map = mMapItemsProvider.getMap();
+				if (map != null) {
+					List<Circle> circles = addCircles(map, circleOptionsList);
+					mMapItemsManager.getRouteData().setRouteCircles(circles);
+				}
+			}
+		}, zoom);
+
+		computeTask.execute(routeData.getRoutePoints());
+	}
+
+// ------------------------------------------------------------------------------------------------
+// UI ACTIONS
+// ------------------------------------------------------------------------------------------------
 
 	public void drawRoute(RouteData routeData) {
 
@@ -167,13 +223,13 @@ public class RouteLogic {
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
-			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be added.");
+			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for polylines to be added.");
 		}
 
 		return polylines;
 	}
 
-	public List<Circle> addCircles(final GoogleMap map, final List<CircleOptions> circleOptionsList) {
+	private List<Circle> addCircles(final GoogleMap map, final List<CircleOptions> circleOptionsList) {
 
 		final List<Circle> circles = new ArrayList<>();
 
@@ -195,7 +251,7 @@ public class RouteLogic {
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
-			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be added.");
+			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for circles to be added.");
 		}
 
 		return circles;
@@ -203,23 +259,40 @@ public class RouteLogic {
 
 	public void removeRoute(final RouteData routeData) {
 
+		final Event eventHandler = new Event();
+
 		mUiController.doRunOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+
 				switch (routeData.getRouteType()) {
 					case DRIVING:
-						for (Polyline polyline : routeData.getRoutePolylines()) {
-							polyline.remove();
+						if (routeData.getRoutePolylines() != null) {
+							for (Polyline polyline : routeData.getRoutePolylines()) {
+								polyline.remove();
+							}
 						}
 						break;
 					case WALKING:
-						for (Circle circle : routeData.getRouteCircles()) {
-							circle.remove();
+						if (routeData.getRouteCircles() != null) {
+							for (Circle circle : routeData.getRouteCircles()) {
+								circle.remove();
+							}
 						}
 						break;
 				}
+
+				eventHandler.set();
 			}
 		});
+
+		try {
+			eventHandler.doWait();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for route to be removed.");
+		}
 	}
 
 // ------------------------------------------------------------------------------------------------

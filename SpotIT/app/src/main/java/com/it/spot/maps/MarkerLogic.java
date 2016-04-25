@@ -1,4 +1,4 @@
-package com.it.spot.maps.report;
+package com.it.spot.maps;
 
 import android.util.Log;
 import android.widget.TextView;
@@ -11,9 +11,6 @@ import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.events.MapItemsProvider;
-import com.it.spot.maps.MapItemsManager;
-import com.it.spot.maps.MarkerData;
-import com.it.spot.maps.UiController;
 import com.it.spot.maps.address.AddressResponseListener;
 import com.it.spot.maps.location.BasicLocation;
 import com.it.spot.threading.Event;
@@ -98,12 +95,23 @@ public class MarkerLogic {
 
 	public void removeMarker(final Marker marker) {
 
+		final Event eventHandler = new Event();
+
 		mUiController.doRunOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				marker.remove();
+				eventHandler.set();
 			}
 		});
+
+		try {
+			eventHandler.doWait();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for marker to be removed.");
+		}
 	}
 
 // ------------------------------------------------------------------------------------------------
