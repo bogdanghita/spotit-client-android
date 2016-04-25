@@ -1,7 +1,7 @@
 package com.it.spot.events;
 
+import com.it.spot.maps.MapItemsService;
 import com.it.spot.maps.location.BasicLocation;
-import com.it.spot.maps.main.LocationRouteService;
 
 /**
  * Created by Bogdan on 19/04/2016.
@@ -9,9 +9,9 @@ import com.it.spot.maps.main.LocationRouteService;
 public class SetMarkerEvent extends BaseEvent {
 
 	private BasicLocation location;
-	private LocationRouteService.MarkerType markerType;
+	private MapItemsService.MarkerType markerType;
 
-	public SetMarkerEvent(BasicLocation location, LocationRouteService.MarkerType markerType) {
+	public SetMarkerEvent(BasicLocation location, MapItemsService.MarkerType markerType) {
 		super(EventManager.EventType.MAP_LISTENER);
 
 		this.location = location;
@@ -22,7 +22,7 @@ public class SetMarkerEvent extends BaseEvent {
 		return location;
 	}
 
-	public LocationRouteService.MarkerType getMarkerType() {
+	public MapItemsService.MarkerType getMarkerType() {
 		return markerType;
 	}
 }

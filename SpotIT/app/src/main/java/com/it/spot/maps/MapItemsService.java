@@ -18,8 +18,6 @@ import com.it.spot.events.RemoveRouteEvent;
 import com.it.spot.events.SetMarkerEvent;
 import com.it.spot.events.SpotsMapEvent;
 import com.it.spot.maps.directions.RouteData;
-import com.it.spot.maps.main.LocationRouteService;
-import com.it.spot.maps.main.SavedSpot;
 import com.it.spot.services.PolygonUI;
 
 import java.util.List;
@@ -28,6 +26,8 @@ import java.util.List;
  * Created by Bogdan on 22/04/2016.
  */
 public class MapItemsService extends MapEventListener {
+
+	public enum MarkerType {SAVED_SPOT, DESTINATION, NONE}
 
 	private MapItemsManager mMapItemsManager;
 	private FileService mFileService;
@@ -69,7 +69,7 @@ public class MapItemsService extends MapEventListener {
 		switch (event.getMarkerType()) {
 			case SAVED_SPOT:
 
-				markerData.markerType = LocationRouteService.MarkerType.SAVED_SPOT;
+				markerData.markerType = MarkerType.SAVED_SPOT;
 				markerData.mMarkerLocation = event.getLocation();
 
 				SavedSpot spot = new SavedSpot(true, event.getLocation());
@@ -78,7 +78,7 @@ public class MapItemsService extends MapEventListener {
 				break;
 			case DESTINATION:
 
-				markerData.markerType = LocationRouteService.MarkerType.DESTINATION;
+				markerData.markerType = MarkerType.DESTINATION;
 				markerData.mMarkerLocation = event.getLocation();
 
 				break;
@@ -116,11 +116,11 @@ public class MapItemsService extends MapEventListener {
 		}
 
 		// Clear saved spot file
-		if (markerData.markerType == LocationRouteService.MarkerType.SAVED_SPOT) {
+		if (markerData.markerType == MarkerType.SAVED_SPOT) {
 			mFileService.writeSavedSpotFile(new SavedSpot(false, null), Constants.SAVED_SPOT_FILE);
 		}
 
-		markerData.markerType = LocationRouteService.MarkerType.NONE;
+		markerData.markerType = MarkerType.NONE;
 
 		clearDirections();
 
