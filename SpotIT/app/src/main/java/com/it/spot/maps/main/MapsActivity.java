@@ -278,6 +278,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		SavedSpot savedSpot = new FileService(this).readSavedSpotFile(Constants.SAVED_SPOT_FILE);
 
+		if (savedSpot == null) {
+			savedSpot = new SavedSpot(false, null);
+		}
+
 		setSaveSpotButton(savedSpot.hasSavedSpot);
 
 		if (savedSpot.hasSavedSpot) {
@@ -386,7 +390,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
 		if (firstTimeLocation) {
-
 			centerCameraOnLastLocation();
 			firstTimeLocation = false;
 		}
