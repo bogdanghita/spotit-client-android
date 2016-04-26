@@ -318,13 +318,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 					return;
 				}
 
+				qgata = true;
+
 				initLastLocation();
 				startLocationUpdates();
 
 				// onMapReady
 				enableLocation();
-
-				qgata = true;
 			}
 		});
 	}
@@ -666,12 +666,12 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			case Constants.REQ_FINE_LOCATION_INIT_LOCATION: {
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+					qgata = true;
+
 					initLastLocation();
 					startLocationUpdates();
 
 					enableLocationAction();
-
-					qgata = true;
 				}
 				break;
 			}
