@@ -32,6 +32,7 @@
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="95"
+			android:paddingRight="15dp"
 			android:singleLine="true"/>
 
 		<TextView
@@ -39,6 +40,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="5"
+			android:paddingRight="5dp"
 			android:textColor="@color/colorPrimary"
 			android:textSize="15sp"
 			android:textStyle="bold"/>
