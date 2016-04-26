@@ -323,9 +323,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 				// onMapReady
 				enableLocation();
+
+				qgata = true;
 			}
 		});
 	}
+
+	boolean qgata = false;
 
 	@Override
 	public void onConnected(Bundle bundle) {
@@ -415,6 +419,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	}
 
 	private void centerCameraOnLastLocation() {
+
+		if (!qgata) {
+			return;
+		}
 
 		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_CENTER_LOCATION)) {
 			return;
@@ -655,16 +663,15 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 
 		switch (requestCode) {
-			case Constants.REQ_FINE_LOCATION_ENABLE_LOCATION: {
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					enableLocationAction();
-				}
-				break;
-			}
 			case Constants.REQ_FINE_LOCATION_INIT_LOCATION: {
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
 					initLastLocation();
 					startLocationUpdates();
+
+					enableLocationAction();
+
+					qgata = true;
 				}
 				break;
 			}
