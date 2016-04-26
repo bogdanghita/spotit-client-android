@@ -62,9 +62,7 @@ import com.it.spot.threading.Event;
 import com.it.spot.threading.StateMonitorListener;
 import com.it.spot.threading.StateMonitorThread;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -74,12 +72,9 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
 		LocationListener, TokenRequestEventListener, StateMonitorListener, MapItemsProvider, UiController {
 
-	private ActionBarDrawerToggle mDrawerToggle;
-
 	private GoogleMap mMap;
 	private GoogleApiClient mMapsGoogleApiClient;
 
-	private String mLastUpdateTime;
 	private LocationRequest mLocationRequest;
 	private LatLngBounds cameraBounds;
 
@@ -92,6 +87,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private MapItemsService mapItemsService;
 
 	private Event onConnectedEvent, onMapReadyEvent;
+	private boolean locationPermissionsGranted;
 
 	private DialogReveal mReportParkingStateDialog;
 
@@ -120,6 +116,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
 		mapItemsService = new MapItemsService(this, this, this);
+
+		locationPermissionsGranted = false;
 
 		startStateMonitor();
 
@@ -246,23 +244,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		Log.d(Constants.APP + Constants.STATE_MONITOR, "onMapReadyEvent.set()");
 	}
 
-	private void enableLocation() {
-
-		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_ENABLE_LOCATION)) {
-			return;
-		}
-		enableLocationAction();
-	}
-
-	private void enableLocationAction() {
-		mMap.setMyLocationEnabled(true);
-		mMap.getUiSettings().setMyLocationButtonEnabled(false);
-	}
-
-	private void startLocationUpdates() {
-		LocationServices.FusedLocationApi.requestLocationUpdates(mMapsGoogleApiClient, mLocationRequest, this);
-	}
-
 	private void initLastLocation() {
 
 		Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mMapsGoogleApiClient);
@@ -272,6 +253,16 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 			onLocationChanged(lastLocation);
 		}
+	}
+
+	private void startLocationUpdates() {
+		LocationServices.FusedLocationApi.requestLocationUpdates(mMapsGoogleApiClient, mLocationRequest, this);
+	}
+
+	private void enableLocation() {
+
+		mMap.setMyLocationEnabled(true);
+		mMap.getUiSettings().setMyLocationButtonEnabled(false);
 	}
 
 	private void loadSavedSpot() {
@@ -313,23 +304,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				// NOTE: it is done here so that the map is ready when the marker will be drawn
 				loadSavedSpot();
 
-				// onConnected
-				if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT_LOCATION)) {
+				if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_INIT)) {
 					return;
 				}
 
-				qgata = true;
+				locationPermissionsGranted = true;
 
 				initLastLocation();
 				startLocationUpdates();
-
-				// onMapReady
 				enableLocation();
 			}
 		});
 	}
-
-	boolean qgata = false;
 
 	@Override
 	public void onConnected(Bundle bundle) {
@@ -391,15 +377,13 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mServiceManager.getLocationManager().setLastLocation(
 				new BasicLocation(location.getLatitude(), location.getLongitude()));
 
-		mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-
 		if (firstTimeLocation) {
 			centerCameraOnLastLocation();
 			firstTimeLocation = false;
 		}
 
 		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
-		Log.d(Constants.APP + Constants.LOCATION, mLastUpdateTime + ": " + lastLocation.getLatitude() +
+		Log.d(Constants.APP + Constants.LOCATION, lastLocation.getLatitude() +
 				", " + lastLocation.getLongitude());
 	}
 
@@ -420,11 +404,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	private void centerCameraOnLastLocation() {
 
-		if (!qgata) {
+		if (!locationPermissionsGranted) {
 			return;
 		}
 
-		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_CENTER_LOCATION)) {
+		if (!permission_FINELOCATION(Constants.REQ_FINE_LOCATION_CENTER)) {
 			return;
 		}
 		centerCameraOnLastLocationAction();
@@ -470,7 +454,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	private void configureNavigationDrawer(DrawerLayout mDrawerLayout, Toolbar toolbar) {
 
 		// Setting up Navigation Drawer
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+		ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
 
 			@Override
 			public void onDrawerOpened(View v) {
@@ -489,10 +473,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 			}
 		};
 
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		mDrawerLayout.setDrawerListener(drawerToggle);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
-		mDrawerToggle.syncState();
+		drawerToggle.syncState();
 	}
 
 	private void toggleNavigationDrawer() {
@@ -663,19 +647,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 
 		switch (requestCode) {
-			case Constants.REQ_FINE_LOCATION_INIT_LOCATION: {
+			case Constants.REQ_FINE_LOCATION_INIT: {
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-					qgata = true;
+					locationPermissionsGranted = true;
 
 					initLastLocation();
 					startLocationUpdates();
-
-					enableLocationAction();
+					enableLocation();
 				}
 				break;
 			}
-			case Constants.REQ_FINE_LOCATION_CENTER_LOCATION: {
+			case Constants.REQ_FINE_LOCATION_CENTER: {
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					centerCameraOnLastLocationAction();
 				}
