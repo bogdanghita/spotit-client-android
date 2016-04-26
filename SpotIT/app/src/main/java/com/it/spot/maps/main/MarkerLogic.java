@@ -36,6 +36,22 @@ public class MarkerLogic {
 		mMapItemsManager = ServiceManager.getInstance().getMapItemsManager();
 	}
 
+	public void clearMarker() {
+
+		MarkerData markerData = mMapItemsManager.getMarkerData();
+		if (markerData == null) {
+			return;
+		}
+
+		if (markerData.mMarker != null) {
+			removeMarker(markerData.mMarker);
+		}
+
+		markerData.mMarker = null;
+		markerData.mMarkerLocation = null;
+		markerData.mMarkerOptions = null;
+	}
+
 	public void drawMarker() {
 
 		MarkerData markerData = mMapItemsManager.getMarkerData();

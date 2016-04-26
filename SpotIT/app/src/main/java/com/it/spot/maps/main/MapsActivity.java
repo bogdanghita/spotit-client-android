@@ -213,8 +213,6 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 				Log.d(Constants.APP + Constants.CAMERA_CHANGE, cameraBounds.getCenter() + " - " + cameraBounds.southwest + ", " + cameraBounds.northeast);
 
 				// Trigger event
-				// TODO: the circles are also recomputed when requestMapStatusUpdate() (see below)
-				// TODO: i.e. se face de doua ori...
 				CameraChangeEvent event = new CameraChangeEvent(mMap.getCameraPosition().zoom);
 				mServiceManager.getEventManager().triggerEvent(event);
 

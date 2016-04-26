@@ -50,6 +50,21 @@ public class RouteLogic {
 		mLocationManager = ServiceManager.getInstance().getLocationManager();
 	}
 
+	public void clearDirections() {
+
+		RouteData routeData = mMapItemsManager.getRouteData();
+		if (routeData == null) {
+			return;
+		}
+
+		if (routeData.isDrawn()) {
+			removeRoute(routeData);
+		}
+
+		routeData.clearRoute();
+		mMapItemsManager.setRouteData(null);
+	}
+
 	public void populateDirections() {
 
 		MarkerData markerData = mMapItemsManager.getMarkerData();
@@ -81,12 +96,7 @@ public class RouteLogic {
 			directions_mode = Constants.MODE_WALKING;
 		}
 		else {
-			// If anyone but Claudiu, ignore this.
-			// !!!!!!!!!!!!!!!!!!!!!!!!!
-			// !!!!!    DRIVING    !!!!!
-			// !!!!!!!!!!!!!!!!!!!!!!!!!
-
-			// TODO NOTE: DEBUG - Change this to walking to force walking route.
+			// TODO-NOTE: DEBUG - Change this to walking to force walking route.
 			directions_mode = Constants.MODE_DRIVING;
 		}
 

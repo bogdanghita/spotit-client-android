@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
@@ -20,7 +21,9 @@ import com.it.spot.events.SpotsMapEvent;
 import com.it.spot.services.FileService;
 import com.it.spot.maps.directions.RouteData;
 import com.it.spot.services.PolygonUI;
+import com.it.spot.threading.Event;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,27 +36,22 @@ public class MapItemsService extends MapEventListener {
 	private MapItemsManager mMapItemsManager;
 	private FileService mFileService;
 
-	private MapItemsProvider mMapItemsProvider;
-	private UiController mUiController;
-
 	private UiItemsController mUiItemsController;
 
 	private RouteLogic mRouteLogic;
 	private MarkerLogic mMarkerLogic;
+	private SpotsLogic mSpotsLogic;
 
 	public MapItemsService(Context context, MapItemsProvider mapItemsProvider, UiController uiController) {
 
-		mMapItemsProvider = mapItemsProvider;
-
 		mFileService = new FileService(context);
 		mMapItemsManager = ServiceManager.getInstance().getMapItemsManager();
-
-		mUiController = uiController;
 
 		mUiItemsController = new UiItemsController(context, mapItemsProvider, uiController);
 
 		mRouteLogic = new RouteLogic(mapItemsProvider, uiController);
 		mMarkerLogic = new MarkerLogic(mapItemsProvider, uiController, mUiItemsController);
+		mSpotsLogic = new SpotsLogic(mapItemsProvider, uiController);
 	}
 
 	@Override
@@ -92,7 +90,7 @@ public class MapItemsService extends MapEventListener {
 		mMapItemsManager.setRouteDisplayed(false);
 		mUiItemsController.setDirectionsButtonIcon(false);
 
-		clearDirections();
+		mRouteLogic.clearDirections();
 
 		mMarkerLogic.drawMarker();
 
@@ -123,10 +121,10 @@ public class MapItemsService extends MapEventListener {
 
 		markerData.markerType = MarkerType.NONE;
 
-		clearDirections();
+		mRouteLogic.clearDirections();
 
 		mMapItemsManager.setRouteData(null);
-		clearMarker();
+		mMarkerLogic.clearMarker();
 	}
 
 	@Override
@@ -168,9 +166,9 @@ public class MapItemsService extends MapEventListener {
 
 		Log.d(Constants.EVENT + Constants.ITEMS, "notifySpotsMap()");
 
-		clearSpots();
+		mSpotsLogic.removeSpots();
 
-		drawSpots(event.getPolygons());
+		mSpotsLogic.drawSpots(event.getPolygons());
 	}
 
 	@Override
@@ -192,101 +190,5 @@ public class MapItemsService extends MapEventListener {
 
 		// Update route to marker
 		mRouteLogic.updateRouteToMarker(zoom, oldZoom);
-	}
-
-	private void clearDirections() {
-
-		RouteData routeData = mMapItemsManager.getRouteData();
-		if (routeData == null) {
-			return;
-		}
-
-		if (routeData.isDrawn()) {
-			mRouteLogic.removeRoute(routeData);
-		}
-
-		routeData.clearRoute();
-		mMapItemsManager.setRouteData(null);
-	}
-
-	private void clearMarker() {
-
-		MarkerData markerData = mMapItemsManager.getMarkerData();
-		if (markerData == null) {
-			return;
-		}
-
-		if (markerData.mMarker != null) {
-			mMarkerLogic.removeMarker(markerData.mMarker);
-		}
-
-		markerData.mMarker = null;
-		markerData.mMarkerLocation = null;
-		markerData.mMarkerOptions = null;
-	}
-
-	private void clearSpots() {
-
-		final GoogleMap map = mMapItemsProvider.getMap();
-		if (map == null) {
-			return;
-		}
-
-		// Clear all map items
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				map.clear();
-			}
-		});
-
-		// Redraw marker
-		MarkerData markerData = mMapItemsManager.getMarkerData();
-		if (markerData != null && markerData.mMarkerOptions != null) {
-			markerData.mMarker = mMarkerLogic.addMarker(markerData.mMarkerOptions);
-		}
-
-		// Draw route only if it is displayed
-		if (!mMapItemsManager.isRouteDisplayed()) {
-			return;
-		}
-
-		// Redraw route
-		RouteData routeData = mMapItemsManager.getRouteData();
-		if (routeData != null && routeData.isDrawn()) {
-			mRouteLogic.drawRoute(routeData);
-		}
-	}
-
-	private void drawSpots(final List<PolygonUI> polygons) {
-
-		final GoogleMap map = mMapItemsProvider.getMap();
-		if (map == null) {
-			return;
-		}
-
-		mUiController.doRunOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				for (PolygonUI polygon : polygons) {
-					drawPolygon(map, polygon.getPoints(), polygon.getColor());
-				}
-			}
-		});
-	}
-
-	private void drawPolygon(GoogleMap map, Iterable<LatLng> points, int color) {
-
-		String text = "";
-		for (LatLng point : points) {
-			text += point.toString() + ", ";
-		}
-		Log.d(Constants.APP + Constants.DRAW, text);
-
-		map.addPolygon(new PolygonOptions()
-				.addAll(points)
-				.strokeColor(color)
-				.strokeWidth(0)
-				.fillColor(color));
 	}
 }
