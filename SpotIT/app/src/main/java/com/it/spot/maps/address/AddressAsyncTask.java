@@ -40,6 +40,7 @@ public class AddressAsyncTask extends AsyncTask<BasicLocation, Void, Void> {
 	protected Void doInBackground(BasicLocation... params) {
 
 		if (params == null || params.length != 1) {
+			mAddressResponseListener.notifyAddressFailure();
 			return null;
 		}
 
@@ -54,8 +55,11 @@ public class AddressAsyncTask extends AsyncTask<BasicLocation, Void, Void> {
 				String formattedAddress;
 				List<Result> results = address.getResults();
 
-				if (results == null || results.size() == 0)
+				if (results == null || results.size() == 0) {
+					Log.d(Constants.ADDRESS, "success but no results");
+					mAddressResponseListener.notifyAddressFailure();
 					return;
+				}
 
 				formattedAddress = results.get(0).getFormattedAddress();
 
@@ -65,6 +69,7 @@ public class AddressAsyncTask extends AsyncTask<BasicLocation, Void, Void> {
 			@Override
 			public void failure(RetrofitError error) {
 				Log.d(Constants.ADDRESS, "failure " + error.toString());
+				mAddressResponseListener.notifyAddressFailure();
 			}
 		});
 

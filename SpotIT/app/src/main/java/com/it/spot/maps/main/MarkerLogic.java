@@ -1,6 +1,7 @@
 package com.it.spot.maps.main;
 
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -127,6 +128,22 @@ public class MarkerLogic {
 				public void run() {
 					TextView locationAddress = (TextView) mMapItemsProvider.getView(R.id.location_address);
 					locationAddress.setText(address);
+					mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.GONE);
+					mMapItemsProvider.getView(R.id.location_address).setVisibility(View.VISIBLE);
+				}
+			});
+		}
+
+		@Override
+		public void notifyAddressFailure() {
+
+			mUiController.doRunOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					TextView locationAddress = (TextView) mMapItemsProvider.getView(R.id.location_address);
+					locationAddress.setText(Constants.NO_ADDRESS);
+					mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.GONE);
+					mMapItemsProvider.getView(R.id.location_address).setVisibility(View.VISIBLE);
 				}
 			});
 		}
