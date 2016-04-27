@@ -39,8 +39,7 @@ public class SchedulerThread extends LooperThread {
 		handler = new SchedulerHandler(mThread, mRunnable, mInterval.longValue());
 
 		// Sleeping until the handler of mThread is created
-		while (mThread.handler == null) {
-		}
+		while (mThread.handler == null) ;
 
 		handler.sendMessage(handler.obtainMessage(SchedulerHandler.MSG_SCHEDULE));
 

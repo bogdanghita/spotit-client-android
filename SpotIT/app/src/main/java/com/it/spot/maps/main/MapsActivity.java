@@ -57,6 +57,7 @@ import com.it.spot.identity.TokenRequestEventListener;
 import com.it.spot.identity.UserInfo;
 import com.it.spot.maps.location.BasicLocation;
 import com.it.spot.maps.report.DialogReveal;
+import com.it.spot.services.InternetConnectionService;
 import com.it.spot.services.PolygonUI;
 import com.it.spot.threading.Event;
 import com.it.spot.threading.StateMonitorListener;
@@ -83,6 +84,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	// Bool to track whether the app is already resolving an error
 	private boolean mResolvingError = false;
 
+	private InternetConnectionService mInternetConnectionService;
 	private MapUpdateService mapUpdateService;
 	private MapItemsService mapItemsService;
 
@@ -114,6 +116,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		createUserProfile();
 
+		mInternetConnectionService = new InternetConnectionService(this);
 		mapUpdateService = new MapUpdateService(mapUpdateCallbackClient);
 		mapItemsService = new MapItemsService(this, this, this);
 
@@ -155,6 +158,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void onResume() {
 		super.onResume();
 
+		mInternetConnectionService.startConnectionCheckLoop();
+
 		mapUpdateService.startMapStatusUpdateLoop();
 	}
 
@@ -163,6 +168,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		super.onPause();
 
 		mapUpdateService.stopMapStatusUpdateLoop();
+
+		mInternetConnectionService.stopConnectionCheckLoop();
 	}
 
 	@Override
@@ -793,4 +800,11 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	public void doRunOnUiThread(Runnable runnable) {
 		runOnUiThread(runnable);
 	}
+
+
+// -------------------------------------------------------------------------------------------------
+// TEST
+// -------------------------------------------------------------------------------------------------
+
+
 }

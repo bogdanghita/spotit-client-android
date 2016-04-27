@@ -17,9 +17,9 @@ public class MapUpdateService {
 
 	private LatLngBounds cameraBounds = null;
 
-	TaskScheduler taskScheduler;
+	private TaskScheduler taskScheduler;
 
-	ServerAPI serverAPI;
+	private ServerAPI serverAPI;
 
 	public MapUpdateService(MapUpdateCallbackClient uiClient) {
 
