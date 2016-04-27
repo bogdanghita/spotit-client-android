@@ -75,6 +75,8 @@ public class Constants {
 	public final static String MODE_DRIVING = "driving";
 	public final static String MODE_WALKING = "walking";
 
+	public static final String NO_ADDRESS = "No address available.";
+
 	public static final float DEFAULT_ZOOM = 17.3f;
 	public static final int DIRECTIONS_STROKE_WIDTH = 30;
 	public static final int DIRECTIONS_STROKE_COLOR = 0xFF3A7EC5;
