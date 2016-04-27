@@ -116,6 +116,10 @@ public class UiItemsController {
 				bottom_layout.setTranslationY(0);
 				directions_fab.setVisibility(View.VISIBLE);
 
+				// Loading address animation
+				mMapItemsProvider.getView(R.id.location_address).setVisibility(View.GONE);
+				mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.VISIBLE);
+
 				AddressAsyncTask addressAsyncTask = new AddressAsyncTask(listener);
 				addressAsyncTask.execute(location);
 

@@ -6,4 +6,5 @@ package com.it.spot.maps.address;
 public interface AddressResponseListener {
 	
 	void notifyAddressResponse(String address);
+	void notifyAddressFailure();
 }
