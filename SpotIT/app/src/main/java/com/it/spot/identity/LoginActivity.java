@@ -23,13 +23,18 @@ import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
 import com.it.spot.maps.main.MapsActivity;
+import com.it.spot.services.InternetConnectionCallbackListener;
+import com.it.spot.services.InternetConnectionService;
+import com.it.spot.threading.Event;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoginActivity extends IdentityActivity {
+public class LoginActivity extends IdentityActivity implements InternetConnectionCallbackListener {
 
 	private ProgressDialog mProgressDialog;
+
+	InternetConnectionService mInternetConnectionService;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,18 +42,54 @@ public class LoginActivity extends IdentityActivity {
 		setContentView(R.layout.activity_login);
 
 		configureSignInButton();
+
+		mInternetConnectionService = new InternetConnectionService(this);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
 
+		// Check internet connection
+		if (!mInternetConnectionService.hasInternet()) {
+			// Subscribe so that we get to know when we have internet
+			mInternetConnectionService.subscribe(this);
+			return;
+		}
+		// Unsubscribe if we have internet
+		mInternetConnectionService.unsubscribe(this);
+
+		// If internet connection is there start login
 		Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
 			public void run() {
 				startSilentSignIn();
 			}
 		}, Constants.INITIAL_LOGIN_DELAY);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		mInternetConnectionService.startConnectionCheckLoop();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+
+		mInternetConnectionService.stopConnectionCheckLoop();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
 	}
 
 	private void startSilentSignIn() {
@@ -249,6 +290,23 @@ public class LoginActivity extends IdentityActivity {
 				}
 				return;
 			}
+		}
+	}
+
+// -------------------------------------------------------------------------------------------------
+// INTERNET CONNECTION CHECK
+// -------------------------------------------------------------------------------------------------
+
+	@Override
+	public void notifyResult(boolean connected) {
+
+		if (connected) {
+
+			// Unsubscribe
+			mInternetConnectionService.unsubscribe(this);
+
+			// Start login
+			startSilentSignIn();
 		}
 	}
 }

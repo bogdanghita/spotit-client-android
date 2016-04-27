@@ -4,6 +4,7 @@ import com.it.spot.events.EventManager;
 import com.it.spot.identity.IdentityManager;
 import com.it.spot.maps.main.MapItemsManager;
 import com.it.spot.maps.location.LocationManager;
+import com.it.spot.services.InternetConnectionService;
 
 /**
  * Created by Bogdan on 19/03/2016.

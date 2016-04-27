@@ -25,12 +25,12 @@ public class TaskScheduler {
 	}
 
 	/**
-	 * Starts the execution of the task, on a separate thread and at the given hour.
-	 * The hour can be modified using the setInterval(long) method.
+	 * Starts the execution of the task, on a separate thread and at the given interval.
+	 * The interval can be modified using the setInterval(long) method.
 	 *
-	 * @param task     - the task that will be executed at the given hour.
-	 * @param interval - the hour at which the task is executed.
-	 * @throws IllegalArgumentException    - if hour is less than or equal to zero.
+	 * @param task     - the task that will be executed at the given interval.
+	 * @param interval - the interval in milliseconds at which the task is executed.
+	 * @throws IllegalArgumentException    - if interval is less than or equal to zero.
 	 * @throws IllegalThreadStateException - if the scheduler was already started.
 	 */
 	public void start(Runnable task, long interval) {
