@@ -45,6 +45,7 @@ import com.it.spot.events.RemoveMarkerEvent;
 import com.it.spot.events.RemoveRouteEvent;
 import com.it.spot.events.SetMarkerEvent;
 import com.it.spot.events.SpotsMapEvent;
+import com.it.spot.intro.IntroActivity;
 import com.it.spot.services.FileService;
 import com.it.spot.common.Constants;
 import com.it.spot.common.ServiceManager;
@@ -704,6 +705,17 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonHelp(View view) {
 
+	}
+
+	public void buttonIntro(View v) {
+
+		startIntroActivity();
+	}
+
+	private void startIntroActivity() {
+
+		Intent intent = new Intent(this, IntroActivity.class);
+		startActivity(intent);
 	}
 
 // -------------------------------------------------------------------------------------------------

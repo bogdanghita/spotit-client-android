@@ -47,6 +47,8 @@ https://developer.android.com/design/patterns/navigation-drawer.html -->
 			android:layout_weight="1"
 			android:orientation="vertical">
 
+			<include layout="@layout/intro"/>
+
 			<include layout="@layout/help"/>
 
 			<include layout="@layout/sign_out"/>
