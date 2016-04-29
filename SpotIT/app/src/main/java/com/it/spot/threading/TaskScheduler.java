@@ -9,10 +9,15 @@ public class TaskScheduler {
 
 	private SchedulerThread mThread = null;
 
+	private final Object syncObj = new Object();
+
 	public void setInterval(long interval) {
 
-		if (mThread != null) {
-			mThread.setInterval(interval);
+		synchronized (syncObj) {
+
+			if (mThread != null) {
+				mThread.setInterval(interval);
+			}
 		}
 	}
 
@@ -21,7 +26,10 @@ public class TaskScheduler {
 	 */
 	public boolean isRunning() {
 
-		return mThread != null;
+		synchronized (syncObj) {
+
+			return mThread != null;
+		}
 	}
 
 	/**
@@ -35,17 +43,20 @@ public class TaskScheduler {
 	 */
 	public void start(Runnable task, long interval) {
 
-		if (mThread != null) {
-			throw new IllegalThreadStateException();
+		synchronized (syncObj) {
+
+			if (mThread != null) {
+				throw new IllegalThreadStateException();
+			}
+
+			if (interval <= 0) {
+				throw new IllegalArgumentException();
+			}
+
+			mThread = new SchedulerThread(task, interval);
+
+			mThread.start();
 		}
-
-		if (interval <= 0) {
-			throw new IllegalArgumentException();
-		}
-
-		mThread = new SchedulerThread(task, interval);
-
-		mThread.start();
 	}
 
 	/**
@@ -57,24 +68,27 @@ public class TaskScheduler {
 	 */
 	public void stop() {
 
-		if (mThread == null) {
-			throw new IllegalThreadStateException();
+		synchronized (syncObj) {
+
+			if (mThread == null) {
+				throw new IllegalThreadStateException();
+			}
+
+			mThread.quit();
+
+			Log.d(TaskScheduler.TAG_TIMER, "mThread quit. Waiting for mThread to join.");
+
+			try {
+				mThread.join();
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+				Log.d(TaskScheduler.TAG_TIMER, e.getClass().getName() + " | " + "exception on join()");
+			}
+
+			Log.d(TaskScheduler.TAG_TIMER, "mThread finished.");
+
+			mThread = null;
 		}
-
-		mThread.quit();
-
-		Log.d(TaskScheduler.TAG_TIMER, "mThread quit. Waiting for mThread to join.");
-
-		try {
-			mThread.join();
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-			Log.d(TaskScheduler.TAG_TIMER, e.getClass().getName() + " | " + "exception on join()");
-		}
-
-		Log.d(TaskScheduler.TAG_TIMER, "mThread finished.");
-
-		mThread = null;
 	}
 }

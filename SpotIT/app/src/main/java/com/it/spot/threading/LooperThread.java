@@ -2,6 +2,9 @@ package com.it.spot.threading;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
+
+import com.it.spot.common.Constants;
 
 
 public class LooperThread extends Thread {
@@ -12,8 +15,8 @@ public class LooperThread extends Thread {
 	public void run() {
 
 		// TODO: think if this is desired and if it affects something; read about mThread priority in Java
-		android.os.Process.setThreadPriority(MAX_PRIORITY);
-		this.setPriority(MAX_PRIORITY);
+//		android.os.Process.setThreadPriority(MAX_PRIORITY);
+//		this.setPriority(MAX_PRIORITY);
 
 		Looper.prepare();
 
