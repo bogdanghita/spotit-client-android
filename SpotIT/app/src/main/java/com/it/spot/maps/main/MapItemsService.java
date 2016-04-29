@@ -44,6 +44,8 @@ public class MapItemsService extends MapEventListener implements StateMonitorLis
 	private SpotsLogic mSpotsLogic;
 
 	private Event mAddressEvent;
+	private Event mDirectionsEvent;
+	private Event mDurationEvent;
 
 	public MapItemsService(Context context, MapItemsProvider mapItemsProvider, UiController uiController) {
 
@@ -66,6 +68,7 @@ public class MapItemsService extends MapEventListener implements StateMonitorLis
 					public void run() {
 						// Loading destination info animation.
 						mMapItemsProvider.getView(R.id.location_address).setVisibility(View.GONE);
+						mMapItemsProvider.getView(R.id.destination_time).setVisibility(View.GONE);
 						mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.VISIBLE);
 					}
 				}
@@ -79,6 +82,7 @@ public class MapItemsService extends MapEventListener implements StateMonitorLis
 					public void run() {
 						// Stop loading destination info animation.
 						mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.GONE);
+						mMapItemsProvider.getView(R.id.destination_time).setVisibility(View.VISIBLE);
 						mMapItemsProvider.getView(R.id.location_address).setVisibility(View.VISIBLE);
 					}
 				}
@@ -87,8 +91,12 @@ public class MapItemsService extends MapEventListener implements StateMonitorLis
 
 	void startStateMonitor() {
 		mAddressEvent = new Event();
+		mDirectionsEvent = new Event();
+		mDurationEvent = new Event();
 		List<Event> eventList = new LinkedList<>();
 		eventList.add(mAddressEvent);
+		eventList.add(mDirectionsEvent);
+		eventList.add(mDurationEvent);
 		new StateMonitorThread(this, eventList).start();
 	}
 
@@ -144,8 +152,10 @@ public class MapItemsService extends MapEventListener implements StateMonitorLis
 		mMarkerLogic.setAddressEvent(mAddressEvent);
 		mMarkerLogic.drawMarker();
 
-		// Perform call to get directions, distance and duration.
+		// Perform call to get directions and duration.
 		// When result is ready, directions will be populated.
+		mRouteLogic.setDirectionsEvent(mDirectionsEvent);
+		mRouteLogic.setDurationEvent(mDurationEvent);
 		mRouteLogic.populateDirections();
 	}
 

@@ -41,6 +41,9 @@ public class RouteLogic {
 	private MapItemsProvider mMapItemsProvider;
 	private UiController mUiController;
 
+	private Event mDirectionsEvent;
+	private Event mDurationEvent;
+
 	public RouteLogic(MapItemsProvider mapItemsProvider, UiController uiController) {
 
 		mMapItemsProvider = mapItemsProvider;
@@ -48,6 +51,14 @@ public class RouteLogic {
 
 		mMapItemsManager = ServiceManager.getInstance().getMapItemsManager();
 		mLocationManager = ServiceManager.getInstance().getLocationManager();
+	}
+
+	public void setDirectionsEvent(Event directionsEvent) {
+		mDirectionsEvent = directionsEvent;
+	}
+
+	public void setDurationEvent(Event durationEvent) {
+		mDurationEvent = durationEvent;
 	}
 
 	public void clearDirections() {
@@ -67,18 +78,29 @@ public class RouteLogic {
 
 	public void populateDirections() {
 
+		if (mDirectionsEvent == null || mDurationEvent == null) {
+			Log.d(Constants.APP + Constants.EVENT, "Error! Directions or duration event (or both) not set!");
+			return;
+		}
+
 		MarkerData markerData = mMapItemsManager.getMarkerData();
 		if (markerData.markerType == MapItemsService.MarkerType.NONE || markerData.mMarkerLocation == null) {
+			mDirectionsEvent.set();
+			mDurationEvent.set();
 			return;
 		}
 
 		BasicLocation lastLocation = mLocationManager.getLastLocation();
 		if (lastLocation == null) {
+			mDirectionsEvent.set();
+			mDurationEvent.set();
 			return;
 		}
 
 		// Checking if this is the same route as the last one
 		if (mMapItemsManager.isRouteDisplayed() && checkSameRoute(lastLocation, markerData.mMarkerLocation)) {
+			mDirectionsEvent.set();
+			mDurationEvent.set();
 			return;
 		}
 
@@ -94,8 +116,7 @@ public class RouteLogic {
 		String directions_mode;
 		if (markerData.markerType == MapItemsService.MarkerType.SAVED_SPOT) {
 			directions_mode = Constants.MODE_WALKING;
-		}
-		else {
+		} else {
 			// TODO-NOTE: DEBUG - Change this to walking to force walking route.
 			directions_mode = Constants.MODE_DRIVING;
 		}
@@ -229,8 +250,7 @@ public class RouteLogic {
 
 		try {
 			eventHandler.doWait();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for polylines to be added.");
 		}
@@ -257,8 +277,7 @@ public class RouteLogic {
 
 		try {
 			eventHandler.doWait();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for circles to be added.");
 		}
@@ -297,8 +316,7 @@ public class RouteLogic {
 
 		try {
 			eventHandler.doWait();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 			Log.d(Constants.APP + Constants.EVENT, "Interrupted while waiting for route to be removed.");
 		}
@@ -318,6 +336,12 @@ public class RouteLogic {
 			if (mMapItemsManager.isRouteDisplayed()) {
 				drawRoute(routeData);
 			}
+			mDirectionsEvent.set();
+		}
+
+		@Override
+		public void notifyDirectionsFailure() {
+			mDirectionsEvent.set();
 		}
 	};
 
@@ -332,6 +356,12 @@ public class RouteLogic {
 					destinationTime.setText(distanceDurationData.getDuration());
 				}
 			});
+			mDurationEvent.set();
+		}
+
+		@Override
+		public void notifyAddressFailure() {
+			mDurationEvent.set();
 		}
 	};
 }

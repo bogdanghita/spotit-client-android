@@ -6,4 +6,5 @@ package com.it.spot.maps.distance_duration;
 public interface DistanceDurationResponseListener {
 
 	void notifyAddressResponse(DistanceDurationData distanceDurationData);
+	void notifyAddressFailure();
 }

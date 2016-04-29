@@ -6,4 +6,5 @@ package com.it.spot.maps.directions;
 public interface DirectionsResultListener {
 
 	void notifyDirectionsResponse(RouteData routeData);
+	void notifyDirectionsFailure();
 }

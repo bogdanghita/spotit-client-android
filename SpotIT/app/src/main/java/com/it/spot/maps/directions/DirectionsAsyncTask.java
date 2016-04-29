@@ -49,13 +49,16 @@ public class DirectionsAsyncTask extends AsyncTask<RouteOptions, Void, Void> {
 		if (params == null || params.length != 1)
 		{
 			Log.d(Constants.DIRECTIONS, "Incorrect parameters");
+			mDirectionsResultListener.notifyDirectionsFailure();
 			return null;
 		}
 		RouteOptions routeOptions = params[0];
 		RouteData routeData = getDirections(routeOptions.source, routeOptions.destination, routeOptions.mode, routeOptions.zoom);
 
-		if (routeData == null)
+		if (routeData == null) {
+			mDirectionsResultListener.notifyDirectionsFailure();
 			return null;
+		}
 
 		mDirectionsResultListener.notifyDirectionsResponse(routeData);
 
