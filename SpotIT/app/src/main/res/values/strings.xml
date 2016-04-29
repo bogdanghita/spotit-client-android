@@ -13,4 +13,11 @@
 	<string name="internet_check_address">www.google.ro</string>
 	<string name="no_internet_message">No internet connection.</string>
 
+	<string name="intro_spots">Find the free parking spots near you on a real-time map</string>
+	<!--<string name="intro_colors">"Color codes:\n Red - Full \n Yellow - there is more then one free spot \n Green - Free"</string>-->
+	<string name="intro_colors">"Red means that the area is full. Yellow means that you might find a parking spot in that area. Green means that the are is free."</string>
+	<string name="intro_report_spot">Spot.it is about community, join other drivers by reporting the parking spots in your area</string>
+	<string name="intro_save_location">"Save your car location and then you can find it faster even if you don't know the area"</string>
+	<string name="intro_directions">Walk to your car or drive to a free spot using directions</string>
+
 </resources>

@@ -60,10 +60,9 @@ public class SampleSlide extends Fragment {
         int w = img.getHeight();
         Context c = getActivity().getApplicationContext();
         Picasso.with(c).load("file:///android_asset/intro/" + imageName)
-                .transform(new CropSquareTransformation())
+                .transform(new CropTransformation(200,0,900,1200))
                 .into(img);
         return view;
-// return inflater.inflate(layoutResId, container, false);
     }
 
 }

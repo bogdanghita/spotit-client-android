@@ -37,12 +37,19 @@ public class IntroActivity extends AppIntro {
 
 		showSkipButton(false);
 		setBarColor(Color.parseColor("#f9f9f9"));
-		setSeparatorColor(Color.parseColor("#ff4e5c"));
-		setIndicatorColor(Color.parseColor("#3b3b58"), Color.parseColor("#252545"));
+
+//		setSeparatorColor(Color.parseColor("#ff4e5c"));
+		setSeparatorColor(Color.parseColor("#f9f9f9"));
+
+//		setIndicatorColor(Color.parseColor("#3b3b58"), Color.parseColor("#252545"));
+		setIndicatorColor(Color.parseColor("#ff4e5c"), Color.parseColor("#e54652"));
+
 		setDoneText("Get Started");
 		setColorDoneText(Color.parseColor("#ff4e5c"));
-		setNextArrowColor(Color.parseColor("#ff4e5c"));
+//		setNextArrowColor(Color.parseColor("#ff4e5c"));
+		setNextArrowColor(Color.parseColor("#f9f9f9"));
 
+		nextButton.setVisibility(View.GONE);
 	}
 	public void setNextArrowColor(@ColorInt final int color) {
 		ImageButton nextButton = (ImageButton) findViewById(R.id.next);
@@ -68,6 +75,7 @@ public class IntroActivity extends AppIntro {
 	@Override
 	public void onSlideChanged() {
 		// Do something when the slide changes.
+		nextButton.setVisibility(View.GONE);
 	}
 
 	@Override
