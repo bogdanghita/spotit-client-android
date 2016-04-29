@@ -37,7 +37,6 @@ public class DialogReveal extends Dialog {
 		super.onCreate(savedInstanceState);
 //        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#3b3b58"));
 //        colorDrawable.setAlpha(0);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.report_parking_spot_layout);
 		getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 

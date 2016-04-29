@@ -63,9 +63,14 @@ public class CircleReportSpotDialogDrawable extends Drawable {
 //        canvas.drawArc(0,0,bounds.right,100,90,90,true,paint);
 //        canvas.drawArc(rectF,-90,90,true,paint);
 //        canvas.drawCircle(900,1100,1000,paint);
-        int x = (int) (bounds.right * 0.625f);
-        int r = (int) (bounds.bottom * 0.9f);
-        canvas.drawCircle(x, bounds.bottom, r, paint);
+
+        //Varianta functionala
+//        int x = (int) (bounds.right * 0.625f);
+//        int r = (int) (bounds.bottom * 0.9f);
+//        canvas.drawCircle(x, bounds.bottom, r, paint);
+        int x = (int) (bounds.right * 0.9f);
+        int r = (int) (bounds.bottom * 1.4f);
+        canvas.drawCircle(x, bounds.bottom * 1.6f, r, paint);
     }
 
     @Override
