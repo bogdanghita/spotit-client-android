@@ -1,7 +1,6 @@
 package com.it.spot.maps.main;
 
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -28,6 +27,8 @@ public class MarkerLogic {
 
 	private UiItemsController mUiItemsController;
 
+	private Event mAddressEvent;
+
 	public MarkerLogic(MapItemsProvider mapItemsProvider, UiController uiController, UiItemsController uiItemsController) {
 
 		mMapItemsProvider = mapItemsProvider;
@@ -35,6 +36,10 @@ public class MarkerLogic {
 		mUiItemsController = uiItemsController;
 
 		mMapItemsManager = ServiceManager.getInstance().getMapItemsManager();
+	}
+
+	public void setAddressEvent(Event addressEvent){
+		mAddressEvent = addressEvent;
 	}
 
 	public void clearMarker() {
@@ -53,10 +58,17 @@ public class MarkerLogic {
 		markerData.mMarkerOptions = null;
 	}
 
+	// An address event must be set!
 	public void drawMarker() {
+
+		if (mAddressEvent == null){
+			Log.d(Constants.APP + Constants.EVENT,"Error! No address event set!");
+			return;
+		}
 
 		MarkerData markerData = mMapItemsManager.getMarkerData();
 		if (markerData == null) {
+			mAddressEvent.set();
 			return;
 		}
 
@@ -65,6 +77,7 @@ public class MarkerLogic {
 		}
 
 		if (markerData.mMarkerLocation == null) {
+			mAddressEvent.set();
 			return;
 		}
 
@@ -144,8 +157,7 @@ public class MarkerLogic {
 				public void run() {
 					TextView locationAddress = (TextView) mMapItemsProvider.getView(R.id.location_address);
 					locationAddress.setText(address);
-					mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.GONE);
-					mMapItemsProvider.getView(R.id.location_address).setVisibility(View.VISIBLE);
+					mAddressEvent.set();
 				}
 			});
 		}
@@ -158,8 +170,7 @@ public class MarkerLogic {
 				public void run() {
 					TextView locationAddress = (TextView) mMapItemsProvider.getView(R.id.location_address);
 					locationAddress.setText(Constants.NO_ADDRESS);
-					mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.GONE);
-					mMapItemsProvider.getView(R.id.location_address).setVisibility(View.VISIBLE);
+					mAddressEvent.set();
 				}
 			});
 		}
