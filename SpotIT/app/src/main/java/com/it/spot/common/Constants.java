@@ -28,6 +28,7 @@ public class Constants {
 	public final static String STATE_MONITOR = "STATE_M-";
 	public final static String EVENT = "EVENT-";
 	public final static String ITEMS = "ITEMS-";
+	public final static String INTERNET = "INTER-";
 
 	public final static int RC_SIGN_IN = 9001;
 	public final static int USER_RECOVERABLE_AUTH_EXCEPTION = 7001;

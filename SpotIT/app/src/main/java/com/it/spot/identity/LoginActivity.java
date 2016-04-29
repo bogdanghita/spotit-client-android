@@ -71,7 +71,7 @@ public class LoginActivity extends IdentityActivity implements InternetConnectio
 	@Override
 	public void onResume() {
 		super.onResume();
-
+		
 		mInternetConnectionService.startConnectionCheckLoop();
 	}
 
