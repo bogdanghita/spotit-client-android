@@ -62,7 +62,7 @@ public class MarkerLogic {
 	public void drawMarker() {
 
 		if (mAddressEvent == null){
-			Log.d(Constants.APP + Constants.EVENT,"Error! No address event set!");
+			Log.d(Constants.APP + Constants.EVENT, "Error! No address event set!");
 			return;
 		}
 

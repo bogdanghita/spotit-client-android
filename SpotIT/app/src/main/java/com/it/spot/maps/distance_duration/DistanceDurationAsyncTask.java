@@ -39,6 +39,7 @@ public class DistanceDurationAsyncTask extends AsyncTask<DistanceDurationOptions
 	protected Void doInBackground(DistanceDurationOptions... params) {
 
 		if (params == null || params.length != 1) {
+			mDistanceDurationResponseListener.notifyAddressFailure();
 			return null;
 		}
 
@@ -66,6 +67,7 @@ public class DistanceDurationAsyncTask extends AsyncTask<DistanceDurationOptions
 					Log.d(Constants.DISTANCE_DURATION, "[" + distance + "] - [" + duration + "]");
 				} catch (Exception e) {
 					Log.d(Constants.DISTANCE_DURATION, e.toString());
+					mDistanceDurationResponseListener.notifyAddressFailure();
 					return;
 				}
 
@@ -77,6 +79,7 @@ public class DistanceDurationAsyncTask extends AsyncTask<DistanceDurationOptions
 			@Override
 			public void failure(RetrofitError error) {
 				Log.d(Constants.DISTANCE_DURATION, "failure " + error.toString());
+				mDistanceDurationResponseListener.notifyAddressFailure();
 			}
 		});
 
