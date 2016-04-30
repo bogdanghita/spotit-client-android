@@ -281,7 +281,10 @@ public class LoginActivity extends IdentityActivity implements InternetConnectio
 	private void startIntroActivity() {
 
 		Intent intent = new Intent(this, IntroActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		startActivity(intent);
+		// Disable activity end transition
+		overridePendingTransition(0, 0);
 	}
 
 // -------------------------------------------------------------------------------------------------

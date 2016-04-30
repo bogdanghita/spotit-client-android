@@ -21,8 +21,10 @@ import com.it.spot.R;
 import com.it.spot.maps.main.MapsActivity;
 
 public class IntroActivity extends AppIntro {
+
 	private String directions = "directions.png";
 	private String reportSpot = "report_spot.png";
+
 	@Override
 	public void init(Bundle savedInstanceState) {
 
@@ -31,9 +33,8 @@ public class IntroActivity extends AppIntro {
 		addSlide(SampleSlide.newInstance(R.layout.intro_spots_slide, directions));
 		addSlide(SampleSlide.newInstance(R.layout.intro_colors_slide, reportSpot));
 		addSlide(SampleSlide.newInstance(R.layout.intro_report_spot_slide, reportSpot));
-		addSlide(SampleSlide.newInstance(R.layout.intro_save_location_slide,directions));
+		addSlide(SampleSlide.newInstance(R.layout.intro_save_location_slide, directions));
 		addSlide(SampleSlide.newInstance(R.layout.intro_directions_slide, directions));
-
 
 		showSkipButton(false);
 		setBarColor(Color.parseColor("#f9f9f9"));
@@ -51,6 +52,7 @@ public class IntroActivity extends AppIntro {
 
 		nextButton.setVisibility(View.GONE);
 	}
+
 	public void setNextArrowColor(@ColorInt final int color) {
 		ImageButton nextButton = (ImageButton) findViewById(R.id.next);
 		nextButton.setColorFilter(color);
@@ -60,11 +62,11 @@ public class IntroActivity extends AppIntro {
 		Button doneButton = (Button) findViewById(R.id.done);
 //		nextButton.setColorFilter(color);
 	}
+
 	@Override
 	public void onSkipPressed() {
 
 	}
-
 
 	@Override
 	public void onDonePressed() {

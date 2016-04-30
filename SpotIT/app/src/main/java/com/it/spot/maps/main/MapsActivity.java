@@ -203,7 +203,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (markerData == null || markerData.markerType != MapItemsService.MarkerType.DESTINATION) {
 
 			super.onBackPressed();
-		} else {
+		}
+		else {
 
 			mServiceManager.getEventManager().triggerEvent(new RemoveMarkerEvent());
 		}
@@ -349,15 +350,18 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (mResolvingError) {
 			// Already attempting to resolve an error.
 			return;
-		} else if (connectionResult.hasResolution()) {
+		}
+		else if (connectionResult.hasResolution()) {
 			try {
 				mResolvingError = true;
 				connectionResult.startResolutionForResult(this, Constants.REQUEST_RESOLVE_ERROR);
-			} catch (IntentSender.SendIntentException e) {
+			}
+			catch (IntentSender.SendIntentException e) {
 				// There was an error with the resolution intent. Try again.
 				mMapsGoogleApiClient.connect();
 			}
-		} else {
+		}
+		else {
 			// Show dialog using GoogleApiAvailability.getErrorDialog()
 			showErrorDialog(connectionResult.getErrorCode());
 			mResolvingError = true;
@@ -383,7 +387,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mServiceManager.getLocationManager().setLastLocation(
 				new BasicLocation(location.getLatitude(), location.getLongitude()));
 
-		if (!firstTimeLocation && centeredCamera){
+		if (!firstTimeLocation && centeredCamera) {
 			centerCameraOnLastLocation();
 		}
 
@@ -495,7 +499,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
 			mDrawerLayout.closeDrawer(Gravity.LEFT);
-		} else {
+		}
+		else {
 			mDrawerLayout.openDrawer(Gravity.LEFT);
 		}
 	}
@@ -507,7 +512,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (hasSavedSpot) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
-		} else {
+		}
+		else {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -521,7 +527,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (buttonLeaveSpot.getVisibility() == View.GONE) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
-		} else {
+		}
+		else {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -559,6 +566,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		Intent intent = new Intent(this, LoginActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		startActivity(intent);
+		// Disable activity end transition
+		overridePendingTransition(0, 0);
 	}
 
 	private void updateToken() {
@@ -717,6 +726,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		Intent intent = new Intent(this, IntroActivity.class);
 		startActivity(intent);
+		// Disable activity end transition
+		overridePendingTransition(0, 0);
 	}
 
 // -------------------------------------------------------------------------------------------------
@@ -766,7 +777,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		BaseEvent event;
 		if (!mServiceManager.getMapItemsManager().isRouteDisplayed()) {
 			event = new DrawRouteEvent();
-		} else {
+		}
+		else {
 			event = new RemoveRouteEvent();
 		}
 		mServiceManager.getEventManager().triggerEvent(event);
