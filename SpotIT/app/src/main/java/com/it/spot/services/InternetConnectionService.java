@@ -11,12 +11,16 @@ import android.view.KeyEvent;
 import com.it.spot.R;
 import com.it.spot.common.Constants;
 import com.it.spot.threading.Event;
-import com.it.spot.threading.TaskScheduler;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Bogdan on 27/04/2016.
@@ -30,7 +34,7 @@ public class InternetConnectionService {
 
 	private Activity runningActivity;
 
-	private TaskScheduler taskScheduler;
+	private ScheduledExecutorService timer;
 
 	private AlertDialog mAlertDialog;
 
@@ -39,13 +43,13 @@ public class InternetConnectionService {
 
 	private String mInternetCheckAddress;
 
+	private final Object syncObject = new Object();
+
 	public InternetConnectionService(Activity activity) {
 
 		runningActivity = activity;
 
 		listeners = new ArrayList<>();
-
-		taskScheduler = new TaskScheduler();
 
 		dialogOpen = false;
 
@@ -71,33 +75,47 @@ public class InternetConnectionService {
 
 	public void startConnectionCheckLoop() {
 
-		taskScheduler.start(new Runnable() {
-			@Override
-			public void run() {
+		synchronized (syncObject) {
 
-				boolean result = hasInternet();
+			if (timer != null) {
+				timer.shutdown();
+			}
 
-				notifyListeners(result);
+			timer = Executors.newSingleThreadScheduledExecutor();
+			timer.scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
 
-				if (!result) {
-					openDialog();
-					taskScheduler.setInterval(INTERVAL_FAST);
-					return;
-				}
+					boolean result = hasInternet();
 
-				synchronized (dialogOpenSync) {
-					if (dialogOpen) {
-						closeDialog();
-						taskScheduler.setInterval(INTERVAL_NORMAL);
+					notifyListeners(result);
+
+					if (!result) {
+						openDialog();
+//					taskScheduler.setInterval(INTERVAL_FAST);
+						return;
+					}
+
+					synchronized (dialogOpenSync) {
+						if (dialogOpen) {
+							closeDialog();
+//						taskScheduler.setInterval(INTERVAL_NORMAL);
+						}
 					}
 				}
-			}
-		}, INTERVAL_NORMAL);
+			}, 0, INTERVAL_NORMAL, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	public void stopConnectionCheckLoop() {
 
-		taskScheduler.stop();
+		synchronized (syncObject) {
+
+			if (timer != null) {
+				timer.shutdown();
+				timer = null;
+			}
+		}
 	}
 
 	public boolean hasInternet() {
@@ -208,14 +226,26 @@ public class InternetConnectionService {
 
 	private void openDialog() {
 
-		synchronized (dialogOpenSync) {
-			mAlertDialog.show();
-			dialogOpen = true;
-		}
+		runningActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+
+				synchronized (dialogOpenSync) {
+					mAlertDialog.show();
+					dialogOpen = true;
+				}
+			}
+		});
 	}
 
 	private void closeDialog() {
 
-		mAlertDialog.dismiss();
+		runningActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+
+				mAlertDialog.dismiss();
+			}
+		});
 	}
 }
