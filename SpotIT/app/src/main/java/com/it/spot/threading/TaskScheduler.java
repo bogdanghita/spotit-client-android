@@ -58,6 +58,7 @@ public class TaskScheduler {
 
 			mThread = new SchedulerThread(task, interval);
 
+			// Blocking until handler is ready
 			mThread.start();
 		}
 	}

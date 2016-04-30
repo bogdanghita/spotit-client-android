@@ -9,9 +9,29 @@ import com.it.spot.common.Constants;
 
 public class LooperThread extends Thread {
 
-	public Handler handler;
+	protected Handler handler;
+
+	private Event mStartEvent;
 
 	protected final Object syncObj = new Object();
+
+	public LooperThread() {
+
+		mStartEvent = new Event();
+	}
+
+	@Override
+	public void start() {
+		super.start();
+
+		try {
+			mStartEvent.doWait();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			Log.d(Constants.APP + Constants.TAG_TIMER, "Interrupted while waiting for thread to start.");
+		}
+	}
 
 	@Override
 	public void run() {
@@ -25,6 +45,8 @@ public class LooperThread extends Thread {
 			Looper.prepare();
 
 			handler = new Handler();
+
+			mStartEvent.set();
 		}
 
 		Looper.loop();
