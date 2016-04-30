@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.it.spot.common.Constants;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -33,10 +35,9 @@ public class SchedulerHandler extends Handler {
 		if (msg.what == MSG_SCHEDULE) {
 
 			this.sendMessageDelayed(this.obtainMessage(MSG_SCHEDULE), mInterval.longValue());
-			Log.d(TaskScheduler.TAG_TIMER, "Sent with delay: " + mInterval);
+			Log.d(Constants.TAG_TIMER, "Sent with delay: " + mInterval);
 
 			mThread.handler.post(mRunnable);
-
 		}
 		else {
 			super.handleMessage(msg);

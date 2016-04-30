@@ -11,6 +11,8 @@ public class LooperThread extends Thread {
 
 	public Handler handler;
 
+	protected final Object syncObj = new Object();
+
 	@Override
 	public void run() {
 
@@ -18,9 +20,12 @@ public class LooperThread extends Thread {
 //		android.os.Process.setThreadPriority(MAX_PRIORITY);
 //		this.setPriority(MAX_PRIORITY);
 
-		Looper.prepare();
+		synchronized (syncObj) {
 
-		handler = new Handler();
+			Looper.prepare();
+
+			handler = new Handler();
+		}
 
 		Looper.loop();
 	}
@@ -30,8 +35,11 @@ public class LooperThread extends Thread {
 	 */
 	public void quit() {
 
-		handler.removeCallbacksAndMessages(null);
+		synchronized (syncObj) {
 
-		handler.getLooper().quit();
+			handler.removeCallbacksAndMessages(null);
+
+			handler.getLooper().quit();
+		}
 	}
 }
