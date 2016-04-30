@@ -94,6 +94,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	private DialogReveal mReportParkingStateDialog;
 
+	private boolean centeredCamera = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -201,8 +203,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (markerData == null || markerData.markerType != MapItemsService.MarkerType.DESTINATION) {
 
 			super.onBackPressed();
-		}
-		else {
+		} else {
 
 			mServiceManager.getEventManager().triggerEvent(new RemoveMarkerEvent());
 		}
@@ -216,6 +217,8 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
 			@Override
 			public void onCameraChange(CameraPosition position) {
+				centeredCamera = false;
+
 				cameraBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
 
 				Log.d(Constants.APP + Constants.CAMERA_CHANGE, cameraBounds.getCenter() + " - " + cameraBounds.southwest + ", " + cameraBounds.northeast);
@@ -346,18 +349,15 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (mResolvingError) {
 			// Already attempting to resolve an error.
 			return;
-		}
-		else if (connectionResult.hasResolution()) {
+		} else if (connectionResult.hasResolution()) {
 			try {
 				mResolvingError = true;
 				connectionResult.startResolutionForResult(this, Constants.REQUEST_RESOLVE_ERROR);
-			}
-			catch (IntentSender.SendIntentException e) {
+			} catch (IntentSender.SendIntentException e) {
 				// There was an error with the resolution intent. Try again.
 				mMapsGoogleApiClient.connect();
 			}
-		}
-		else {
+		} else {
 			// Show dialog using GoogleApiAvailability.getErrorDialog()
 			showErrorDialog(connectionResult.getErrorCode());
 			mResolvingError = true;
@@ -382,6 +382,10 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		mServiceManager.getLocationManager().setLastLocation(
 				new BasicLocation(location.getLatitude(), location.getLongitude()));
+
+		if (!firstTimeLocation && centeredCamera){
+			centerCameraOnLastLocation();
+		}
 
 		if (firstTimeLocation) {
 			centerCameraOnLastLocation();
@@ -491,8 +495,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 		if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
 			mDrawerLayout.closeDrawer(Gravity.LEFT);
-		}
-		else {
+		} else {
 			mDrawerLayout.openDrawer(Gravity.LEFT);
 		}
 	}
@@ -504,8 +507,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (hasSavedSpot) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
-		}
-		else {
+		} else {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -519,8 +521,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		if (buttonLeaveSpot.getVisibility() == View.GONE) {
 			buttonLeaveSpot.setVisibility(View.VISIBLE);
 			buttonSaveSpot.setVisibility(View.GONE);
-		}
-		else {
+		} else {
 			buttonLeaveSpot.setVisibility(View.GONE);
 			buttonSaveSpot.setVisibility(View.VISIBLE);
 		}
@@ -756,7 +757,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 	}
 
 	public void buttonCenterOnLocation(View v) {
-
+		centeredCamera = true;
 		centerCameraOnLastLocation();
 	}
 
@@ -765,8 +766,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 		BaseEvent event;
 		if (!mServiceManager.getMapItemsManager().isRouteDisplayed()) {
 			event = new DrawRouteEvent();
-		}
-		else {
+		} else {
 			event = new RemoveRouteEvent();
 		}
 		mServiceManager.getEventManager().triggerEvent(event);
