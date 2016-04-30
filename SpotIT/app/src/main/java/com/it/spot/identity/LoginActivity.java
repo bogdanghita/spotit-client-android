@@ -21,13 +21,15 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.it.spot.R;
 import com.it.spot.common.Constants;
-import com.it.spot.common.ServiceManager;
+import com.it.spot.intro.IntroActivity;
 import com.it.spot.maps.main.MapsActivity;
+import com.it.spot.services.FileService;
 import com.it.spot.services.InternetConnectionCallbackListener;
 import com.it.spot.services.InternetConnectionService;
-import com.it.spot.threading.Event;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class LoginActivity extends IdentityActivity implements InternetConnectionCallbackListener {
@@ -71,7 +73,7 @@ public class LoginActivity extends IdentityActivity implements InternetConnectio
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		mInternetConnectionService.startConnectionCheckLoop();
 	}
 
@@ -205,7 +207,7 @@ public class LoginActivity extends IdentityActivity implements InternetConnectio
 
 			String stringPhoto = photo != null ? photo.toString() : "";
 			UserInfo userInfo = new UserInfo(name, email, stringPhoto);
-			ServiceManager.getInstance().getIdentityManager().setUserInfo(userInfo);
+			mServiceManager.getIdentityManager().setUserInfo(userInfo);
 
 			Log.d(Constants.APP + Constants.SIGN_IN, "handleSignInResult(): " + email + ", " + name + ", " + photo);
 			Log.d(Constants.APP + Constants.SIGN_IN, "handleSignInResult(): " + "id: " + id);
@@ -213,7 +215,7 @@ public class LoginActivity extends IdentityActivity implements InternetConnectio
 			Log.d(Constants.APP + Constants.SIGN_IN, "handleSignInResult(): " + "serverAuthCode: " + serverAuthCode);
 
 			// Login successful. Starting main activity
-			startMainActivity();
+			proceedToApp(userInfo);
 		}
 		else {
 
@@ -239,6 +241,34 @@ public class LoginActivity extends IdentityActivity implements InternetConnectio
 		}
 	}
 
+	private void proceedToApp(UserInfo userInfo) {
+
+		if (userInfo == null || userInfo.getEmail() == null) {
+			return;
+		}
+
+		List<String> userList = new FileService(this).readUserListFile(Constants.USER_LIST_FILE);
+
+		if (userList == null) {
+			userList = new LinkedList<>();
+		}
+
+		handleFirstSignIn(userInfo.getEmail(), userList);
+	}
+
+	private void handleFirstSignIn(String email, List<String> userList) {
+
+		if (userList.contains(email)) {
+			startMainActivity();
+			return;
+		}
+
+		userList.add(email);
+		new FileService(this).writeUserListFile(userList, Constants.USER_LIST_FILE);
+
+		startIntroActivity();
+	}
+
 	private void startMainActivity() {
 
 		Intent intent = new Intent(this, MapsActivity.class);
@@ -246,6 +276,12 @@ public class LoginActivity extends IdentityActivity implements InternetConnectio
 		startActivity(intent);
 		// Disable activity end transition
 		overridePendingTransition(0, 0);
+	}
+
+	private void startIntroActivity() {
+
+		Intent intent = new Intent(this, IntroActivity.class);
+		startActivity(intent);
 	}
 
 // -------------------------------------------------------------------------------------------------

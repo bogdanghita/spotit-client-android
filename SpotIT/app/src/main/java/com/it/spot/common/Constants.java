@@ -72,6 +72,8 @@ public class Constants {
 	public static final int HTTP_UNAUTHORIZED = 401;
 
 	public static final String SAVED_SPOT_FILE = "saved_spot.json";
+	public static final String USER_LIST_FILE = "user_list.json";
+
 	public static final String GOOGLE_MAPS_API = "http://maps.googleapis.com";
 
 	public final static String MODE_DRIVING = "driving";

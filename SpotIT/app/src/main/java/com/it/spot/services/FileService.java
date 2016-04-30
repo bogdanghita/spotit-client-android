@@ -13,6 +13,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Bogdan on 22/04/2016.
@@ -63,6 +66,52 @@ public class FileService {
 		catch (IOException e) {
 			e.printStackTrace();
 			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error reading saved spot from file: " + filename);
+		}
+
+		return result;
+	}
+
+	public void writeUserListFile(List<String> userList, String filename) {
+
+		try {
+			FileOutputStream fos = mContext.openFileOutput(filename, Context.MODE_PRIVATE);
+
+			Gson gson = new Gson();
+			String jsonString = gson.toJson(userList);
+
+			fos.write(jsonString.getBytes());
+
+			fos.close();
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error writing user list to file: " + filename);
+		}
+	}
+
+	public List<String> readUserListFile(String filename) {
+
+		List<String> result = null;
+
+		try {
+			FileInputStream fis = mContext.openFileInput(filename);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+			Gson gson = new Gson();
+			String[] userArray = gson.fromJson(reader, String[].class);
+
+			result = new ArrayList<>();
+			result.addAll(Arrays.asList(userArray));
+
+			reader.close();
+			fis.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Log.d(Constants.APP + Constants.SAVED_SPOT, "Error reading user list from file: " + filename);
 		}
 
 		return result;
