@@ -13,18 +13,27 @@ public class LooperThread extends Thread {
 
 	protected final Object syncObj = new Object();
 
+	protected boolean isRunning;
+
+	public LooperThread() {
+
+		isRunning = false;
+	}
+
 	@Override
 	public void run() {
 
-		// TODO: think if this is desired and if it affects something; read about mThread priority in Java
-//		android.os.Process.setThreadPriority(MAX_PRIORITY);
-//		this.setPriority(MAX_PRIORITY);
-
 		synchronized (syncObj) {
+
+			// TODO: think if this is desired and if it affects something; read about mThread priority in Java
+//		    android.os.Process.setThreadPriority(MAX_PRIORITY);
+//		    this.setPriority(MAX_PRIORITY);
 
 			Looper.prepare();
 
 			handler = new Handler();
+
+			isRunning = true;
 		}
 
 		Looper.loop();
@@ -36,6 +45,11 @@ public class LooperThread extends Thread {
 	public void quit() {
 
 		synchronized (syncObj) {
+
+			if (!isRunning) {
+				throw new IllegalThreadStateException();
+//				return;
+			}
 
 			handler.removeCallbacksAndMessages(null);
 
