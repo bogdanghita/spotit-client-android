@@ -2,10 +2,10 @@ package com.it.spot.threading;
 
 import android.util.Log;
 
+import com.it.spot.common.Constants;
+
 
 public class TaskScheduler {
-
-	public final static String TAG_TIMER = "TIMER";
 
 	private SchedulerThread mThread = null;
 
@@ -45,6 +45,9 @@ public class TaskScheduler {
 
 		synchronized (syncObj) {
 
+//			Thread.dumpStack();
+			Log.d(Constants.APP + Constants.LIFECYCLE + Constants.TAG_TIMER, TaskScheduler.class + " - start()");
+
 			if (mThread != null) {
 				throw new IllegalThreadStateException();
 			}
@@ -70,23 +73,26 @@ public class TaskScheduler {
 
 		synchronized (syncObj) {
 
+//			Thread.dumpStack();
+			Log.d(Constants.APP + Constants.LIFECYCLE + Constants.TAG_TIMER, TaskScheduler.class + " - stop()");
+
 			if (mThread == null) {
 				throw new IllegalThreadStateException();
 			}
 
 			mThread.quit();
 
-			Log.d(TaskScheduler.TAG_TIMER, "mThread quit. Waiting for mThread to join.");
+			Log.d(Constants.APP + Constants.TAG_TIMER, "mThread quit. Waiting for mThread to join.");
 
 			try {
 				mThread.join();
 			}
 			catch (InterruptedException e) {
 				e.printStackTrace();
-				Log.d(TaskScheduler.TAG_TIMER, e.getClass().getName() + " | " + "exception on join()");
+				Log.d(Constants.APP + Constants.TAG_TIMER, e.getClass().getName() + " | " + "exception on join()");
 			}
 
-			Log.d(TaskScheduler.TAG_TIMER, "mThread finished.");
+			Log.d(Constants.APP + Constants.TAG_TIMER, "mThread finished.");
 
 			mThread = null;
 		}
