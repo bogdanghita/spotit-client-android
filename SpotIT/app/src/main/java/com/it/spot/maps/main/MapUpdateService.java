@@ -8,7 +8,12 @@ import com.it.spot.common.Constants;
 import com.it.spot.common.Utils;
 import com.it.spot.maps.location.BasicLocation;
 import com.it.spot.services.ServerAPI;
-import com.it.spot.threading.TaskScheduler;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Bogdan on 20/03/2016.
@@ -17,13 +22,13 @@ public class MapUpdateService {
 
 	private LatLngBounds cameraBounds = null;
 
-	private TaskScheduler taskScheduler;
+	private ScheduledExecutorService timer;
 
 	private ServerAPI serverAPI;
 
-	public MapUpdateService(MapUpdateCallbackClient uiClient) {
+	private final Object syncObject = new Object();
 
-		taskScheduler = new TaskScheduler();
+	public MapUpdateService(MapUpdateCallbackClient uiClient) {
 
 		serverAPI = new ServerAPI(uiClient);
 	}
@@ -35,19 +40,32 @@ public class MapUpdateService {
 
 	public void startMapStatusUpdateLoop() {
 
-		taskScheduler.start(new Runnable() {
-			@Override
-			public void run() {
+		synchronized (syncObject) {
 
-				// Requesting map status update
-				requestMapStatusUpdate();
+			if (timer != null) {
+				timer.shutdown();
 			}
-		}, Constants.MAP_UPDATE_INTERVAL);
+
+			timer = Executors.newSingleThreadScheduledExecutor();
+			timer.scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					// Requesting map status update
+					requestMapStatusUpdate();
+				}
+			}, 0, Constants.MAP_UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	public void stopMapStatusUpdateLoop() {
 
-		taskScheduler.stop();
+		synchronized (syncObject) {
+
+			if (timer != null) {
+				timer.shutdown();
+				timer = null;
+			}
+		}
 	}
 
 	public void requestMapStatusUpdate() {
