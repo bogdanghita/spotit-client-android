@@ -15,10 +15,14 @@ public class SchedulerThread extends LooperThread {
 	private Runnable mRunnable;
 	private AtomicLong mInterval = new AtomicLong();
 
+	private Event mStartEvent;
+
 	public SchedulerThread(Runnable runnable, long interval) {
 
 		this.mRunnable = runnable;
 		this.mInterval.set(interval);
+
+		mStartEvent = new Event();
 	}
 
 	public void setInterval(long interval) {
@@ -34,6 +38,19 @@ public class SchedulerThread extends LooperThread {
 	}
 
 	@Override
+	public void start() {
+		super.start();
+
+		try {
+			mStartEvent.doWait();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+			Log.d(Constants.APP + Constants.TAG_TIMER, "Interrupted while waiting for thread to start.");
+		}
+	}
+
+	@Override
 	public void run() {
 
 		synchronized (syncObj) {
@@ -41,14 +58,14 @@ public class SchedulerThread extends LooperThread {
 			Looper.prepare();
 
 			mThread = new LooperThread();
+			// Blocking until handler is ready
 			mThread.start();
 
 			handler = new SchedulerHandler(mThread, mRunnable, mInterval.longValue());
 
-			// Waiting until the handler of mThread is created
-			while (mThread.handler == null) ;
-
 			handler.sendMessage(handler.obtainMessage(SchedulerHandler.MSG_SCHEDULE));
+
+			mStartEvent.set();
 		}
 
 		Looper.loop();
