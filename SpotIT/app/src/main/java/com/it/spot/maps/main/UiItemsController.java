@@ -41,7 +41,7 @@ public class UiItemsController {
 			@Override
 			public void run() {
 
-				LinearLayout bottom_layout = (LinearLayout) mMapItemsProvider.getView(R.id.location_info_bar);
+				View bottom_layout = mMapItemsProvider.getView(R.id.location_info_bar);
 				View directions_fab = mMapItemsProvider.getView(R.id.directions_fab);
 
 				bottom_layout.setTranslationY(bottom_layout.getHeight());
@@ -110,7 +110,7 @@ public class UiItemsController {
 				// Clear items first (useful when location info bar was not closed)
 				clearLocationInfoBarItems();
 
-				LinearLayout bottom_layout = (LinearLayout) mMapItemsProvider.getView(R.id.location_info_bar);
+				View bottom_layout = mMapItemsProvider.getView(R.id.location_info_bar);
 				View directions_fab = mMapItemsProvider.getView(R.id.directions_fab);
 
 				bottom_layout.setTranslationY(0);

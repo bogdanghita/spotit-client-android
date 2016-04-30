@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
 	android:id="@+id/location_info_bar"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
@@ -11,50 +11,63 @@
 	android:orientation="vertical"
 	android:translationY="90dp">
 
-	<TextView
-		android:id="@+id/location_title"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingLeft="15dp"
-		android:paddingTop="15dp"
-		android:text="@string/location_info_bar_title_saved_spot"
-		android:textSize="20sp"/>
-
 	<RelativeLayout
+		android:id="@+id/loading_address"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:paddingLeft="15dp"
-		android:paddingTop="10dp">
+		android:visibility="gone">
 
-		<TextView
-			android:id="@+id/location_address"
+		<ProgressBar
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:paddingRight="5dp"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/destination_time"
-			android:singleLine="true"/>
-
-        <ProgressBar
-            android:id="@+id/loading_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
-            android:visibility="gone"/>
-
-		<TextView
-			android:id="@+id/destination_time"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:paddingRight="5dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignBottom="@+id/location_address"
-			android:textColor="@color/colorPrimary"
-			android:textSize="15sp"
-			android:textStyle="bold"/>
+			android:layout_centerInParent="true"
+			android:indeterminate="true"/>
 
 	</RelativeLayout>
 
-</LinearLayout>
+	<LinearLayout
+		android:id="@+id/location_info_layout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical">
+
+		<TextView
+			android:id="@+id/location_title"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="15dp"
+			android:paddingTop="15dp"
+			android:text="@string/location_info_bar_title_saved_spot"
+			android:textSize="20sp"/>
+
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:paddingLeft="15dp"
+			android:paddingTop="10dp">
+
+			<TextView
+				android:id="@+id/location_address"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+				android:layout_toLeftOf="@+id/destination_time"
+				android:paddingRight="5dp"
+				android:singleLine="true"/>
+
+			<TextView
+				android:id="@+id/destination_time"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignBottom="@+id/location_address"
+				android:layout_alignParentRight="true"
+				android:paddingRight="5dp"
+				android:textColor="@color/colorPrimary"
+				android:textSize="15sp"
+				android:textStyle="bold"/>
+
+		</RelativeLayout>
+
+	</LinearLayout>
+
+</RelativeLayout>

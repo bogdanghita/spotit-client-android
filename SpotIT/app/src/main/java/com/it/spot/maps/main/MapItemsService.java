@@ -67,8 +67,7 @@ public class MapItemsService extends MapEventListener implements StateMonitorLis
 					@Override
 					public void run() {
 						// Loading destination info animation.
-						mMapItemsProvider.getView(R.id.location_address).setVisibility(View.GONE);
-						mMapItemsProvider.getView(R.id.destination_time).setVisibility(View.GONE);
+						mMapItemsProvider.getView(R.id.location_info_layout).setVisibility(View.GONE);
 						mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.VISIBLE);
 					}
 				}
@@ -82,8 +81,7 @@ public class MapItemsService extends MapEventListener implements StateMonitorLis
 					public void run() {
 						// Stop loading destination info animation.
 						mMapItemsProvider.getView(R.id.loading_address).setVisibility(View.GONE);
-						mMapItemsProvider.getView(R.id.destination_time).setVisibility(View.VISIBLE);
-						mMapItemsProvider.getView(R.id.location_address).setVisibility(View.VISIBLE);
+						mMapItemsProvider.getView(R.id.location_info_layout).setVisibility(View.VISIBLE);
 					}
 				}
 		);
