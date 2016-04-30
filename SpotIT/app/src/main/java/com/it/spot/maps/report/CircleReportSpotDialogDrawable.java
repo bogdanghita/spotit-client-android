@@ -69,13 +69,14 @@ public class CircleReportSpotDialogDrawable extends Drawable {
 //        int r = (int) (bounds.bottom * 0.9f);
 //        canvas.drawCircle(x, bounds.bottom, r, paint);
         int x = (int) (bounds.right * 0.9f);
-        int r = (int) (bounds.bottom * 1.4f);
+        int r = (int) (bounds.bottom * 1.4f * 2);
         canvas.drawCircle(x, bounds.bottom * 1.6f, r, paint);
     }
 
     @Override
     public void setAlpha(int alpha) {
         // Has no effect
+        paint.setAlpha(alpha);
     }
 
     @Override

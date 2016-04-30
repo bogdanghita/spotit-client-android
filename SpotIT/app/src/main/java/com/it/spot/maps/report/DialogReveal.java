@@ -8,13 +8,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.LinearLayout;
@@ -45,6 +48,7 @@ public class DialogReveal extends Dialog {
 		// Round dialog ---->
 		LinearLayout ll = (LinearLayout) findViewById(R.id.dialog_data);
 		Drawable d = new CircleReportSpotDialogDrawable(Color.parseColor("#3b3b58"));
+		d.setAlpha(230);
 		//TODO pick between deprecated and api 16
 		if (Build.VERSION.SDK_INT >= 16) {
 			ll.setBackground(d);

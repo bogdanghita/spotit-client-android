@@ -725,6 +725,7 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 
 	public void buttonOpenParkingStateOptions(View v) {
 
+//		mReportParkingStateDialog = new DialogReveal(this);
 		mReportParkingStateDialog = new DialogReveal(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 		mReportParkingStateDialog.show();
 	}
