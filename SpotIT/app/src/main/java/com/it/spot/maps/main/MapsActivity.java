@@ -1,22 +1,37 @@
 package com.it.spot.maps.main;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.Interpolator;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -722,19 +737,137 @@ public class MapsActivity extends IdentityActivity implements OnMapReadyCallback
 // -------------------------------------------------------------------------------------------------
 // ON SCREEN BUTTONS
 // -------------------------------------------------------------------------------------------------
-
+	int saveX;
+	int saveY;
+	Animator anim;
 	public void buttonOpenParkingStateOptions(View v) {
+		final FloatingActionButton mFab = (FloatingActionButton) findViewById(R.id.fab_report_state);
+		final DisplayMetrics metrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		final int x = getRelativeLeft(mFab);
+		final int y = getRelativeTop(mFab);
+		saveX = -x/2;
+		//mFab.setTranslationX(-x/2);
 
-		mReportParkingStateDialog = new DialogReveal(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-		mReportParkingStateDialog.show();
+		ObjectAnimator objectAnimatorX
+				= ObjectAnimator.ofFloat(mFab, "translationX", 0f, -x/2);
+		ObjectAnimator objectAnimatorY
+				= ObjectAnimator.ofFloat(mFab, "translationY", -70, -50);
+
+		objectAnimatorX.setDuration(500);
+		objectAnimatorY.setDuration(1000);
+
+		objectAnimatorX.start();
+		//objectAnimatorY.start();
+
+		objectAnimatorX.addListener(new Animator.AnimatorListener() {
+
+			@Override
+			public void onAnimationStart(Animator animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+
+				int k = (metrics.heightPixels - y) / 2;
+				//mFab.setTranslationY(-k);
+				saveY = -k;
+
+				int cx = x/2 + mFab.getWidth()/2;
+				int cy = metrics.heightPixels - k - mFab.getHeight()/2;
+
+
+				LinearLayout mRevealView = (LinearLayout) findViewById(R.id.report_spot_reveal);
+				int radius = Math.max(mRevealView.getWidth(), mRevealView.getHeight());
+				if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					Animator animator =
+							ViewAnimationUtils.createCircularReveal(mRevealView, cx, cy, 0, radius);
+					anim = ViewAnimationUtils.createCircularReveal(mRevealView, cx, cy, 0, radius);
+					animator.setInterpolator(new AccelerateDecelerateInterpolator());
+					animator.setDuration(600);
+					mRevealView.setVisibility(View.VISIBLE);
+					animator.start();
+				}
+				else{
+					mRevealView.setVisibility(View.VISIBLE);
+				}
+			}
+
+			@Override
+			public void onAnimationCancel(Animator animation) {
+
+			}
+
+			@Override
+			public void onAnimationRepeat(Animator animation) {
+
+			}
+
+		});
+
+//		mFab.setTranslationY();
+		//mReportParkingStateDialog = new DialogReveal(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+		//mReportParkingStateDialog.show();
+	}
+
+
+	private int getRelativeLeft(View myView) {
+		if (myView.getParent() == myView.getRootView())
+			return myView.getLeft();
+		else
+			return myView.getLeft() + getRelativeLeft((View) myView.getParent());
+	}
+
+	private int getRelativeTop(View myView) {
+		if (myView.getParent() == myView.getRootView())
+			return myView.getTop();
+		else
+			return myView.getTop() + getRelativeTop((View) myView.getParent());
+	}
+	private void exitReveal(){
+		anim.setInterpolator(new ReverseInterpolator());
+		final LinearLayout mRevealView = (LinearLayout) findViewById(R.id.report_spot_reveal);
+		int radius = Math.max(mRevealView.getWidth(), mRevealView.getHeight());
+		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			anim.addListener(new AnimatorListenerAdapter() {
+
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					mRevealView.setVisibility(View.INVISIBLE);
+					FloatingActionButton mFab = (FloatingActionButton) findViewById(R.id.fab_report_state);
+					//mFab.setTranslationX(0);
+					final DisplayMetrics metrics = new DisplayMetrics();
+					getWindowManager().getDefaultDisplay().getMetrics(metrics);
+					ObjectAnimator objectAnimatorX
+							= ObjectAnimator.ofFloat(mFab, "translationX", -metrics.widthPixels/2 + mFab.getWidth()/2, 0f);
+					objectAnimatorX.setDuration(500);
+					objectAnimatorX.start();
+					//mFab.setTranslationY(saveY - mFab.getHeight());
+					//mFab.setTranslationY(0);
+				}
+			});
+			anim.start();
+
+		}
+		else{
+			mRevealView.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	public class ReverseInterpolator implements Interpolator {
+		@Override
+		public float getInterpolation(float paramFloat) {
+			return Math.abs(paramFloat -1f);
+		}
 	}
 
 	public void buttonReportParkingState(View v) {
 		int buttonId = v.getId();
 
 		// Dismiss dialog
-		mReportParkingStateDialog.dismiss();
-
+		//mReportParkingStateDialog.dismiss();
+		exitReveal();
 		BasicLocation lastLocation = mServiceManager.getLocationManager().getLastLocation();
 		if (lastLocation == null) {
 			return;
