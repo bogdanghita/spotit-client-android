@@ -116,6 +116,8 @@ public class InternetConnectionService {
 				timer = null;
 			}
 		}
+
+		closeDialog();
 	}
 
 	public boolean hasInternet() {
