@@ -43,15 +43,15 @@ public class DialogReveal extends Dialog {
 		this.setOnShowListener(showListener);
 
 		// Round dialog ---->
-		LinearLayout ll = (LinearLayout) findViewById(R.id.dialog_data);
-		Drawable d = new CircleReportSpotDialogDrawable(Color.parseColor("#3b3b58"));
-		//TODO pick between deprecated and api 16
-		if (Build.VERSION.SDK_INT >= 16) {
-			ll.setBackground(d);
-		}
-		else {
-			ll.setBackgroundDrawable(d);
-		}
+//		LinearLayout ll = (LinearLayout) findViewById(R.id.dialog_data);
+//		Drawable d = new CircleReportSpotDialogDrawable(Color.parseColor("#3b3b58"));
+//		//TODO pick between deprecated and api 16
+//		if (Build.VERSION.SDK_INT >= 16) {
+//			ll.setBackground(d);
+//		}
+//		else {
+//			ll.setBackgroundDrawable(d);
+//		}
 		// <---- Round dialog
 	}
 
