@@ -11,6 +11,13 @@ public class TaskScheduler {
 
 	private final Object syncObj = new Object();
 
+	private Event schedulerStartedEvent;
+
+	public TaskScheduler() {
+
+		schedulerStartedEvent = new Event();
+	}
+
 	public void setInterval(long interval) {
 
 		synchronized (syncObj) {
@@ -56,9 +63,18 @@ public class TaskScheduler {
 				throw new IllegalArgumentException();
 			}
 
-			mThread = new SchedulerThread(task, interval);
+			mThread = new SchedulerThread(task, interval, schedulerStartedEvent);
 
 			mThread.start();
+
+			// Wait for scheduler to start
+			try {
+				schedulerStartedEvent.doWait();
+				Log.d(Constants.APP + Constants.TAG_TIMER, "Interrupted while waiting for scheduler to start.");
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -15,10 +15,13 @@ public class SchedulerThread extends LooperThread {
 	private Runnable mRunnable;
 	private AtomicLong mInterval = new AtomicLong();
 
-	public SchedulerThread(Runnable runnable, long interval) {
+	private Event schedulerStartedEvent;
+
+	public SchedulerThread(Runnable runnable, long interval, Event schedulerStartedEvent) {
 
 		this.mRunnable = runnable;
 		this.mInterval.set(interval);
+		this.schedulerStartedEvent = schedulerStartedEvent;
 	}
 
 	public void setInterval(long interval) {
@@ -49,6 +52,10 @@ public class SchedulerThread extends LooperThread {
 			while (mThread.handler == null) ;
 
 			handler.sendMessage(handler.obtainMessage(SchedulerHandler.MSG_SCHEDULE));
+
+			isRunning = true;
+
+			schedulerStartedEvent.set();
 		}
 
 		Looper.loop();
@@ -58,6 +65,11 @@ public class SchedulerThread extends LooperThread {
 	public void quit() {
 
 		synchronized (syncObj) {
+
+			if (!isRunning) {
+				throw new IllegalThreadStateException();
+//				return;
+			}
 
 			/**
 			 * NOTE: synchronized locks are reentrant
